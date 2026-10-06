@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Man hinh co cutout (lo camera/tai tho): ve noi dung TRAN vao vung cutout thay vi de dai den (letterbox). -->
+    <style name="Theme.BtmhKiosk" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorPrimaryDark">@color/page_bg</item>
+        <item name="colorAccent">@color/gold</item>
+        <item name="android:windowBackground">#140305</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

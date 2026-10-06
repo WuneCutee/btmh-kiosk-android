@@ -1,0 +1,28 @@
+*.iml
+.gradle
+local.properties
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+
+# Android Studio / IntelliJ
+.idea/*
+!.idea/codeStyles
+!.idea/runConfigurations.xml
+
+# Per-module build output
+app/build/
+app/release/
+app/debug/
+
+# Ad-hoc debug screenshots dropped at repo root during manual QA (not project source)
+/*_check.png
+/*_check2.png
+/*_zoom.png
+/*_zoom2.png
+/*_v2.png
+/after_tap.png

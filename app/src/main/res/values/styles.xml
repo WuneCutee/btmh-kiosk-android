@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.BtmhKiosk" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorPrimaryDark">@color/page_bg</item>
+        <item name="colorAccent">@color/gold</item>
+        <item name="android:windowBackground">#140305</item>
+    </style>
+</resources>

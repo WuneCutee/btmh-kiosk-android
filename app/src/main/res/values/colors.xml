@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gold">#D4AF37</color>
+    <color name="gold_border">#C5A059</color>
+    <color name="card_bg">#1E080C</color>
+    <color name="page_bg">#100406</color>
+    <color name="muted_text">#C8BAA8</color>
+    <color name="error_color">#F87171</color>
+    <color name="white">#FFFFFF</color>
+    <color name="button_text">#240508</color>
+</resources>
