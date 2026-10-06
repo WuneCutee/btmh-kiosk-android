@@ -7,11 +7,27 @@ nhập khách, đặt mua và thanh toán (nút xác nhận luôn là "Coming so
 Java thuần, giao diện dựng bằng code (không XML layout, không Compose), **1 Activity duy nhất**, `minSdk 26`,
 `targetSdk 34`. Giao diện dựng lại từ bản WinForms cũ (`KioskApp/BtmhKiosk`) rồi mở rộng theo spec.
 
+## Clone về máy khác
+
+`local.properties` (đường dẫn Android SDK trên máy) **không** nằm trong repo (bị `.gitignore`, vì mỗi máy một
+đường dẫn khác nhau) — máy mới phải tự tạo lại file này trước khi build:
+
+```powershell
+git clone https://github.com/WuneCutee/btmh-kiosk-android.git
+cd btmh-kiosk-android
+# Tao local.properties tro dung thu muc da cai Android SDK tren may nay (vi du):
+"sdk.dir=C:\\Android" | Out-File -Encoding ascii local.properties
+```
+
+Cần cài sẵn trên máy: **JDK 17+** (project test với JDK 21) và **Android SDK** (qua Android Studio hoặc
+`sdkmanager` dòng lệnh) — platform `android-34` + build-tools tương ứng. Android Studio cũng tự nhận project khi
+mở thư mục này (tự sinh `local.properties` nếu chưa có).
+
 ## Build & chạy
 
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
-$env:ANDROID_HOME = "C:\Android"
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"   # sua theo duong dan JDK tren may ban
+$env:ANDROID_HOME = "C:\Android"                                               # sua theo duong dan SDK tren may ban
 cd C:\Users\Admin\BTMH\KioskApp\BtmhKioskAndroid
 .\gradlew.bat assembleDebug        # app\build\outputs\apk\debug\app-debug.apk
 .\gradlew.bat assembleRelease      # app-release-unsigned.apk (cần ký trước khi phát hành)
