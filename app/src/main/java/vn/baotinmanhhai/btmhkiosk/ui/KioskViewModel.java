@@ -1207,6 +1207,52 @@ public class KioskViewModel extends AndroidViewModel {
      * tu man Thong tin don hang: mo man xac nhan voi TOAN BO gio hang hien tai (co the nhieu san pham — spec "Danh sach
      * san pham"/"Thong tin don hang" trong Kiosk.xlsx) va tai tinh/thanh, cua hang, han muc.
      */
+    /**
+     * CHI DUNG DE PHAT TRIEN GIAO DIEN: nhay thang tu man Kich hoat vao man Thong tin don hang voi
+     * gio hang + tinh/cua hang gia, khong goi API, khong can kich hoat/them san pham truoc. Goi tu
+     * {@link SetupView.Callbacks#onDebugPreviewOrderConfirm()} (chi hien o ban DEBUG). Sua xong
+     * OrderConfirmView thi build lai + mo app la vao thang man nay de xem, khong phai bam qua cac man khac.
+     */
+    public void debugPreviewOrderConfirm() {
+        updateState(s -> {
+            Models.ProductDto p1 = new Models.ProductDto();
+            p1.id = "debug-1";
+            p1.name = "Dây chuyền vàng 10K PYD2V10KDH-511010-015 (demo)";
+            p1.code = "PYD2V10KDH-511010-015";
+            p1.price = 5_732_000;
+            p1.quantity = 1;
+            p1.remainingQuantity = 99;
+
+            Models.ProductDto p2 = new Models.ProductDto();
+            p2.id = "debug-2";
+            p2.name = "Charm bạc BACHB92KD0-508005-1276 (demo)";
+            p2.code = "BACHB92KD0-508005-1276";
+            p2.price = 604_000;
+            p2.quantity = 1;
+            p2.remainingQuantity = 99;
+
+            s.cart.clear();
+            s.cart.add(new Models.CartItem(p1, 1));
+            s.cart.add(new Models.CartItem(p2, 2));
+
+            Models.ProvinceDto hn = new Models.ProvinceDto();
+            hn.id = 1;
+            hn.code = "HN";
+            hn.name = "Hà Nội";
+            hn.storeCount = 1;
+            s.provinces = new ArrayList<>();
+            s.provinces.add(hn);
+            s.selectedProvinceId = 1L;
+            s.stores = new ArrayList<>();
+            s.selectedStoreId = null;
+            s.limitQuantity = null;
+
+            s.screen = AppScreen.ORDER;
+            s.orderLoading = false;
+            s.orderError = null;
+        });
+    }
+
     public void openOrderConfirm() {
         updateState(s -> {
             if (s.cart.isEmpty()) {

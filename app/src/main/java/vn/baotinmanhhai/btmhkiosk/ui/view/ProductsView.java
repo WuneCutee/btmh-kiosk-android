@@ -34,10 +34,10 @@ import vn.baotinmanhhai.btmhkiosk.ui.KioskViewModel;
 import vn.baotinmanhhai.btmhkiosk.ui.Ui;
 
 /**
- * Man "San pham tich luy" (spec II.1.7), nam trong khung {@link ShellView} (tieu de + Quay lai do thanh dau cua khung
- * lo). Phan dau (dinh) nam TREN luoi va hoi trong suot: banner anh (chi khi co, doi moi 5s) -> o tim kiem (>= 2 ky tu,
- * debounce 300ms) -> MOT hang chip danh muc cuon ngang. Luoi san pham (the trang) co phan trang chay phia duoi phan do
- * (phan duy nhat cuon duoc); luc tai hien skeleton mau be co vet sang.
+ * Man "San pham tich luy" (spec II.1.7), nam trong khung {@link ShellView}.
+ * Thanh tong hop day man duoc thiet ke noi (floating) tren nen trang:
+ * - Card thong tin bo tron ben trai: So luong, So chi, Thanh tien.
+ * - Nut "TIEP TUC" ben phai doc lap mau do ruou.
  */
 public class ProductsView extends FrameLayout implements Ui.InsetAware {
 
@@ -46,23 +46,23 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
 
         void onProductClick(Models.ProductDto product);
 
-        /** Goi sau 300ms khong go them; VM tu bo qua chuoi < 2 ky tu (tra ve danh sach thuong). */
+        /** Goi sau 300ms khong go them; VM tu bo qua chuoi < 2 ky tu. */
         void onSearch(String query);
 
         void onLoadMore();
 
-        /** Stepper [-/+] tren the luoi: them/bot 1 san pham khoi gio hang (khong qua man Chi tiet). */
+        /** Stepper [-/+] tren the luoi: them/bot 1 san pham khoi gio hang. */
         void onIncrement(Models.ProductDto product);
 
         void onDecrement(Models.ProductDto product);
 
-        /** Nut "TIEP TUC" tren thanh tong hop day man (khi gio hang co san pham): mo man Xac nhan don hang. */
+        /** Nut "TIEP TUC" tren thanh tong hop: mo man Xac nhan don hang. */
         void onContinue();
     }
 
     private static final int CHIP_HEIGHT = 60;
     private static final int CHIP_GAP = 10;
-    private static final int BANNER_HEIGHT = 120;
+    private static final int BANNER_HEIGHT = 210;
     private static final long DEBOUNCE_MS = 300;
 
     private final Callbacks callbacks;
@@ -83,8 +83,11 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
     private final LinearLayout skeleton;
     private final RecyclerView recycler;
     private final ProductAdapter adapter;
+
+    // Cum tong hop noi o day man
     private final LinearLayout summaryBar;
     private final TextView summaryQty;
+    private final TextView summaryUnits;
     private final TextView summaryValue;
     private final TextView continueButton;
 
@@ -117,7 +120,7 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         super(context);
         this.callbacks = callbacks;
 
-        // ---- Luoi san pham (day toan vung noi dung, padding tren = chieu cao phan dau) ----
+        // ---- Luoi san pham ----
         recycler = new RecyclerView(context);
         int half = Ui.px(ProductAdapter.SPACING / 2f);
         recycler.setPadding(half, half, half, half);
@@ -127,10 +130,12 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         gm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return adapter.isFooter(position) ? ProductAdapter.COLUMNS : 1; // dong cuoi chiem het chieu ngang
+                return adapter.isFooter(position) ? ProductAdapter.COLUMNS : 1;
             }
         });
         recycler.setLayoutManager(gm);
+        // The san pham: chon chieu cao sao cho dung 2 hang vua khit vung hien thi (khong tinh phan cuon)
+        recycler.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> fitTwoRows());
         adapter = new ProductAdapter(product -> callbacks.onProductClick(product), new ProductAdapter.OnStepperChange() {
             @Override
             public void onIncrement(Models.ProductDto product) {
@@ -148,7 +153,7 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
             public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
                 if (dy <= 0) return;
                 int last = gm.findLastVisibleItemPosition();
-                if (last >= adapter.getItemCount() - 4) callbacks.onLoadMore(); // gan cuoi -> tai trang ke
+                if (last >= adapter.getItemCount() - 4) callbacks.onLoadMore();
             }
         });
         addView(recycler, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -190,49 +195,91 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         emptyHost.addView(emptyBox, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         addView(emptyHost, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        // ---- Thanh tong hop day man (theo mockup Figma "Man hinh Chon vat pham"): luon hien (ke ca gio hang
-        // rong, hien 0), So luong/Thanh tien + nut "TIEP TUC" — xam #C5C5C5/#757981 khi gio rong, do ruou khi co hang ----
+        // ---- Thanh tong hop day man (Floating container ben tren nen) ----
         summaryBar = new LinearLayout(context);
         summaryBar.setOrientation(LinearLayout.HORIZONTAL);
         summaryBar.setGravity(Gravity.CENTER_VERTICAL);
-        summaryBar.setBackgroundColor(Ui.SURFACE_WHITE);
-        summaryBar.setPadding(Ui.px(18), Ui.px(12), Ui.px(14), Ui.px(12));
-        Ui.elevate(summaryBar, 6, 0xFF6B4A2B);
-        LinearLayout summaryTexts = new LinearLayout(context);
-        summaryTexts.setOrientation(LinearLayout.VERTICAL);
-        // Dong 1: "So luong  N   So chi  N" — dong 2: "Thanh tien   X VND" (theo mockup Figma).
-        summaryQty = Ui.text(context, "", 9.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_MEDIUM);
-        summaryTexts.addView(summaryQty, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        LinearLayout valueRow = new LinearLayout(context);
-        valueRow.setOrientation(LinearLayout.HORIZONTAL);
-        valueRow.addView(Ui.text(context, "Thành tiền", 9.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_MEDIUM),
-                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        summaryValue = Ui.text(context, "", 12.5f, Ui.BURGUNDY_PRIMARY, Ui.W_BOLD); // #AA1F23 dung CSS Figma (khong phai cam)
-        LinearLayout.LayoutParams svLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        svLp.leftMargin = Ui.px(8);
-        valueRow.addView(summaryValue, svLp);
-        LinearLayout.LayoutParams valueRowLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        valueRowLp.topMargin = Ui.px(2);
-        summaryTexts.addView(valueRow, valueRowLp);
-        summaryBar.addView(summaryTexts, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        continueButton = Ui.primaryButton(context, "TIẾP TỤC", 11f);
+        // Nen panel lien tuc phia sau thanh tong hop, de khong bi cac the san pham de len
+        summaryBar.setBackgroundColor(Ui.PAGE_BG_LIGHT);
+        summaryBar.setPadding(Ui.px(14), Ui.px(10), Ui.px(14), Ui.px(10));
+        summaryBar.setElevation(Ui.px(4));
+
+        // 1. Card thong tin ben trai: nen trang bo tron, co bong
+        LinearLayout summaryCard = new LinearLayout(context);
+        summaryCard.setOrientation(LinearLayout.VERTICAL);
+        summaryCard.setBackground(Ui.rect(Ui.SURFACE_WHITE, Ui.R_LG, 0, 0));
+        summaryCard.setPadding(Ui.px(18), Ui.px(12), Ui.px(18), Ui.px(12));
+        Ui.elevate(summaryCard, 4, 0x1A000000);
+
+        // Hang 1 cua card: "Số lượng ... X"  va  "Số chỉ ... Y"
+        LinearLayout row1 = new LinearLayout(context);
+        row1.setOrientation(LinearLayout.HORIZONTAL);
+        row1.setGravity(Gravity.CENTER_VERTICAL);
+
+        // Cột Số lượng
+        LinearLayout colQty = new LinearLayout(context);
+        colQty.setOrientation(LinearLayout.HORIZONTAL);
+        colQty.setGravity(Gravity.CENTER_VERTICAL);
+        TextView lblQty = Ui.text(context, "Số lượng", 10.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
+        colQty.addView(lblQty, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        summaryQty = Ui.text(context, "0", 11.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
+        colQty.addView(summaryQty, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        row1.addView(colQty, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        View gap = new View(context);
+        row1.addView(gap, new LinearLayout.LayoutParams(Ui.px(20), 1));
+
+        // Cột Số chỉ
+        LinearLayout colUnits = new LinearLayout(context);
+        colUnits.setOrientation(LinearLayout.HORIZONTAL);
+        colUnits.setGravity(Gravity.CENTER_VERTICAL);
+        TextView lblUnits = Ui.text(context, "Số chỉ", 10.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
+        colUnits.addView(lblUnits, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        summaryUnits = Ui.text(context, "0", 11.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
+        colUnits.addView(summaryUnits, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        row1.addView(colUnits, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        summaryCard.addView(row1, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        // Hang 2 cua card: "Thành tiền" ... "XXX,XXX VND"
+        LinearLayout row2 = new LinearLayout(context);
+        row2.setOrientation(LinearLayout.HORIZONTAL);
+        row2.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams r2Lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        r2Lp.topMargin = Ui.px(6);
+        row2.setLayoutParams(r2Lp);
+
+        TextView lblTotal = Ui.text(context, "Thành tiền", 10.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
+        row2.addView(lblTotal, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        summaryValue = Ui.text(context, "0 VND", 13f, Ui.BURGUNDY_PRIMARY, Ui.W_BOLD);
+        row2.addView(summaryValue, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        summaryCard.addView(row2);
+        summaryBar.addView(summaryCard, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        // 2. Nut "TIẾP TỤC" pill rieng biet ben phai
+        continueButton = Ui.text(context, "TIẾP TỤC", 11.5f, 0xFFFFFFFF, Ui.W_BOLD);
+        continueButton.setGravity(Gravity.CENTER);
         continueButton.setOnClickListener(v -> {
             if (boundHasCart) callbacks.onContinue();
         });
-        summaryBar.addView(continueButton, new LinearLayout.LayoutParams(Ui.px(160), Ui.px(60)));
-        addView(summaryBar, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+        LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(Ui.px(130), LinearLayout.LayoutParams.MATCH_PARENT);
+        btnLp.leftMargin = Ui.px(12);
+        summaryBar.addView(continueButton, btnLp);
 
-        // ---- Phan dau (dinh, kem sang) nam duoi thanh dau cua khung: o tim kiem, banner, hang chip ----
-        // Thu tu theo mockup Figma moi nhat "Man hinh Chon vat pham": O TIM KIEM TRUOC, banner quang cao SAU
-        // (truoc day banner dung truoc o tim kiem — DA DOI lai cho dung thu tu Figma).
+        FrameLayout.LayoutParams sbLp = new FrameLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        sbLp.setMargins(0, 0, 0, 0);
+        addView(summaryBar, sbLp);
+
+        // ---- Phan dau (header) ----
         header = new LinearLayout(context);
         header.setOrientation(LinearLayout.VERTICAL);
         header.setBackgroundColor(Ui.PAGE_BG_LIGHT);
         header.setElevation(Ui.px(2));
 
-        // O tim kiem (theo mockup Figma "Man hinh Chon vat pham"): pill trang, icon kinh lup o BEN PHAI, nut xoa; vien do ruou khi dang go
+        // O tim kiem
         searchBox = new LinearLayout(context);
         searchBox.setOrientation(LinearLayout.HORIZONTAL);
         searchBox.setGravity(Gravity.CENTER_VERTICAL);
@@ -241,13 +288,13 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
 
         searchInput = new EditText(context);
         searchInput.setHint("Nhập tên sản phẩm");
-        searchInput.setHintTextColor(0xFF666666); // dung CSS Figma (man "Chon vat pham"): color: #666666
+        searchInput.setHintTextColor(0xFF666666);
         searchInput.setTextColor(Ui.TEXT_TITLE_DARK);
         searchInput.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(10.5f));
         searchInput.setSingleLine(true);
         searchInput.setInputType(InputType.TYPE_CLASS_TEXT);
         searchInput.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        searchInput.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(250)}); // II.2.7: name <= 250
+        searchInput.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(250)});
         searchInput.setIncludeFontPadding(false);
         searchInput.setBackground(null);
         searchInput.setPadding(Ui.px(24), 0, Ui.px(10), 0);
@@ -268,7 +315,7 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
                 clearButton.setVisibility(s.length() > 0 ? VISIBLE : INVISIBLE);
                 if (suppressSearch) return;
                 handler.removeCallbacks(searchRunnable);
-                handler.postDelayed(searchRunnable, DEBOUNCE_MS); // debounce 300ms sau phim cuoi
+                handler.postDelayed(searchRunnable, DEBOUNCE_MS);
             }
         });
         searchInput.setOnEditorActionListener((v, actionId, event) -> {
@@ -283,7 +330,7 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
 
         FrameLayout clear = new FrameLayout(context);
         clear.setVisibility(INVISIBLE);
-        clear.setOnClickListener(v -> searchInput.setText("")); // TextWatcher se goi tim kiem (chuoi rong)
+        clear.setOnClickListener(v -> searchInput.setText(""));
         FrameLayout clearDisc = new FrameLayout(context);
         clearDisc.setBackground(Ui.oval(Ui.PAGE_BG_LIGHT));
         clearDisc.addView(new IconView(context, IconView.CLOSE, Ui.TEXT_BODY_DARK).strokeUnits(2.2f),
@@ -292,17 +339,16 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         Ui.pressEffect(clear);
         clearButton = clear;
         searchBox.addView(clear, new LinearLayout.LayoutParams(Ui.px(56), Ui.px(64)));
-        IconView searchIcon = new IconView(context, IconView.SEARCH, Ui.INK_500).strokeUnits(1.9f); // #504F4F dung CSS Figma
+        IconView searchIcon = new IconView(context, IconView.SEARCH, Ui.INK_500).strokeUnits(1.9f);
         LinearLayout.LayoutParams siLp = new LinearLayout.LayoutParams(Ui.px(26), Ui.px(26));
         siLp.setMargins(0, 0, Ui.px(22), 0);
         searchBox.addView(searchIcon, siLp);
-        LinearLayout.LayoutParams sbLp = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams searchLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(64));
-        sbLp.setMargins(Ui.px(14), Ui.px(10), Ui.px(14), Ui.px(10));
-        header.addView(searchBox, sbLp);
+        searchLp.setMargins(Ui.px(14), Ui.px(10), Ui.px(14), Ui.px(10));
+        header.addView(searchBox, searchLp);
 
-        // Banner: video thuong hieu mac dinh (chay lien tuc, giong banner Home) khi server CHUA co banner anh nao;
-        // co banner anh tu server thi uu tien hien anh (an video) — theo yeu cau "banner trong thi dung video thay the".
+        // Banner
         FrameLayout bannerFrame = new FrameLayout(context);
         bannerVideo = new CoverVideoView(context, R.raw.banner);
         bannerFrame.addView(bannerVideo, new FrameLayout.LayoutParams(
@@ -316,8 +362,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         Ui.clipRounded(bannerFrame, Ui.R_LG);
         Ui.softShadow(bannerFrame);
 
-        // Cham chi so banner (dung CSS Figma: "Silder" position:absolute, bottom:12px — NOI TRUC TIEP TREN
-        // anh banner, khong phai hang rieng ben duoi). Tat ca cham deu tron deu, chi khac mau (khong gian ra khi active).
         bannerDots = new LinearLayout(context);
         bannerDots.setOrientation(LinearLayout.HORIZONTAL);
         bannerDots.setGravity(Gravity.CENTER);
@@ -332,7 +376,7 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         bannerLp.setMargins(Ui.px(14), Ui.px(4), Ui.px(14), Ui.px(4));
         header.addView(bannerFrame, bannerLp);
 
-        // Hang chip danh muc: MOT hang cuon ngang, co mui ten 2 dau goi y con the cuon duoc (theo mockup Figma)
+        // Hang chip danh muc
         LinearLayout chipArea = new LinearLayout(context);
         chipArea.setOrientation(LinearLayout.HORIZONTAL);
         chipArea.setGravity(Gravity.CENTER_VERTICAL);
@@ -379,10 +423,9 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         });
     }
 
-    /** Mui ten nho goi y con the cuon danh muc (goc trai/phai hang chip), theo mockup Figma. */
     private static FrameLayout chipArrow(Context context, int icon) {
         FrameLayout f = new FrameLayout(context);
-        f.addView(new IconView(context, icon, Ui.rgb(190, 166, 134)).strokeUnits(2.2f), // #BEA686 (Gold/600, dung Figma)
+        f.addView(new IconView(context, icon, Ui.rgb(190, 166, 134)).strokeUnits(2.2f),
                 new FrameLayout.LayoutParams(Ui.px(18), Ui.px(18), Gravity.CENTER));
         f.setClickable(true);
         Ui.pressEffect(f);
@@ -430,7 +473,18 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         }
     };
 
-    /** Vung an toan phia tren (cutout) do thanh dau cua khung lo; duoi (thanh dieu huong / ban phim) chua cho luoi. */
+    /** Dat chieu cao the sao cho 2 hang (ke ca khoang cach) vua vung hien thi cua luoi. */
+    private void fitTwoRows() {
+        // Vung nhin thay that: tu day thanh dau den mep tren thanh tong hop (neu dang hien)
+        int top = header.getBottom();
+        int bottom = summaryBar.getVisibility() == VISIBLE ? summaryBar.getTop() : getHeight();
+        int visible = bottom - top;
+        if (visible <= 0) return;
+        int margin = Ui.px(ProductAdapter.SPACING / 2f);
+        int cardH = (visible - 4 * margin) / 2;
+        if (cardH > 0) adapter.setCardHeightPx(cardH);
+    }
+
     @Override
     public void onInsets(int l, int t, int r, int b) {
         setPadding(l, 0, r, 0);
@@ -442,11 +496,16 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         int half = Ui.px(ProductAdapter.SPACING / 2f);
         int top = headerHeight + half + Ui.px(4);
         boolean summaryVisible = summaryBar.getVisibility() == VISIBLE;
-        int bottomExtra = summaryVisible ? Ui.px(84) + insetBottom : insetBottom;
+        int bottomExtra = summaryVisible ? Ui.px(104) + insetBottom : insetBottom;
         recycler.setPadding(half, top, half, half + bottomExtra);
         skeleton.setPadding(half, top, half, 0);
-        emptyHost.setPadding(0, headerHeight, 0, insetBottom); // trang thai rong nam giua vung luoi (khong duoi thanh dau/ban phim)
-        summaryBar.setPadding(Ui.px(18), Ui.px(12), Ui.px(14), Ui.px(12) + insetBottom);
+        emptyHost.setPadding(0, headerHeight, 0, insetBottom);
+
+        FrameLayout.LayoutParams sbLp = (FrameLayout.LayoutParams) summaryBar.getLayoutParams();
+        if (sbLp != null) {
+            sbLp.bottomMargin = insetBottom;
+            summaryBar.setLayoutParams(sbLp);
+        }
     }
 
     public void bind(KioskViewModel.UiState state) {
@@ -454,7 +513,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
             boundBanners = state.banners;
             bannerIndex = 0;
             if (boundBanners == null || boundBanners.isEmpty()) {
-                // Chua co banner tu server -> hien video thuong hieu mac dinh (giong banner Home) thay vi de trong.
                 bannerImage.setVisibility(GONE);
                 bannerDots.setVisibility(GONE);
                 bannerVideo.setVisibility(VISIBLE);
@@ -470,7 +528,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
             boundCategories = state.categories;
             boundSelectedCategory = state.selectedCategoryId;
             buildTabs(state.categories, state.selectedCategoryId);
-            // Doi tab -> xoa o tim kiem (VM da dat searchQuery = "").
             if (categoryChanged && state.searchQuery.isEmpty() && searchInput.length() > 0) {
                 suppressSearch = true;
                 searchInput.setText("");
@@ -493,14 +550,13 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         if (empty) {
             boolean searching = state.searchQuery != null && state.searchQuery.length() >= 2;
             emptyText.setText(searching ? "Không tìm thấy sản phẩm"
-                    // II.4: KHONG bao gio hien "message" cua server cho khach — chi cau chung.
                     : (state.errorMessage != null ? "Không tải được dữ liệu. Vui lòng thử lại sau." : "Không có sản phẩm"));
             emptyBox.setVisibility(VISIBLE);
         } else {
             emptyBox.setVisibility(GONE);
         }
 
-        // ---- Stepper tren the + thanh tong hop (theo so luong dang co trong gio hang) ----
+        // Stepper tren the + thanh tong hop
         Map<String, Integer> quantities = new HashMap<>();
         int totalQty = 0;
         double totalUnits = 0;
@@ -515,39 +571,23 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         boolean hasCart = totalQty > 0;
         boundHasCart = hasCart;
 
-        // "So luong  N   So chi  N" (N dong san pham khac nhau · tong so chi tat ca cac dong), theo mockup Figma.
-        // Thanh nay LUON hien (ke ca gio hang rong, hien 0) — theo mockup Figma moi nhat "Man hinh Chon vat pham".
-        android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
-        appendLabelValue(sb, "Số lượng  ", String.valueOf(state.cart.size()));
-        sb.append("    ");
-        appendLabelValue(sb, "Số chỉ  ", Ui.number(totalUnits));
-        summaryQty.setText(sb);
+        // Cap nhat card tong hop
+        summaryQty.setText(String.valueOf(totalQty));
+        summaryUnits.setText(Ui.number(totalUnits));
         summaryValue.setText(hasCart && state.pricesHidden ? "Đang cập nhật giá…" : Ui.price(totalValue));
 
-        // Nut "TIEP TUC": xam #C5C5C5/chu #757981 khi gio rong (khong bam duoc), do ruou khi co hang.
+        // Nut "TIẾP TỤC"
         if (hasCart) {
-            continueButton.setTextColor(0xFFFFFBF4); // dung CSS Figma: color #FFFBF4 (khong phai trang thuan)
-            continueButton.setBackground(Ui.pressable(Ui.rect(Ui.BURGUNDY_PRIMARY, Ui.R_PILL, 0, 0), Ui.rect(Ui.BURGUNDY_DARK, Ui.R_PILL, 0, 0)));
+            continueButton.setTextColor(0xFFFFFFFF);
+            continueButton.setBackground(Ui.pressable(
+                    Ui.rect(Ui.BURGUNDY_PRIMARY, Ui.R_PILL, 0, 0),
+                    Ui.rect(Ui.BURGUNDY_DARK, Ui.R_PILL, 0, 0)));
             Ui.elevate(continueButton, 4, Ui.BURGUNDY_PRIMARY);
         } else {
             continueButton.setTextColor(0xFF757981);
             continueButton.setBackground(Ui.rect(0xFFC5C5C5, Ui.R_PILL, 0, 0));
             continueButton.setElevation(0);
         }
-    }
-
-    /** Noi 1 doan "nhan muted + gia tri dam" vao SpannableStringBuilder (dung cho dong "So luong N  So chi N"). */
-    private static void appendLabelValue(android.text.SpannableStringBuilder sb, String label, String value) {
-        int s1 = sb.length();
-        sb.append(label);
-        sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.TEXT_MUTED_LIGHT), s1, sb.length(),
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        int s2 = sb.length();
-        sb.append(value);
-        sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.TEXT_TITLE_DARK), s2, sb.length(),
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), s2, sb.length(),
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     public void pauseVideo() {
@@ -558,7 +598,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         bannerVideo.resume();
     }
 
-    /** Tro ve trang thai ban dau khi roi man (xoa tu khoa cu). */
     public void clearSearchField() {
         suppressSearch = true;
         searchInput.setText("");
@@ -567,7 +606,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
 
     private void showBanner() {
         if (boundBanners == null || boundBanners.isEmpty()) return;
-        // Giu nguyen thu tu mang (server da sap san theo priority) — khong tu sap lai (spec II.2.4).
         int count = boundBanners.size();
         int active = bannerIndex % count;
         String url = boundBanners.get(active).imagePath;
@@ -577,7 +615,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
             bannerDots.removeAllViews();
             for (int i = 0; i < count; i++) {
                 View dot = new View(getContext());
-                // Dung CSS Figma: cham tron 10x10 deu nhau, gap 6 — KHONG gian rong khi active, chi doi mau.
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Ui.px(10), Ui.px(10));
                 lp.setMargins(Ui.px(3), 0, Ui.px(3), 0);
                 bannerDots.addView(dot, lp);
@@ -587,15 +624,10 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         for (int i = 0; i < bannerDots.getChildCount(); i++) {
             View dot = bannerDots.getChildAt(i);
             boolean on = i == active;
-            // Mau cham dung dung CSS Figma: #EAEAEA (sang) / #BFBFBF (xam) — khong phai do thuong hieu.
             dot.setBackground(Ui.oval(on ? Ui.rgb(234, 234, 234) : Ui.rgb(191, 191, 191)));
         }
     }
 
-    /**
-     * Hang chip danh muc: MOT hang cuon ngang. Chip dang chon = pill do ruou (chu trang); chip con lai = nen trang
-     * vien be (chu nau). Chip dang chon duoc cuon ra giua khi doi.
-     */
     private void buildTabs(List<Models.CategoryDto> categories, String selectedId) {
         List<Models.CategoryDto> items = new ArrayList<>();
         items.add(new Models.CategoryDto("ALL", "Tất cả"));
@@ -605,8 +637,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         View selectedChip = null;
         for (Models.CategoryDto category : items) {
             boolean active = category.id.equals(selectedId);
-            // Theo CSS dev-mode cua Figma (Man hinh Vang tich luy): CA 2 trang thai deu chu do #AA1F23, chi khac nen —
-            // dang chon = gradient trang->vang (#FFFFFF -> #CBBCA9), chua chon = trang dac, bo goc 8 (KHONG phai pill).
             TextView chip = Ui.text(getContext(), category.name, 10.5f, Ui.BURGUNDY_PRIMARY, Ui.W_MEDIUM);
             chip.setGravity(Gravity.CENTER);
             chip.setSingleLine(true);
@@ -630,7 +660,6 @@ public class ProductsView extends FrameLayout implements Ui.InsetAware {
         chipScroll.post(this::centerSelectedChip);
     }
 
-    /** Cuon chip dang chon ra giua hang (chay lai khi bo cuc xong, vi luc dung tab man hinh co the chua do kich thuoc). */
     private void centerSelectedChip() {
         View target = selectedChipView;
         if (!pendingCenter || target == null || chipScroll.getWidth() == 0 || target.getWidth() == 0) return;

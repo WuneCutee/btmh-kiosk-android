@@ -35,6 +35,9 @@ public class SetupView extends FrameLayout {
 
         /** Ky thuat vien nhan giu logo de doi dia chi may chu (STAGING/DEV). */
         void onEditBaseUrl();
+
+        /** CHI ban DEBUG: nhay thang vao man Thong tin don hang voi gio hang gia, de chinh giao dien nhanh. */
+        void onDebugPreviewOrderConfirm();
     }
 
     private static final int CARD_WIDTH = 440;
@@ -158,7 +161,19 @@ public class SetupView extends FrameLayout {
 
         TextView footer = Ui.text(context, "Hotline hỗ trợ: 1900 xxxx", 8.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
         footer.setGravity(Gravity.CENTER);
-        add(card, footer, CARD_WIDTH - 40, 20, 0);
+        add(card, footer, CARD_WIDTH - 40, 20, BuildConfig.DEBUG ? 14 : 0);
+
+        // Loi tat rieng cho dev: nhay thang vao man "Thong tin don hang" voi gio hang gia, khong can
+        // kich hoat/dang nhap/them san pham. Dung de chinh kich thuoc/vi tri roi build lai xem ngay.
+        if (BuildConfig.DEBUG) {
+            TextView previewLink = Ui.text(context, "DEBUG: Xem màn Thông tin đơn hàng", 8.5f, Ui.BURGUNDY_PRIMARY, Ui.W_BOLD);
+            previewLink.setGravity(Gravity.CENTER);
+            previewLink.setPadding(0, Ui.px(10), 0, 0);
+            previewLink.setClickable(true);
+            Ui.pressEffect(previewLink);
+            previewLink.setOnClickListener(v -> callbacks.onDebugPreviewOrderConfirm());
+            add(card, previewLink, CARD_WIDTH - 40, 20, 0);
+        }
     }
 
     private static LinearLayout.LayoutParams margins(int width, int height, float bottomDesign) {

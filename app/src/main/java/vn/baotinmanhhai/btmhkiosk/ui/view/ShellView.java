@@ -255,7 +255,8 @@ public class ShellView extends FrameLayout {
                 setTitle("Chi tiết sản phẩm", true);
                 break;
             case ORDER:
-                setTitle("Chi tiết đơn hàng", true);
+                setTitle("Thông tin đơn hàng", true);
+                titleRow.setPadding(0, Ui.px(16), 0, 0); // Tieu de man xac nhan xuong thap hon mot chut
                 break;
             default:
                 break;

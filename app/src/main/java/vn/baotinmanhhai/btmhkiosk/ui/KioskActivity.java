@@ -281,6 +281,18 @@ public class KioskActivity extends AppCompatActivity {
             public void onEditBaseUrl() {
                 if (BuildConfig.DEBUG) showBaseUrlDialog(); // II.2.14: release khong co loi tat nay
             }
+
+            @Override
+            public void onDebugPreviewOrderConfirm() {
+                if (!BuildConfig.DEBUG) return;
+                // May chua kich hoat nen render() vua danh dau bootIdlePending=true (II.1.1: vao man cho
+                // truoc) — huy no va an man cho ngay, neu khong man cho se de len tren man Xac nhan gia lap.
+                bootIdlePending = false;
+                idleShowing = false;
+                idle.animate().cancel();
+                idle.setVisibility(View.GONE);
+                viewModel.debugPreviewOrderConfirm();
+            }
         });
         status = new StatusView(this, () -> viewModel.retryNow());
         website = new WebsiteView(this, () -> viewModel.closeWebsite());

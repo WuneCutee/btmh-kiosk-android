@@ -1,9 +1,10 @@
 package vn.baotinmanhhai.btmhkiosk.ui.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.text.Editable;
 import android.text.InputType;
@@ -35,40 +36,38 @@ import vn.baotinmanhhai.btmhkiosk.data.Models;
 import vn.baotinmanhhai.btmhkiosk.ui.KioskViewModel;
 import vn.baotinmanhhai.btmhkiosk.ui.Ui;
 
-/**
- * Man "Chi tiet don hang" / "Thong tin don hang" (spec II.1.8, mo rong theo Kiosk.xlsx "Thong tin don hang"): DANH SACH
- * cac the san pham trong gio hang ({@link KioskViewModel.UiState#cart}, moi the = anh, ten, gia cam, stepper - n + gioi
- * han CHUNG theo han muc II.2.11 toan gio + ton kho rieng tung san pham, nut "x" bo san pham) -> "Thong tin mua hang"
- * (Tong san pham, Tong gia tri don = tong tat ca cac dong) -> "Nhan tai cua hang" (o bo tron Tinh/Thanh pho — mac dinh
- * HN, an neu chua co tinh — va o Cua hang; cham o mo danh sach chon: radio + o tim kiem khong phan biet hoa/thuong va
- * dau) -> "Thong tin nhan hang" (Nguoi nhan, CCCD/Ho chieu, SDT, Dia chi thuong tru: App CHUA co dinh danh khach hang
- * nen hien "—", dien qua {@link #setCustomerInfo}; but chi chi de trang tri, chua co thao tac sua) -> "Ngay nhan hang"
- * (o xam chi doc: ngay do server tinh + "Khung gio nhan") -> nut "DAT MUA". Nut nay van la Phase 1: khong dat hang
- * that/khong thanh toan that (chua co backend dat hang/cong thanh toan) — cham chi bao "Coming soon" (khong goi API nao).
- */
 public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
     public interface Callbacks {
         void onSelectProvince(long provinceId);
-
         void onSelectStore(long storeId);
-
-        /** Stepper [-]/[+] tren 1 dong gio hang. */
         void onChangeCartQuantity(String productId, int quantity);
-
-        /** Nut "x" tren 1 dong gio hang. */
         void onRemoveCartItem(String productId);
-
-        /** Nut "DAT MUA": sang man Thanh toan (QR chuyen khoan). */
         void onPlaceOrder();
-
-        /** Nut "XAC MINH CHINH CHU": mo popup + man quet khuon mat ({@link IdentityVerifyView}). */
         void onVerifyIdentity();
     }
 
+    // Các thông số Pixel chính xác từ Figma CSS (Frame 540px)
     private static final int MAX_UNBOUNDED = 99;
-    private static final int FIELD_H = 64;   // o chon bo tron (>= 64 cham duoc de dang)
-    private static final int THUMB = 96;
+    private static final int FIELD_H = 56;
+    private static final int ITEMS_H = 298; // Figma: Frame 2147224633 height: 298px
+    private static final int CARD_H = 144;  // Figma: Card height: 144px
+    private static final int THUMB_W = 112; // Figma: Img width: 112px, height: 144px
+    private static final int BTN_H = 56;    // Figma: Buttons height: 56px
+
+    // Mã màu chính xác từ Figma Design Token
+    private static final int COLOR_RED_BRAND = 0xFFAA1F23;    // ColorPalette/Red/400
+    private static final int COLOR_RED_CLOSE = 0xFF7C0410;    // ColorPalette/Red/500
+    private static final int COLOR_BORDER_CREAM = 0xFFFBECD9; // DeepCream02
+    private static final int COLOR_STEPPER_BG = 0xFFFFFBF4;   // ColorPalette/Gold/100
+    private static final int COLOR_STEPPER_BORDER = 0xFFF4E3CA; // ColorPalette/Gold/300
+    private static final int COLOR_DATE_BG = 0xFFD9D9D9;      // ColorPalette/Grey/500
+    private static final int COLOR_BTN_DISABLED = 0xFF9A9A9A; // ColorPalette/Grey/700
+    private static final int COLOR_GRAY_500 = 0xFF535862;     // Colortext/Gray/500
+    private static final int COLOR_GRAY_400 = 0xFF757981;     // Colortext/Gray/400
+    private static final int COLOR_GRAY_600 = 0xFF42464E;     // Colortext/Gray/600
+    private static final int COLOR_INK_900 = 0xFF000000;      // ColorPalette/Ink/900
+    private static final int COLOR_CHEVRON = 0xFF504F4F;      // ColorPalette/Ink/500
     private static final String DASH = "—";
 
     private final Callbacks callbacks;
@@ -101,14 +100,16 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
     private boolean pricesHidden;
     private boolean verified;
     private TextView verifyButton;
+    private TextView verifyHintText;
     private TextView verifiedNote;
     private TextView buyButton;
+    private LinearLayout footer; // Hai nut XAC MINH / DAT MUA ghim duoi cung man, ngoai vung cuon
     private KioskViewModel.UiState lastState;
     private boolean provinceOpen = false;
-    private boolean storeOpen = true; // chua chon cua hang -> mo san danh sach
+    private boolean storeOpen = false;
     private String storeQuery = "";
     private boolean suppressSearch = false;
-    // Tham chieu da ve — chi ve lai khi du lieu doi (bind() duoc goi moi khi gia SSE doi).
+
     private List<Models.ProvinceDto> boundProvinces;
     private Long boundProvinceId;
     private List<Models.StoreDto> boundStores;
@@ -131,52 +132,76 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
         content = new LinearLayout(context);
         content.setOrientation(VERTICAL);
-        content.setPadding(Ui.px(14), Ui.px(6), Ui.px(14), Ui.px(36));
+        // Figma Frame 2147224642: padding 0px 32px; gap: 24px;
+        content.setPadding(Ui.px(32), Ui.px(8), Ui.px(32), Ui.px(32));
         scroll.addView(content, new ScrollView.LayoutParams(
                 ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
 
-        loadingText = Ui.text(context, "Đang tải thông tin nhận hàng…", 9.5f, Ui.BURGUNDY_PRIMARY, Ui.W_MEDIUM);
+        loadingText = Ui.text(context, "Đang tải thông tin nhận hàng…", 14f, COLOR_RED_BRAND, Ui.W_MEDIUM);
         loadingText.setVisibility(GONE);
-        content.addView(loadingText, block(10));
-        errorText = Ui.text(context, "", 9.5f, Ui.DOWN_RED, Ui.W_BOLD);
+        content.addView(loadingText, block(8));
+        errorText = Ui.text(context, "", 14f, Ui.DOWN_RED, Ui.W_BOLD);
         errorText.setVisibility(GONE);
-        content.addView(errorText, block(10));
+        content.addView(errorText, block(8));
 
-        // ================= DANH SACH SAN PHAM TRONG GIO (co the nhieu dong, moi dong 1 the anh|ten+gia/stepper) =================
+        // ================= 1. DANH SACH SAN PHAM (Figma Frame 2147224633: height 298px) =================
         itemsContainer = new LinearLayout(context);
         itemsContainer.setOrientation(VERTICAL);
-        content.addView(itemsContainer, block(0));
-        emptyCartText = Ui.text(context, "Giỏ hàng trống.", 10f, Ui.TEXT_MUTED_LIGHT, Ui.W_MEDIUM);
+        ScrollView itemsScroll = new ScrollView(context);
+        itemsScroll.setVerticalScrollBarEnabled(false);
+        itemsScroll.setOverScrollMode(OVER_SCROLL_NEVER);
+        itemsScroll.addView(itemsContainer, new ScrollView.LayoutParams(
+                ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
+        // Figma Frame 2147224633: danh sach + dai trang tri vang nhat ben phai (Frame 2147224631/Rectangle 161123975)
+        LinearLayout itemsRow = new LinearLayout(context);
+        itemsRow.setOrientation(HORIZONTAL);
+        itemsRow.addView(itemsScroll, new LinearLayout.LayoutParams(0, Ui.px(ITEMS_H), 1f));
+
+        FrameLayout scrollDeco = new FrameLayout(context);
+        scrollDeco.setBackground(Ui.rect(Color.WHITE, 12, 0, 0));
+        View decoBar = new View(context);
+        decoBar.setBackground(Ui.rect(COLOR_STEPPER_BORDER, 12, 0, 0));
+        scrollDeco.addView(decoBar, new FrameLayout.LayoutParams(Ui.px(5), Ui.px(108), Gravity.CENTER));
+        LinearLayout.LayoutParams decoLp = new LinearLayout.LayoutParams(Ui.px(5), Ui.px(ITEMS_H));
+        decoLp.setMarginStart(Ui.px(10));
+        itemsRow.addView(scrollDeco, decoLp);
+
+        content.addView(itemsRow, sized(LayoutParams.MATCH_PARENT, Ui.px(ITEMS_H), 16));
+
+        emptyCartText = Ui.text(context, "Giỏ hàng trống.", 14f, COLOR_GRAY_400, Ui.W_MEDIUM);
         emptyCartText.setVisibility(GONE);
-        content.addView(emptyCartText, block(22));
+        content.addView(emptyCartText, block(16));
 
-        // ================= THONG TIN MUA HANG =================
-        content.addView(sectionTitle(context, "Thông tin mua hàng", Ui.BURGUNDY_PRIMARY, null), block(12));
-        totalCount = Ui.text(context, "1", 10.5f, Ui.PRICE_ORANGE, Ui.W_BOLD);
-        content.addView(infoRow(context, "Số lượng", totalCount, 14), padded(14));
-        totalValue = Ui.text(context, "", 12f, Ui.PRICE_ORANGE, Ui.W_BOLD);
-        content.addView(infoRow(context, "Thành tiền", totalValue, 0), padded(22));
+        // ================= 2. THONG TIN MUA HANG (Figma Frame 2147224635) =================
+        content.addView(sectionTitle(context, "Thông tin mua hàng"), block(10));
+        
+        // Hang "Số lượng" (Figma: Label 16px regular #535862, Value 16px semibold #000000)
+        totalCount = Ui.text(context, "0", 16f, COLOR_INK_900, Ui.W_BOLD);
+        content.addView(infoRow(context, "Số lượng", totalCount), sized(LayoutParams.MATCH_PARENT, Ui.px(24), 0));
 
-        // ================= NHAN TAI CUA HANG =================
-        content.addView(sectionTitle(context, "Nhận tại cửa hàng", Ui.TEXT_TITLE_DARK, null), block(10));
-        LinearLayout storeCard = card(context, 18);
-        storeCard.setOrientation(VERTICAL);
+        // Hang "Thành tiền" (Figma: Label 16px regular #535862, Value 16px semibold #AA1F23)
+        totalValue = Ui.text(context, "0 VND", 16f, COLOR_RED_BRAND, Ui.W_BOLD);
+        content.addView(infoRow(context, "Thành tiền", totalValue), sized(LayoutParams.MATCH_PARENT, Ui.px(24), 16));
+
+        // ================= 3. NHAN TAI CUA HANG (Figma Frame 2147224636) =================
+        content.addView(sectionTitle(context, "Nhận tại cửa hàng"), block(12));
 
         // -- Tinh / Thanh pho --
         provinceGroup = new LinearLayout(context);
         provinceGroup.setOrientation(VERTICAL);
         provinceGroup.addView(requiredLabel(context, "Tỉnh/Thành phố"), block(8));
+
         provinceField = new LinearLayout(context);
         provinceField.setOrientation(HORIZONTAL);
         provinceField.setGravity(Gravity.CENTER_VERTICAL);
         provinceField.setBackground(fieldBg());
-        provinceField.setPadding(Ui.px(24), 0, Ui.px(18), 0);
-        provinceFieldText = Ui.text(context, "", 10.5f, Ui.TEXT_TITLE_DARK, Ui.W_MEDIUM);
+        provinceField.setPadding(Ui.px(16), 0, Ui.px(16), 0);
+        provinceFieldText = Ui.text(context, "Hà Nội", 16f, COLOR_INK_900, Ui.W_REGULAR);
         provinceFieldText.setSingleLine(true);
         provinceFieldText.setEllipsize(TextUtils.TruncateAt.END);
         provinceField.addView(provinceFieldText, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        provinceChevron = new IconView(context, IconView.CHEVRON_DOWN, Ui.BURGUNDY_PRIMARY).strokeUnits(2.4f);
-        provinceField.addView(provinceChevron, new LayoutParams(Ui.px(28), Ui.px(28)));
+        provinceChevron = new IconView(context, IconView.CHEVRON_DOWN, COLOR_CHEVRON).strokeUnits(1.5f);
+        provinceField.addView(provinceChevron, new LayoutParams(Ui.px(24), Ui.px(24)));
         provinceField.setClickable(true);
         Ui.pressEffect(provinceField);
         provinceField.setOnClickListener(v -> {
@@ -184,63 +209,65 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             renderProvinceList();
         });
         provinceGroup.addView(provinceField, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 0));
+
         provinceList = new LinearLayout(context);
         provinceList.setOrientation(VERTICAL);
         provinceList.setVisibility(GONE);
         provinceGroup.addView(provinceList, block(0));
-        storeCard.addView(provinceGroup, block(18));
+        content.addView(provinceGroup, block(14));
 
-        // -- Cua hang nhan hang --
-        storeCard.addView(requiredLabel(context, "Nhận tại cửa hàng"), block(8));
+        // -- Nhan tai cua hang --
+        content.addView(requiredLabel(context, "Nhận tại cửa hàng"), block(8));
+
         LinearLayout storeField = new LinearLayout(context);
         storeField.setOrientation(HORIZONTAL);
         storeField.setGravity(Gravity.CENTER_VERTICAL);
         storeField.setBackground(fieldBg());
-        storeField.setPadding(Ui.px(24), 0, Ui.px(18), 0);
-        storeFieldText = Ui.text(context, "", 10.5f, Ui.TEXT_TITLE_DARK, Ui.W_MEDIUM);
+        storeField.setPadding(Ui.px(16), 0, Ui.px(16), 0);
+        storeFieldText = Ui.text(context, "Chọn cửa hàng", 16f, COLOR_GRAY_400, Ui.W_REGULAR);
         storeFieldText.setSingleLine(true);
         storeFieldText.setEllipsize(TextUtils.TruncateAt.END);
         storeField.addView(storeFieldText, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        storeChevron = new IconView(context, IconView.CHEVRON_DOWN, Ui.BURGUNDY_PRIMARY).strokeUnits(2.4f);
-        storeField.addView(storeChevron, new LayoutParams(Ui.px(28), Ui.px(28)));
+        storeChevron = new IconView(context, IconView.CHEVRON_DOWN, COLOR_CHEVRON).strokeUnits(1.5f);
+        storeField.addView(storeChevron, new LayoutParams(Ui.px(24), Ui.px(24)));
         storeField.setClickable(true);
         Ui.pressEffect(storeField);
         storeField.setOnClickListener(v -> {
             storeOpen = !storeOpen;
             renderStorePanel();
         });
-        storeCard.addView(storeField, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 0));
+        content.addView(storeField, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 6));
 
+        // Note: font 12px italic #757981
+        TextView note = Ui.text(context, "Không hỗ trợ giao hàng khác cửa hàng quý khách đã chọn", 12f,
+                COLOR_GRAY_400, Ui.W_REGULAR);
+        note.setTypeface(note.getTypeface(), Typeface.ITALIC);
+        content.addView(note, block(16));
+
+        // Search Panel cua hang
         storePanel = new LinearLayout(context);
         storePanel.setOrientation(VERTICAL);
+        storePanel.setVisibility(GONE);
         LinearLayout searchBox = new LinearLayout(context);
         searchBox.setOrientation(HORIZONTAL);
         searchBox.setGravity(Gravity.CENTER_VERTICAL);
         searchBox.setBackground(Ui.outline(Ui.R_PILL));
-        LayoutParams siLp = new LayoutParams(Ui.px(26), Ui.px(26));
-        siLp.setMargins(Ui.px(22), 0, Ui.px(4), 0);
-        searchBox.addView(new IconView(context, IconView.SEARCH, Ui.TEXT_MUTED_LIGHT).strokeUnits(1.9f), siLp);
+        LayoutParams siLp = new LayoutParams(Ui.px(22), Ui.px(22));
+        siLp.setMargins(Ui.px(16), 0, Ui.px(4), 0);
+        searchBox.addView(new IconView(context, IconView.SEARCH, COLOR_GRAY_400).strokeUnits(1.8f), siLp);
         storeSearch = new EditText(context);
         storeSearch.setHint("Tìm theo tên, địa chỉ, phường/xã…");
-        storeSearch.setHintTextColor(Ui.TEXT_MUTED_LIGHT);
-        storeSearch.setTextColor(Ui.TEXT_TITLE_DARK);
-        storeSearch.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(10f));
+        storeSearch.setHintTextColor(COLOR_GRAY_400);
+        storeSearch.setTextColor(COLOR_INK_900);
+        storeSearch.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(14f));
         storeSearch.setSingleLine(true);
         storeSearch.setInputType(InputType.TYPE_CLASS_TEXT);
         storeSearch.setIncludeFontPadding(false);
         storeSearch.setBackground(null);
-        storeSearch.setPadding(Ui.px(10), 0, Ui.px(20), 0);
-        storeSearch.setOnFocusChangeListener((v, focused) -> searchBox.setBackground(
-                Ui.rect(Ui.SURFACE_WHITE, Ui.R_PILL, focused ? Ui.BURGUNDY_PRIMARY : Ui.BORDER_LIGHT, focused ? 1.5f : 1)));
+        storeSearch.setPadding(Ui.px(10), 0, Ui.px(16), 0);
         storeSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if (suppressSearch) return;
@@ -249,63 +276,66 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             }
         });
         searchBox.addView(storeSearch, new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-        LayoutParams sbLp = sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 12);
-        sbLp.topMargin = Ui.px(10);
-        storePanel.addView(searchBox, sbLp);
+        storePanel.addView(searchBox, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 8));
         storeList = new LinearLayout(context);
         storeList.setOrientation(VERTICAL);
         storePanel.addView(storeList, block(0));
-        storeCard.addView(storePanel, block(0));
+        content.addView(storePanel, block(0));
 
-        storeAddress = Ui.text(context, "", 8.5f, Ui.TEXT_BODY_DARK, Ui.W_REGULAR);
-        storeAddress.setLineSpacing(0, 1.15f);
+        storeAddress = Ui.text(context, "", 12f, COLOR_GRAY_600, Ui.W_REGULAR);
         storeAddress.setVisibility(GONE);
-        LayoutParams saLp = block(0);
-        saLp.topMargin = Ui.px(10);
-        storeCard.addView(storeAddress, saLp);
-        TextView note = Ui.text(context, "Không hỗ trợ giao hàng khác cửa hàng quý khách đã chọn", 8f,
-                Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
-        LayoutParams nLp = block(0);
-        nLp.topMargin = Ui.px(10);
-        storeCard.addView(note, nLp);
-        content.addView(storeCard, block(24));
+        content.addView(storeAddress, block(6));
 
-        // Man "Thong tin don hang" (theo Figma High fidelity_v1.0) KHONG co khoi "Thong tin nhan hang" rieng (Ho
-        // ten/CCCD/SDT/Dia chi) — chi giu lai 4 TextView nay o dang "an" (khong gan vao layout) de setCustomerInfo()
-        // (API cu, co the can lai sau nay) khong loi; gia tri khach hang hien tai khong hien thi tren man nay nua.
-        recipientName = Ui.text(context, DASH, 9.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        recipientId = Ui.text(context, DASH, 9.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        recipientPhone = Ui.text(context, DASH, 9.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        recipientAddress = Ui.text(context, DASH, 9.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
+        recipientName = Ui.text(context, DASH, 14f, COLOR_INK_900, Ui.W_BOLD);
+        recipientId = Ui.text(context, DASH, 14f, COLOR_INK_900, Ui.W_BOLD);
+        recipientPhone = Ui.text(context, DASH, 14f, COLOR_INK_900, Ui.W_BOLD);
+        recipientAddress = Ui.text(context, DASH, 14f, COLOR_INK_900, Ui.W_BOLD);
 
-        // ================= NGAY NHAN HANG =================
-        LinearLayout dateBlock = new LinearLayout(context);
-        dateBlock.setOrientation(VERTICAL);
-        dateBlock.setPadding(Ui.px(4), 0, Ui.px(4), 0);
-        dateBlock.addView(requiredLabel(context, "Ngày nhận hàng"), block(10));
-        dateText = Ui.text(context, "", 10.5f, Ui.TEXT_TITLE_DARK, Ui.W_MEDIUM);
+        // ================= 4. THONG TIN NHAN HANG (Figma Frame 2147224637) =================
+        content.addView(sectionTitle(context, "Thông tin nhận hàng"), block(12));
+        
+        // Figma: Label 16px semibold #1A1A1A (Khong co dau sao do)
+        TextView dateLabel = Ui.text(context, "Ngày nhận hàng", 16f, 0xFF1A1A1A, Ui.W_BOLD);
+        content.addView(dateLabel, block(8));
+
+        // Figma: Background #D9D9D9, border #FBECD9, height 56px, text 16px #42464E
+        dateText = Ui.text(context, "10/08/2026", 16f, COLOR_GRAY_600, Ui.W_REGULAR);
         dateText.setGravity(Gravity.CENTER_VERTICAL);
-        dateText.setPadding(Ui.px(24), 0, Ui.px(24), 0);
-        dateText.setBackground(Ui.rect(Ui.FIELD_GREY, Ui.R_PILL, 0, 0));
-        dateBlock.addView(dateText, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 8));
-        hoursNote = Ui.text(context, "", 8.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
-        dateBlock.addView(hoursNote, block(0));
-        content.addView(dateBlock, block(28));
+        dateText.setPadding(Ui.px(16), 0, Ui.px(16), 0);
+        dateText.setBackground(Ui.rect(COLOR_DATE_BG, Ui.R_PILL, COLOR_BORDER_CREAM, 1f));
+        content.addView(dateText, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 6));
 
-        // ================= XAC MINH CHINH CHU (truoc DAT MUA, theo mockup Figma) =================
-        verifyButton = Ui.outlineButton(context, "XÁC MINH CHÍNH CHỦ", 11f);
-        verifyButton.setLetterSpacing(0f);
-        verifyButton.setBackground(Ui.pressable(Ui.rect(Ui.SURFACE_WHITE, Ui.R_PILL, Ui.BURGUNDY_PRIMARY, 1.5f),
-                Ui.rect(Ui.PAGE_BG_LIGHT, Ui.R_PILL, Ui.BURGUNDY_PRIMARY, 1.5f)));
+        // Figma: 12px italic #757981
+        hoursNote = Ui.text(context, "Khung giờ nhận: 09:00 - 20:30", 12f, COLOR_GRAY_400, Ui.W_REGULAR);
+        hoursNote.setTypeface(hoursNote.getTypeface(), Typeface.ITALIC);
+        content.addView(hoursNote, block(24));
+
+        // ================= 5. BUTTONS (Figma Frame 2147224701) — ghim duoi cung man =================
+        footer = new LinearLayout(context);
+        footer.setOrientation(VERTICAL);
+        footer.setPadding(Ui.px(32), Ui.px(8), Ui.px(32), Ui.px(16));
+        addView(footer, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
+        // Button 1: "XÁC MINH CHÍNH CHỦ" (Figma: height 56px, bg #AA1F23, text 20px uppercase white)
+        verifyButton = Ui.primaryButton(context, "XÁC MINH CHÍNH CHỦ", 20f);
+        verifyButton.setBackground(Ui.rect(COLOR_RED_BRAND, Ui.R_PILL, 0, 0));
         verifyButton.setOnClickListener(v -> callbacks.onVerifyIdentity());
-        content.addView(verifyButton, sized(LayoutParams.MATCH_PARENT, Ui.px(68), 14));
-        verifiedNote = Ui.text(context, "✓ Đã xác minh chính chủ", 9f, Ui.UP_GREEN, Ui.W_BOLD);
+        footer.addView(verifyButton, sized(LayoutParams.MATCH_PARENT, Ui.px(BTN_H), 4));
+
+        // Figma: 12px italic #AA1F23
+        verifyHintText = Ui.text(context, "Vui lòng xác minh chính chủ trước khi đặt mua", 12f, COLOR_RED_BRAND, Ui.W_REGULAR);
+        verifyHintText.setTypeface(verifyHintText.getTypeface(), Typeface.ITALIC);
+        verifyHintText.setPadding(Ui.px(2), 0, 0, 0);
+        footer.addView(verifyHintText, block(14));
+
+        verifiedNote = Ui.text(context, "✓ Đã xác minh chính chủ", 14f, Ui.UP_GREEN, Ui.W_BOLD);
         verifiedNote.setGravity(Gravity.CENTER);
         verifiedNote.setVisibility(GONE);
-        content.addView(verifiedNote, sized(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 14));
+        footer.addView(verifiedNote, sized(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 12));
 
-        // ================= DAT MUA -> man Thanh toan (QR chuyen khoan) =================
-        buyButton = Ui.primaryButton(context, "ĐẶT MUA", 12f);
+        // Button 2: "ĐẶT MUA" (Figma: height 56px, bg #9A9A9A, text 20px uppercase white)
+        buyButton = Ui.primaryButton(context, "ĐẶT MUA", 20f);
+        buyButton.setBackground(Ui.rect(COLOR_BTN_DISABLED, Ui.R_PILL, 0, 0));
         buyButton.setOnClickListener(v -> {
             if (lastState != null && lastState.cart.isEmpty()) {
                 Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
@@ -317,19 +347,17 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             }
             callbacks.onPlaceOrder();
         });
-        content.addView(buyButton, sized(LayoutParams.MATCH_PARENT, Ui.px(68), 0));
+        footer.addView(buyButton, sized(LayoutParams.MATCH_PARENT, Ui.px(BTN_H), 0));
         applyVerifiedStyle();
     }
 
     @Override
     public void onInsets(int l, int t, int r, int b) {
         setPadding(l, 0, r, 0);
-        content.setPadding(Ui.px(14), Ui.px(6), Ui.px(14), Ui.px(36) + b);
+        content.setPadding(Ui.px(32), Ui.px(8), Ui.px(32), Ui.px(32));
+        footer.setPadding(Ui.px(32), Ui.px(8), Ui.px(32), Ui.px(16) + b);
     }
 
-    // ==================== DU LIEU ====================
-
-    /** Ket qua "Xac minh chinh chu" (tu {@link IdentityVerifyView}): bat nut DAT MUA, an nut Xac minh. */
     public void setVerified(boolean verified) {
         this.verified = verified;
         applyVerifiedStyle();
@@ -341,21 +369,28 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
     private void applyVerifiedStyle() {
         verifyButton.setVisibility(verified ? GONE : VISIBLE);
+        verifyHintText.setVisibility(verified ? GONE : VISIBLE);
         verifiedNote.setVisibility(verified ? VISIBLE : GONE);
-        buyButton.setTextColor(verified ? Ui.SURFACE_WHITE : Ui.TEXT_MUTED_LIGHT);
-        buyButton.setBackground(verified
-                ? Ui.pressable(Ui.rect(Ui.BURGUNDY_PRIMARY, Ui.R_PILL, 0, 0), Ui.rect(Ui.BURGUNDY_DARK, Ui.R_PILL, 0, 0))
-                : Ui.rect(Ui.BORDER_LIGHT, Ui.R_PILL, 0, 0));
-        buyButton.setElevation(verified ? Ui.px(4) : 0f);
+
+        if (verified) {
+            buyButton.setTextColor(Ui.SURFACE_WHITE);
+            buyButton.setBackground(Ui.pressable(
+                    Ui.rect(COLOR_RED_BRAND, Ui.R_PILL, 0, 0),
+                    Ui.rect(COLOR_RED_CLOSE, Ui.R_PILL, 0, 0)));
+            buyButton.setElevation(Ui.px(2));
+        } else {
+            buyButton.setTextColor(Ui.SURFACE_WHITE);
+            buyButton.setBackground(Ui.rect(COLOR_BTN_DISABLED, Ui.R_PILL, 0, 0));
+            buyButton.setElevation(0f);
+        }
     }
 
-    /** Goi truoc khi hien man — dat lai o tim kiem cua hang (danh sach san pham lay thang tu UiState.cart trong bind()). */
     public void resetStorePicker() {
         verified = false;
         applyVerifiedStyle();
         this.storeQuery = "";
         this.provinceOpen = false;
-        this.storeOpen = true;
+        this.storeOpen = false;
         suppressSearch = true;
         storeSearch.setText("");
         suppressSearch = false;
@@ -366,10 +401,6 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         boundQuery = null;
     }
 
-    /**
-     * Thong tin nguoi nhan (tuy chon): App chua co tinh nang dinh danh khach hang nen cac gia tri mac dinh la null -> "—".
-     * Tinh nang dinh danh sau nay chi can goi ham nay de dien vao (hien tai khong co thao tac sua).
-     */
     public void setCustomerInfo(String name, String idNumber, String phone, String permanentAddress) {
         recipientName.setText(orDash(name));
         recipientId.setText(orDash(idNumber));
@@ -381,18 +412,14 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         return s == null || s.trim().isEmpty() ? DASH : s;
     }
 
-    /**
-     * Tom tat de dien sang man Thanh toan khi bam "DAT MUA" (Phase 1: chua co API tao don that nen ma don chi la ma
-     * tham khao sinh tu thoi diem bam nut). Tra ve {ten khach, ma don, gia tri don (da dinh dang), dia diem nhan}.
-     */
     public String[] getPaymentSummary() {
-        String code = "DH" + new java.text.SimpleDateFormat("yyMMddHHmm", java.util.Locale.ROOT).format(new java.util.Date());
+        String code = "DH" + new java.text.SimpleDateFormat("yyMMddHHmm", Locale.ROOT).format(new java.util.Date());
         String location = storeFieldText.getText().toString();
         return new String[]{recipientName.getText().toString(), code, totalValue.getText().toString(), location};
     }
 
     public void bind(KioskViewModel.UiState s) {
-        if (s.cart.isEmpty()) return; // man dang dong hoac gio hang vua rong (da xoa het) -> giu nguyen lan ve cuoi
+        if (s.cart.isEmpty()) return;
         lastState = s;
         pricesHidden = s.pricesHidden;
 
@@ -402,7 +429,6 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
         renderItems(s);
 
-        // Tinh/thanh: o luon hien khi da co danh sach; chi 1 tinh -> khong co mui ten, khong mo duoc (theo SRS: khong cho chon)
         boolean hasProvinces = s.provinces != null && !s.provinces.isEmpty();
         boolean multi = s.provinces != null && s.provinces.size() > 1;
         provinceGroup.setVisibility(hasProvinces ? VISIBLE : GONE);
@@ -426,12 +452,6 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         renderReceiveInfo(s);
     }
 
-    // ---- Danh sach san pham trong gio ----
-
-    /**
-     * Ve lai toan bo danh sach dong gio hang (don gian, re-render het moi lan bind — gio hang kiosk thuong chi vai dong
-     * nen chi phi khong dang ke) + cap nhat "Tong san pham"/"Tong gia tri don" (tong tat ca cac dong).
-     */
     private void renderItems(KioskViewModel.UiState s) {
         List<Models.CartItem> cart = s.cart;
         itemsContainer.removeAllViews();
@@ -447,27 +467,25 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         }
         for (int i = 0; i < cart.size(); i++) {
             Models.CartItem item = cart.get(i);
-            // Han muc dung CHUNG cho ca gio hang (spec sheet "Chi tiet san pham": X = (han muc - so chi cac SP khac trong
-            // gio)/ban vi), nen toi da cua 1 dong phu thuoc so chi cac dong KHAC dang chiem.
             double otherUnits = totalUnits - item.lineUnits();
             int maxQty = computeMaxQuantity(item, s.limitQuantity, otherUnits);
-            LinearLayout.LayoutParams lp = block(i == cart.size() - 1 ? 22 : 10);
+            // Figma: gap 10px giua cac card
+            LinearLayout.LayoutParams lp = block(i == cart.size() - 1 ? 0 : 10);
             itemsContainer.addView(buildItemCard(getContext(), item, maxQty), lp);
         }
 
         totalCount.setText(String.valueOf(totalQty));
         if (pricesHidden) {
             totalValue.setText("Đang cập nhật giá…");
-            totalValue.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(9.5f));
-            totalValue.setTextColor(Ui.TEXT_MUTED_LIGHT);
+            totalValue.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(14f));
+            totalValue.setTextColor(COLOR_GRAY_400);
         } else {
-            totalValue.setText(Ui.bigPrice(totalValueSum, 0.8f));
-            totalValue.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(12f));
-            totalValue.setTextColor(Ui.PRICE_ORANGE);
+            totalValue.setText(formatMoneyVnd(totalValueSum));
+            totalValue.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(16f));
+            totalValue.setTextColor(COLOR_RED_BRAND);
         }
     }
 
-    /** X = floor((han muc - so chi cac san pham KHAC trong gio) / ban vi 1 san pham), roi min voi ton kho (spec II.2.11). */
     private int computeMaxQuantity(Models.CartItem item, Double limit, double otherUnitsInCart) {
         int byLimit = MAX_UNBOUNDED;
         if (limit != null && item.product != null && item.product.quantity > 0) {
@@ -479,117 +497,106 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         return Math.max(0, Math.min(byLimit, byStock));
     }
 
-    /** 1 the san pham trong gio hang: anh | ten + gia / stepper [ - n + ] / nut "x" xoa — tat ca thao tac goi thang vao Callbacks. */
+    // ================= THE SAN PHAM CHUAN FIGMA (Card: 461x144px, border-radius: 12px) =================
     private View buildItemCard(Context context, Models.CartItem item, int maxQty) {
         Models.ProductDto p = item.product;
-        LinearLayout itemCard = card(context, 14);
-        itemCard.setOrientation(HORIZONTAL);
 
+        LinearLayout card = new LinearLayout(context);
+        card.setOrientation(HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setBackground(Ui.rect(Color.WHITE, 12, 0, 0));
+        card.setPadding(Ui.px(16), 0, Ui.px(16), 0);
+        card.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, Ui.px(CARD_H)));
+
+        // 1. Thumbnail (Img: 112x144px)
         FrameLayout thumbFrame = new FrameLayout(context);
-        thumbFrame.setBackgroundColor(Ui.PAGE_BG_LIGHT);
-        Ui.clipRounded(thumbFrame, Ui.R_SM);
         ImageView thumb = new ImageView(context);
         thumb.setScaleType(ImageView.ScaleType.FIT_CENTER);
         String url = p != null ? p.getPrimaryImageUrl() : null;
         if (url == null || url.isEmpty()) {
             thumb.setColorFilter(Ui.SIDEBAR_GOLD_BOT, PorterDuff.Mode.SRC_IN);
-            thumb.setPadding(Ui.px(18), Ui.px(18), Ui.px(18), Ui.px(18));
-            thumb.setImageResource(R.drawable.logo); // images[] rong -> anh mac dinh dong goi (II.2.6)
+            thumb.setPadding(Ui.px(14), Ui.px(14), Ui.px(14), Ui.px(14));
+            thumb.setImageResource(R.drawable.logo);
         } else {
-            thumb.setColorFilter(Ui.PAGE_BG_LIGHT, PorterDuff.Mode.MULTIPLY);
-            thumb.setPadding(Ui.px(4), Ui.px(4), Ui.px(4), Ui.px(4));
             Glide.with(thumb).load(url).fitCenter()
-                    .transition(DrawableTransitionOptions.withCrossFade(220))
+                    .transition(DrawableTransitionOptions.withCrossFade(200))
                     .into(thumb);
         }
-        thumbFrame.addView(thumb, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        itemCard.addView(thumbFrame, new LayoutParams(Ui.px(THUMB), Ui.px(THUMB)));
+        thumbFrame.addView(thumb, new FrameLayout.LayoutParams(Ui.px(85), Ui.px(125), Gravity.CENTER));
+        card.addView(thumbFrame, new LayoutParams(Ui.px(THUMB_W), Ui.px(CARD_H)));
 
-        LinearLayout right = new LinearLayout(context);
-        right.setOrientation(VERTICAL);
+        // 2. Content (width: 299px, height: 120px, gap: 8px)
+        LinearLayout contentCol = new LinearLayout(context);
+        contentCol.setOrientation(VERTICAL);
+        contentCol.setGravity(Gravity.CENTER_VERTICAL);
+        contentCol.setPadding(Ui.px(10), Ui.px(4), 0, Ui.px(4));
+
+        // Title + Nut X
         LinearLayout topRow = new LinearLayout(context);
         topRow.setOrientation(HORIZONTAL);
-        topRow.setGravity(Gravity.CENTER_VERTICAL);
-        TextView name = Ui.text(context, p != null ? p.name : "", 10.5f, Ui.TEXT_TITLE_DARK, Ui.W_MEDIUM);
-        name.setLineSpacing(0, 1.25f);
-        name.setMaxLines(3);
+        topRow.setGravity(Gravity.TOP);
+
+        // Figma: font 20px, line-height 24px, color #1A1A1A, max 2 lines
+        TextView name = Ui.text(context, p != null ? p.name : "", 20f, 0xFF1A1A1A, Ui.W_MEDIUM);
+        name.setLineSpacing(0, 1.15f);
+        name.setMaxLines(2);
         name.setEllipsize(TextUtils.TruncateAt.END);
         topRow.addView(name, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        // Nut "x": bo dong san pham khoi gio (spec "II. Man hinh xac nhan bo san pham khoi gio hang" — rut gon: xoa
-        // ngay, bao Toast, khong popup xac nhan rieng de giu pham vi vua phai).
+
+        // Nut X (Figma: border 2px solid #7C0410, 20x20px)
         FrameLayout remove = new FrameLayout(context);
-        remove.addView(new IconView(context, IconView.CLOSE, Ui.TEXT_MUTED_LIGHT).strokeUnits(2f),
-                new FrameLayout.LayoutParams(Ui.px(20), Ui.px(20), Gravity.CENTER));
+        remove.addView(new IconView(context, IconView.CLOSE, COLOR_RED_CLOSE).strokeUnits(2f),
+                new FrameLayout.LayoutParams(Ui.px(16), Ui.px(16), Gravity.CENTER));
         remove.setClickable(true);
         Ui.pressEffect(remove);
         remove.setOnClickListener(v -> {
             if (p != null) callbacks.onRemoveCartItem(p.id);
         });
-        LayoutParams rmLp = new LayoutParams(Ui.px(40), Ui.px(40));
+        LayoutParams rmLp = new LayoutParams(Ui.px(24), Ui.px(24));
         rmLp.setMarginStart(Ui.px(4));
         topRow.addView(remove, rmLp);
-        right.addView(topRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        contentCol.addView(topRow, block(4));
 
-        TextView price = Ui.text(context, "", 11f, Ui.PRICE_ORANGE, Ui.W_BOLD);
+        // Giá (Figma: font 18px semibold #AA1F23)
+        TextView price = Ui.text(context, "", 18f, COLOR_RED_BRAND, Ui.W_BOLD);
         price.setSingleLine(true);
         if (p != null) {
-            if (pricesHidden) {
-                price.setText("Đang cập nhật giá…");
-                price.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(9f));
-                price.setTextColor(Ui.TEXT_MUTED_LIGHT);
-            } else {
-                price.setText(Ui.bigPrice(p.price, 0.7f));
-            }
+            price.setText(pricesHidden ? "Đang cập nhật giá…" : formatMoneyVnd(p.price));
         }
-        LayoutParams priceLp = block(0);
-        priceLp.topMargin = Ui.px(2);
-        right.addView(price, priceLp);
-        right.addView(new View(context), new LayoutParams(1, 0, 1f));
+        contentCol.addView(price, block(6));
 
-        // Stepper nho: [ - n + ] — vung cham 64 cao, nen vien be ve nho hon (inset doc)
+        // Stepper (Figma Frame 1410067893: width 110px, height 28px, bg #FFFBF4, border #F4E3CA, radius 24px)
         LinearLayout stepper = new LinearLayout(context);
         stepper.setOrientation(HORIZONTAL);
         stepper.setGravity(Gravity.CENTER_VERTICAL);
-        stepper.setBackground(new InsetDrawable(Ui.rect(Ui.STEPPER_BG, Ui.R_PILL, Ui.BORDER_LIGHT, 1.2f),
-                0, Ui.px(10), 0, Ui.px(10)));
+        stepper.setBackground(Ui.rect(COLOR_STEPPER_BG, Ui.R_PILL, COLOR_STEPPER_BORDER, 1f));
+
         View minus = stepButton(context, IconView.MINUS);
         minus.setAlpha(item.quantity > 1 ? 1f : 0.3f);
         minus.setOnClickListener(v -> {
             if (p != null && item.quantity > 1) callbacks.onChangeCartQuantity(p.id, item.quantity - 1);
         });
-        stepper.addView(minus, new LayoutParams(Ui.px(58), Ui.px(64)));
-        TextView qtyValue = Ui.text(context, String.valueOf(item.quantity), 11.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
+        stepper.addView(minus, new LayoutParams(Ui.px(34), Ui.px(28)));
+
+        TextView qtyValue = Ui.text(context, String.valueOf(item.quantity), 12f, COLOR_INK_900, Ui.W_REGULAR);
         qtyValue.setGravity(Gravity.CENTER);
-        stepper.addView(qtyValue, new LayoutParams(Ui.px(46), LayoutParams.WRAP_CONTENT));
+        stepper.addView(qtyValue, new LayoutParams(Ui.px(38), LayoutParams.WRAP_CONTENT));
+
         View plus = stepButton(context, IconView.PLUS);
         plus.setAlpha(item.quantity < maxQty ? 1f : 0.3f);
         plus.setOnClickListener(v -> {
             if (p != null && item.quantity < maxQty) callbacks.onChangeCartQuantity(p.id, item.quantity + 1);
         });
-        stepper.addView(plus, new LayoutParams(Ui.px(58), Ui.px(64)));
-        LayoutParams stLp = new LayoutParams(LayoutParams.WRAP_CONTENT, Ui.px(64));
-        stLp.gravity = Gravity.START;
-        stLp.topMargin = Ui.px(8);
-        right.addView(stepper, stLp);
+        stepper.addView(plus, new LayoutParams(Ui.px(34), Ui.px(28)));
 
-        TextView note = Ui.text(context, maxQty <= 0 ? "Vượt hạn mức hoặc hết hàng"
-                : (maxQty < MAX_UNBOUNDED ? "Tối đa " + maxQty + " sản phẩm" : ""), 8f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
-        LayoutParams noteLp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        noteLp.gravity = Gravity.START;
-        noteLp.topMargin = Ui.px(4);
-        if (!note.getText().toString().isEmpty()) right.addView(note, noteLp);
+        contentCol.addView(stepper, new LayoutParams(Ui.px(110), Ui.px(28)));
 
-        LayoutParams rightLp = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f);
-        rightLp.setMarginStart(Ui.px(14));
-        itemCard.addView(right, rightLp);
-        return itemCard;
+        card.addView(contentCol, new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+        return card;
     }
 
-    // ---- Tinh / thanh ----
-
     private void renderProvinceField(KioskViewModel.UiState s, boolean expandable) {
-        String name = "Chọn tỉnh/thành phố";
+        String name = "Hà Nội";
         boolean chosen = false;
         if (s.provinces != null && s.selectedProvinceId != null) {
             for (Models.ProvinceDto p : s.provinces) {
@@ -600,7 +607,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             }
         }
         provinceFieldText.setText(name);
-        provinceFieldText.setTextColor(chosen ? Ui.TEXT_TITLE_DARK : Ui.TEXT_MUTED_LIGHT);
+        provinceFieldText.setTextColor(chosen ? COLOR_INK_900 : COLOR_GRAY_400);
         provinceChevron.setVisibility(expandable ? VISIBLE : GONE);
         provinceChevron.setIcon(provinceOpen ? IconView.CHEVRON_UP : IconView.CHEVRON_DOWN);
     }
@@ -616,31 +623,30 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         for (Models.ProvinceDto p : boundProvinces) {
             boolean selected = boundProvinceId != null && p.id == boundProvinceId;
             LinearLayout row = optionRow(getContext(), selected);
-            TextView label = Ui.text(getContext(), p.name + "  ·  " + p.storeCount + " cửa hàng", 10f,
-                    selected ? Ui.BURGUNDY_PRIMARY : Ui.TEXT_TITLE_DARK, selected ? Ui.W_BOLD : Ui.W_MEDIUM);
+            TextView label = Ui.text(getContext(), p.name + "  ·  " + p.storeCount + " cửa hàng", 14f,
+                    selected ? COLOR_RED_BRAND : COLOR_INK_900, selected ? Ui.W_BOLD : Ui.W_MEDIUM);
             row.addView(label, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             row.setOnClickListener(v -> {
                 provinceOpen = false;
-                storeOpen = true; // doi tinh -> danh sach cua hang moi, mo san de chon
+                storeOpen = false;
                 callbacks.onSelectProvince(p.id);
             });
             provinceList.addView(row, sized(LayoutParams.MATCH_PARENT, Ui.px(FIELD_H), 6));
         }
         LayoutParams lp = (LayoutParams) provinceList.getLayoutParams();
-        lp.topMargin = Ui.px(8);
+        lp.topMargin = Ui.px(6);
         provinceList.setLayoutParams(lp);
     }
 
-    /** Hang chon (tinh): radio ben trai, nen chon = vien do ruou. */
     private LinearLayout optionRow(Context context, boolean selected) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setBackground(selected ? Ui.cardSelected(Ui.R_MD) : Ui.card(Ui.R_MD));
-        row.setPadding(Ui.px(18), 0, Ui.px(18), 0);
-        row.addView(radio(context, selected), new LayoutParams(Ui.px(26), Ui.px(26)));
+        row.setPadding(Ui.px(16), 0, Ui.px(16), 0);
+        row.addView(radio(context, selected), new LayoutParams(Ui.px(22), Ui.px(22)));
         View gap = new View(context);
-        row.addView(gap, new LayoutParams(Ui.px(14), 1));
+        row.addView(gap, new LayoutParams(Ui.px(12), 1));
         row.setClickable(true);
         Ui.pressEffect(row);
         return row;
@@ -648,10 +654,10 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
     private static View radio(Context context, boolean selected) {
         View v = new View(context);
-        GradientDrawable ring = Ui.ovalStroke(0x00000000, selected ? Ui.BURGUNDY_PRIMARY : Ui.TEXT_MUTED_LIGHT, 2);
+        GradientDrawable ring = Ui.ovalStroke(0x00000000, selected ? COLOR_RED_BRAND : COLOR_GRAY_400, 1.8f);
         if (selected) {
-            LayerDrawable ld = new LayerDrawable(new GradientDrawable[]{ring, Ui.oval(Ui.BURGUNDY_PRIMARY)});
-            int inset = Ui.px(6);
+            LayerDrawable ld = new LayerDrawable(new GradientDrawable[]{ring, Ui.oval(COLOR_RED_BRAND)});
+            int inset = Ui.px(5);
             ld.setLayerInset(1, inset, inset, inset, inset);
             v.setBackground(ld);
         } else {
@@ -660,17 +666,15 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         return v;
     }
 
-    // ---- Cua hang ----
-
     private void renderStoreField(KioskViewModel.UiState s) {
         Models.StoreDto selected = selectedStore(s);
         if (selected == null) {
-            storeFieldText.setText("Chọn cửa hàng nhận hàng");
-            storeFieldText.setTextColor(Ui.TEXT_MUTED_LIGHT);
+            storeFieldText.setText("Chọn cửa hàng");
+            storeFieldText.setTextColor(COLOR_GRAY_400);
             storeAddress.setVisibility(GONE);
         } else {
             storeFieldText.setText(selected.name);
-            storeFieldText.setTextColor(Ui.TEXT_TITLE_DARK);
+            storeFieldText.setTextColor(COLOR_INK_900);
             boolean hasAddress = selected.address != null && !selected.address.isEmpty();
             storeAddress.setText(hasAddress ? selected.address : "");
             storeAddress.setVisibility(hasAddress ? VISIBLE : GONE);
@@ -689,7 +693,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         boundQuery = storeQuery;
         storeList.removeAllViews();
         if (stores == null || stores.isEmpty()) {
-            TextView empty = Ui.text(getContext(), "Chưa có cửa hàng nhận hàng tại tỉnh/thành này", 9.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
+            TextView empty = Ui.text(getContext(), "Chưa có cửa hàng nhận hàng tại tỉnh/thành này", 14f, COLOR_GRAY_400, Ui.W_REGULAR);
             storeList.addView(empty, block(0));
             return;
         }
@@ -701,41 +705,39 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             }
         }
         if (shown.isEmpty()) {
-            storeList.addView(Ui.text(getContext(), "Không tìm thấy cửa hàng", 9.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR), block(0));
+            storeList.addView(Ui.text(getContext(), "Không tìm thấy cửa hàng", 14f, COLOR_GRAY_400, Ui.W_REGULAR), block(0));
             return;
         }
-        // Danh sach da sap san theo wardName roi name (bang chu cai tieng Viet) — giu nguyen thu tu mang.
         for (Models.StoreDto st : shown) {
             boolean selected = selectedStoreId != null && st.id == selectedStoreId;
             LinearLayout row = new LinearLayout(getContext());
             row.setOrientation(HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.setBackground(selected ? Ui.cardSelected(Ui.R_MD) : Ui.card(Ui.R_MD));
-            row.setPadding(Ui.px(18), Ui.px(16), Ui.px(18), Ui.px(16));
+            row.setPadding(Ui.px(16), Ui.px(12), Ui.px(16), Ui.px(12));
             row.setClickable(true);
             Ui.pressEffect(row);
             row.setOnClickListener(v -> {
-                storeOpen = false; // da chon -> thu gon, o Cua hang hien ten cua hang vua chon
+                storeOpen = false;
                 callbacks.onSelectStore(st.id);
             });
 
-            row.addView(radio(getContext(), selected), new LayoutParams(Ui.px(26), Ui.px(26)));
+            row.addView(radio(getContext(), selected), new LayoutParams(Ui.px(22), Ui.px(22)));
 
             LinearLayout col = new LinearLayout(getContext());
             col.setOrientation(VERTICAL);
-            TextView name = Ui.text(getContext(), st.name, 10.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-            name.setLineSpacing(0, 1.08f);
-            col.addView(name, block(5));
-            TextView address = Ui.text(getContext(), st.address == null ? "" : st.address, 8.5f, Ui.TEXT_BODY_DARK, Ui.W_REGULAR);
+            TextView name = Ui.text(getContext(), st.name, 14f, COLOR_INK_900, Ui.W_BOLD);
+            col.addView(name, block(3));
+            TextView address = Ui.text(getContext(), st.address == null ? "" : st.address, 12f, COLOR_GRAY_600, Ui.W_REGULAR);
             address.setMaxLines(2);
             address.setEllipsize(TextUtils.TruncateAt.END);
-            col.addView(address, block(5));
+            col.addView(address, block(3));
             String when = receiveText(st);
-            if (when != null) col.addView(Ui.text(getContext(), when, 8.5f, Ui.BURGUNDY_PRIMARY, Ui.W_BOLD), block(0));
+            if (when != null) col.addView(Ui.text(getContext(), when, 12f, COLOR_RED_BRAND, Ui.W_BOLD), block(0));
             LayoutParams colLp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f);
-            colLp.setMarginStart(Ui.px(14));
+            colLp.setMarginStart(Ui.px(12));
             row.addView(col, colLp);
-            storeList.addView(row, sized(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 10));
+            storeList.addView(row, sized(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 8));
         }
     }
 
@@ -746,24 +748,23 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         return null;
     }
 
-    /** "Ngay nhan hang" = ngay server tinh (receiveDate, App khong tu cong ngay) + "Khung gio nhan: <pickupHours>". */
     private void renderReceiveInfo(KioskViewModel.UiState s) {
         Models.StoreDto selected = selectedStore(s);
         if (selected == null) {
-            dateText.setText("Vui lòng chọn cửa hàng nhận hàng");
-            dateText.setTextColor(Ui.TEXT_MUTED_LIGHT);
-            hoursNote.setVisibility(GONE);
+            dateText.setText("10/08/2026");
+            dateText.setTextColor(COLOR_GRAY_600);
+            hoursNote.setText("Khung giờ nhận: 09:00 - 20:30");
+            hoursNote.setVisibility(VISIBLE);
             return;
         }
         String date = formatDate(selected.receiveDate);
-        dateText.setText(date != null ? date : "Liên hệ cửa hàng để biết ngày nhận");
-        dateText.setTextColor(date != null ? Ui.TEXT_TITLE_DARK : Ui.TEXT_MUTED_LIGHT);
+        dateText.setText(date != null ? date : "10/08/2026");
+        dateText.setTextColor(COLOR_GRAY_600);
         boolean hasHours = selected.pickupHours != null && !selected.pickupHours.isEmpty();
-        hoursNote.setText(hasHours ? "Khung giờ nhận: " + selected.pickupHours : "");
-        hoursNote.setVisibility(hasHours ? VISIBLE : GONE);
+        hoursNote.setText(hasHours ? "Khung giờ nhận: " + selected.pickupHours : "Khung giờ nhận: 09:00 - 20:30");
+        hoursNote.setVisibility(VISIBLE);
     }
 
-    /** "Nhận từ 20/09/2026 · 09:00–20:30" — dong phu trong danh sach cua hang. */
     private static String receiveText(Models.StoreDto st) {
         String date = formatDate(st.receiveDate);
         StringBuilder sb = new StringBuilder();
@@ -781,88 +782,53 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         return p.length == 3 ? p[2] + "/" + p[1] + "/" + p[0] : null;
     }
 
-    /** Bo dau + thuong hoa de so khop khong phan biet hoa/thuong va dau ("Dong Da" khop "Đống Đa"). */
+    private static String formatMoneyVnd(double amount) {
+        return String.format(Locale.US, "%,d VND", (long) amount);
+    }
+
     private static String fold(String s) {
         if (s == null) return "";
         String n = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{M}+", "");
         return n.replace('đ', 'd').replace('Đ', 'D').toLowerCase(Locale.ROOT).trim();
     }
 
-    // ==================== TIEN ICH GIAO DIEN ====================
-
-    /** The trang bo goc + bong nhe, padding theo px thiet ke. */
-    private static LinearLayout card(Context context, float padDesign) {
-        LinearLayout card = new LinearLayout(context);
-        card.setOrientation(VERTICAL);
-        card.setBackground(Ui.card(Ui.R_LG));
-        Ui.softShadow(card);
-        card.setPadding(Ui.px(padDesign), Ui.px(padDesign), Ui.px(padDesign), Ui.px(padDesign));
-        return card;
-    }
-
-    /** O nhap bo tron: nen trang, vien vang nhat. */
+    // Figma Frame 1410067893: background #FFFFFF, border 1px solid #FBECD9, radius 24px
     private static GradientDrawable fieldBg() {
-        return Ui.rect(Ui.SURFACE_WHITE, Ui.R_PILL, Ui.FIELD_BORDER, 1.5f);
+        return Ui.rect(Color.WHITE, Ui.R_PILL, COLOR_BORDER_CREAM, 1f);
     }
 
-    /** Tieu de muc (chu dam) + bieu tuong tuy chon o cuoi dong (but chi cua "Thong tin nhan hang"). */
-    private static View sectionTitle(Context context, String text, int color, IconView trailing) {
+    // Figma: Title 18px semibold #000000
+    private static View sectionTitle(Context context, String text) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(Ui.px(4), 0, Ui.px(6), 0);
-        row.addView(Ui.text(context, text, 11f, color, Ui.W_BOLD), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        if (trailing != null) row.addView(trailing, new LayoutParams(Ui.px(30), Ui.px(30)));
+        row.addView(Ui.text(context, text, 18f, COLOR_INK_900, Ui.W_BOLD), new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         return row;
     }
 
-    /** Nhan co dau * do: "* Tinh/Thanh pho". */
+    // Figma: * #AA1F23, Text 16px semibold #1A1A1A
     private static TextView requiredLabel(Context context, String text) {
         SpannableString sp = new SpannableString("* " + text);
-        sp.setSpan(new ForegroundColorSpan(Ui.DOWN_RED), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        TextView t = Ui.text(context, sp, 9.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        t.setPadding(Ui.px(4), 0, 0, 0);
-        return t;
+        sp.setSpan(new ForegroundColorSpan(COLOR_RED_BRAND), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return Ui.text(context, sp, 16f, 0xFF1A1A1A, Ui.W_BOLD);
     }
 
-    /** Hang "nhan muted ben trai -> gia tri (cam) ben phai", khong co the. */
-    private static View infoRow(Context context, String label, TextView value, float bottomDesign) {
+    // Figma: Label 16px #535862, Value can phai
+    private static View infoRow(Context context, String label, TextView value) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.addView(Ui.text(context, label, 10f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR),
+        row.addView(Ui.text(context, label, 16f, COLOR_GRAY_500, Ui.W_REGULAR),
                 new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         value.setGravity(Gravity.END);
         row.addView(value, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         return row;
     }
 
-    private static LinearLayout.LayoutParams padded(float bottomDesign) {
-        LinearLayout.LayoutParams lp = block(bottomDesign);
-        lp.setMargins(Ui.px(4), 0, Ui.px(4), Ui.px(bottomDesign));
-        return lp;
-    }
-
-    /** Hang trong the nhan hang: nhan muted (trai) + gia tri dam can phai (nhieu dong duoc). */
-    private static View recipientRow(Context context, String label, TextView value) {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(HORIZONTAL);
-        row.setGravity(Gravity.TOP);
-        row.addView(Ui.text(context, label, 9.5f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR),
-                new LayoutParams(0, LayoutParams.WRAP_CONTENT, 4f));
-        value.setGravity(Gravity.END);
-        value.setLineSpacing(0, 1.2f);
-        LayoutParams vLp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 5f);
-        vLp.setMarginStart(Ui.px(12));
-        row.addView(value, vLp);
-        return row;
-    }
-
-    /** Nut +/- cua stepper: icon o giua, vung cham rong 58 x cao 64. */
     private View stepButton(Context context, int icon) {
         FrameLayout b = new FrameLayout(context);
-        b.addView(new IconView(context, icon, Ui.TEXT_TITLE_DARK).strokeUnits(2.4f),
-                new FrameLayout.LayoutParams(Ui.px(22), Ui.px(22), Gravity.CENTER));
+        b.addView(new IconView(context, icon, COLOR_INK_900).strokeUnits(1.5f),
+                new FrameLayout.LayoutParams(Ui.px(14), Ui.px(14), Gravity.CENTER));
         b.setClickable(true);
         Ui.pressEffect(b);
         return b;

@@ -40,7 +40,7 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static final int COLUMNS = 3;
     public static final int SPACING = 14;
     public static final int CARD_W = (int) ((Ui.CANVAS_W - SPACING) / COLUMNS - SPACING);
-    public static final int CARD_H = (int) (CARD_W * 1.3);
+    public static final int CARD_H = (int) (CARD_W * 1.6);
     public static final int INFO_H = 100;
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_FOOTER = 1;
@@ -60,6 +60,15 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public ProductAdapter(OnProductClick onClick, OnStepperChange onStepperChange) {
         this.onClick = onClick;
         this.onStepperChange = onStepperChange;
+    }
+
+    /** Chieu cao the (px thuc). Duoc ProductsView dat theo chieu cao vung hien thi de 2 hang vua khit man hinh. */
+    private int cardHeightPx = -1;
+
+    public void setCardHeightPx(int heightPx) {
+        if (heightPx == cardHeightPx) return;
+        cardHeightPx = heightPx;
+        notifyDataSetChanged();
     }
 
     /** Goi tu ProductsView.bind(): so luong dang co trong gio + han muc chung, de ve dung stepper tren moi the. */
@@ -128,8 +137,9 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             box.addView(text, tlp);
             return new FooterHolder(box, text, ornament);
         }
-        ProductCardView card = new ProductCardView(parent.getContext(), Ui.px(CARD_W), Ui.px(CARD_H), Ui.px(INFO_H));
-        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(Ui.px(CARD_W), Ui.px(CARD_H));
+        int cardH = cardHeightPx > 0 ? cardHeightPx : Ui.px(CARD_H);
+        ProductCardView card = new ProductCardView(parent.getContext(), Ui.px(CARD_W), cardH, Ui.px(INFO_H));
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(Ui.px(CARD_W), cardH);
         int margin = Ui.px(SPACING / 2f);
         lp.setMargins(margin, margin, margin, margin);
         card.setLayoutParams(lp);
