@@ -1,6 +1,440 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.BtmhKiosk" parent="Theme.AppCompat.NoActionBar">
+    <!-- Home (bảng giá) — Figma 844:9967.
+         includeFontPadding=false + chiều cao cố định ở layout: hộp chữ đúng bằng line-height của Figma
+         (mặc định Android chừa thêm khoảng trên/dưới làm cả khối tiêu đề dài hơn ~12dp). -->
+    <style name="HomePillText">
+        <item name="android:fontFamily">@font/cabin_semibold</item>
+        <item name="android:textSize">@dimen/home_text_body</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="lineHeight">@dimen/home_line_control</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="HomeTitle">
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textSize">@dimen/home_text_title</item>
+        <item name="android:textColor">@color/home_title</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="lineHeight">@dimen/home_line_title</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="HomeSubtitle">
+        <item name="android:fontFamily">@font/inter_24pt_italic</item>
+        <item name="android:textSize">@dimen/home_text_body</item>
+        <item name="android:textColor">@color/home_subtitle</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="lineHeight">@dimen/home_line_body</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="HomeWarning">
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/home_text_warning</item>
+        <item name="android:textColor">@color/brand_red</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="HomeTableHeader">
+        <item name="android:fontFamily">@font/inter_24pt_bold</item>
+        <item name="android:textSize">@dimen/home_text_body</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="lineHeight">@dimen/home_line_body</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="HomeRowText">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/home_text_body</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="lineHeight">@dimen/home_line_body</item>
+    </style>
+
+    <!-- Tên sản phẩm trong bảng: Inter 14, mỗi dòng cao 20 -->
+    <style name="HomeRowName">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/home_text_name</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="lineHeight">@dimen/home_line_name</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Giá trong ô 88, canh trái như Figma: một dòng, tự thu nhỏ khi số quá dài (vd 150,000,000) thay vì bị cắt. -->
+    <style name="HomeRowPrice">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMaxTextSize">@dimen/home_text_body</item>
+        <item name="autoSizeMinTextSize">@dimen/home_price_text_min</item>
+        <item name="autoSizeStepGranularity">1sp</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="HomeActionButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/brand_red</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/home_text_button</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="cornerRadius">@dimen/home_button_radius</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Thông tin đơn hàng, Xác nhận thông tin KH -->
+    <style name="OrderSectionTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/order_section_top</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/order_section_text</item>
+    </style>
+
+    <style name="OrderRowLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/order_label</item>
+        <item name="android:textSize">@dimen/order_row_text</item>
+        <item name="lineHeight">@dimen/order_line_16</item>
+    </style>
+
+    <style name="OrderRowValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/order_row_text</item>
+        <item name="lineHeight">@dimen/order_line_16</item>
+    </style>
+
+    <style name="OrderFieldLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/order_label_top</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textColor">@color/order_value</item>
+        <item name="android:textSize">@dimen/order_label_text</item>
+        <item name="lineHeight">@dimen/order_line_16</item>
+    </style>
+
+    <style name="OrderDropdown">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/order_field_height</item>
+        <item name="android:layout_marginTop">@dimen/order_field_top</item>
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:drawableEnd">@drawable/ic_chevron_down</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingHorizontal">@dimen/order_field_padding_h</item>
+        <item name="android:textColor">@color/order_value</item>
+        <item name="android:textColorHint">@color/order_field_text</item>
+        <item name="android:textSize">@dimen/order_field_text</item>
+    </style>
+
+    <style name="OrderHint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/order_hint_top</item>
+        <item name="android:textColor">@color/order_hint</item>
+        <item name="android:textSize">@dimen/order_hint_text</item>
+        <item name="lineHeight">@dimen/order_line_12</item>
+    </style>
+
+    <style name="OrderButton">
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/order_button_height</item>
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/order_button_text</item>
+    </style>
+
+    <style name="DialogButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/dialog_button_height</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">@dimen/dialog_button_text</item>
+    </style>
+
+    <style name="ConfirmField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/confirm_field_height</item>
+        <item name="android:layout_marginTop">@dimen/order_field_top</item>
+        <item name="android:background">@drawable/bg_field_confirm_readonly</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingHorizontal">@dimen/order_field_padding_h</item>
+        <item name="android:textColor">@color/order_field_text</item>
+        <item name="android:textSize">@dimen/order_field_text</item>
+    </style>
+
+    <!-- Dialog nền trong suốt: bo góc do bg_dialog vẽ. -->
+    <style name="OrderDialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <!-- 15/10/2026: 0.5 -> 0.65 van chua du toi theo phan hoi thuc te tren may that - tang tiep len 0.82. -->
+        <item name="android:backgroundDimAmount">0.82</item>
+    </style>
+
+    <!-- Tràn viền: không bật thì Material thụt sheet theo thanh hệ thống dù app đã ẩn chúng, đáy sheet hở. -->
+    <style name="OrderSheet" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/OrderSheetModal</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Dong bo dung muc do toi voi OrderDialog (xem ghi chu tren) - toan app dung chung 1 muc. -->
+        <item name="android:backgroundDimAmount">0.82</item>
+    </style>
+
+    <style name="OrderSheetModal" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <!-- Máy kiosk luôn ẩn thanh hệ thống: đệm theo thanh điều hướng chỉ để lại dải hở dưới đáy. -->
+        <item name="paddingBottomSystemWindowInsets">false</item>
+    </style>
+
+    <!-- Giấy hẹn -->
+    <style name="AppointmentTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/appt_section_gap</item>
+        <item name="android:layout_marginBottom">@dimen/appt_title_bottom</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/appt_title_text</item>
+        <item name="lineHeight">@dimen/appt_title_line</item>
+    </style>
+
+    <style name="AppointmentCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_appt_card</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/appt_card_padding</item>
+        <item name="divider">@drawable/space_appt_row</item>
+        <item name="showDividers">middle</item>
+    </style>
+
+    <style name="AppointmentLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/appt_label</item>
+        <item name="android:textSize">@dimen/appt_row_text</item>
+        <item name="lineHeight">@dimen/appt_row_line</item>
+    </style>
+
+    <style name="AppointmentValue">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">@dimen/appt_row_label_gap</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:gravity">end</item>
+        <item name="android:textColor">@color/appt_value</item>
+        <item name="android:textSize">@dimen/appt_row_text</item>
+        <item name="lineHeight">@dimen/appt_row_line</item>
+    </style>
+
+    <style name="AppointmentStepper">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/appt_value</item>
+        <item name="android:textSize">@dimen/appt_stepper_text</item>
+    </style>
+
+    <!-- Màn Vàng tích luỹ — Figma 970:10373 -->
+    <style name="ListTab">
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/list_tab_text</item>
+        <item name="android:textColor">@color/brand_red</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="lineHeight">@dimen/list_tab_line</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListCardName">
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/list_name_text</item>
+        <item name="android:textColor">@color/list_text_dark</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+        <item name="lineHeight">@dimen/list_name_line</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Giá dài (150,000,000 VND) tự co trong ô 127 thay vì bị cắt. -->
+    <style name="ListCardPrice">
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textColor">@color/brand_red</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMaxTextSize">@dimen/list_price_text</item>
+        <item name="autoSizeMinTextSize">@dimen/list_price_text_min</item>
+        <item name="autoSizeStepGranularity">1sp</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListStepperSign">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_regular</item>
+        <item name="android:textSize">@dimen/list_stepper_sign_text</item>
+        <item name="android:textColor">@color/list_stepper_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListStepperCount">
+        <item name="android:fontFamily">@font/plus_jakarta_sans_regular</item>
+        <item name="android:textSize">@dimen/list_stepper_count_text</item>
+        <item name="android:textColor">@color/list_text_dark</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListBadge">
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/list_badge_text</item>
+        <item name="android:textColor">@color/list_badge_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListSummaryLabel">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/list_summary_label_text</item>
+        <item name="android:textColor">@color/list_summary_label</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListSummaryValue">
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textSize">@dimen/list_summary_value_text</item>
+        <item name="android:textColor">@color/list_text_dark</item>
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="ListSummaryTotal" parent="ListSummaryValue">
+        <item name="android:textSize">@dimen/list_summary_total_text</item>
+        <item name="android:textColor">@color/brand_red</item>
+    </style>
+
+    <style name="ListNextButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/list_next_bg</item>
+        <item name="android:textColor">@color/list_next_text</item>
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textSize">@dimen/list_next_text</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="cornerRadius">@dimen/list_next_radius</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Màn Kích hoạt máy -->
+    <!-- Tiêu đề màn ngừng hoạt động / kích hoạt: icon trên, chữ đen. -->
+    <style name="StatusTitle">
+        <item name="android:fontFamily">@font/inter_24pt_semibold</item>
+        <item name="android:textSize">@dimen/status_title_text</item>
+        <item name="android:textColor">@color/order_value</item>
+        <item name="android:gravity">center</item>
+        <item name="lineHeight">@dimen/status_title_line</item>
+    </style>
+
+    <!-- Lỗi dưới từng ô của màn kích hoạt. -->
+    <style name="ActivationFieldError">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/act_help_top</item>
+        <item name="android:paddingStart">@dimen/act_field_padding_h</item>
+        <item name="android:paddingEnd">@dimen/act_field_padding_h</item>
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/act_message_text</item>
+        <item name="android:textColor">@color/brand_red</item>
+        <item name="lineHeight">@dimen/act_message_line</item>
+    </style>
+
+    <style name="ActivationSubtitle">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/act_body_text</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:gravity">center</item>
+        <item name="lineHeight">@dimen/act_body_line</item>
+    </style>
+
+    <style name="ActivationLabel">
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/act_body_text</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="lineHeight">@dimen/act_body_line</item>
+    </style>
+
+    <!-- Mã chỉ gồm chữ hoa và số: tắt gợi ý để bàn phím không tự sửa hay ghép chữ. -->
+    <style name="ActivationField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/act_field_height</item>
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:paddingStart">@dimen/act_field_padding_h</item>
+        <item name="android:paddingEnd">@dimen/act_field_padding_h</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:inputType">textVisiblePassword|textCapCharacters|textNoSuggestions</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:importantForAutofill">no</item>
+        <item name="android:fontFamily">@font/inter_24pt_medium</item>
+        <item name="android:textSize">@dimen/act_field_text</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+    </style>
+
+    <style name="ActivationMessage">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/act_message_text</item>
+        <item name="android:textColor">@color/brand_red</item>
+        <item name="lineHeight">@dimen/act_message_line</item>
+    </style>
+
+    <style name="ActivationFooter">
+        <item name="android:fontFamily">@font/inter_24pt_regular</item>
+        <item name="android:textSize">@dimen/act_footer_text</item>
+        <item name="android:textColor">@color/text_hint</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- BtmhKioskAndroid rieng (theme cu Activity, giu lai) -->
+    <!-- Parent doi tu Theme.AppCompat.NoActionBar sang Theme.Material3 (nhu Theme.BTMH that): layout that vua copy
+         sang (activity_home.xml...) dung MaterialCardView/MaterialButton, cac widget nay BAT BUOC app theme phai
+         ke thua Theme.MaterialComponents/Theme.Material3, neu khong crash ngay luc inflate (IllegalArgumentException
+         "requires your app theme to be Theme.MaterialComponents"). -->
+    <style name="Theme.BtmhKiosk" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/gold</item>
         <item name="colorPrimaryDark">@color/page_bg</item>
         <item name="colorAccent">@color/gold</item>

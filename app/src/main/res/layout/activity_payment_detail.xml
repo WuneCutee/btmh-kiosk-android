@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QR thanh toán (S08) — Figma "Màn hình QR thanh toán"; overlay IV–VII theo mockup SRS. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/payment_padding_h"
+        android:paddingBottom="@dimen/order_content_bottom"
+        app:layout_constraintBottom_toTopOf="@id/actions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/payment_note_top"
+                android:fontFamily="@font/inter_24pt_lightitalic"
+                android:padding="@dimen/payment_inset"
+                android:textColor="@color/payment_note"
+                android:textSize="@dimen/payment_note_text"
+                app:lineHeight="@dimen/payment_note_line"
+                tools:text="Lưu ý quan trọng: Theo quy định ngành vàng…" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/payment_scan_top"
+                android:gravity="center"
+                android:text="@string/payment_scan"
+                android:textColor="@color/black"
+                android:textSize="@dimen/payment_scan_text"
+                app:lineHeight="@dimen/payment_text_line" />
+
+            <FrameLayout
+                android:layout_width="@dimen/payment_qr_size"
+                android:layout_height="@dimen/payment_qr_size"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/payment_qr_top"
+                android:background="@drawable/bg_qr_card"
+                android:elevation="@dimen/payment_qr_elevation"
+                android:padding="@dimen/payment_qr_padding">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivQr"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/payment_qr_description"
+                    android:scaleType="fitCenter" />
+
+                <!-- Logo giữa QR: QR SePay mức sửa lỗi H, che cỡ này vẫn quét được (đã thử trên ảnh sandbox 29/09/2026). -->
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/qrLogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_qr_logo"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/qr_logo_padding_h"
+                    android:paddingVertical="@dimen/qr_logo_padding_v"
+                    android:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/qr_logo_image"
+                        android:layout_height="@dimen/qr_logo_image"
+                        android:importantForAccessibility="no"
+                        app:srcCompat="@drawable/logo" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_24pt_medium"
+                        android:maxLines="1"
+                        android:text="@string/qr_logo_text"
+                        android:textColor="@color/brand_red"
+                        android:textSize="@dimen/qr_logo_text" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/creatingQr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminateTint="@color/brand_red" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/payment_overlay_text_top"
+                        android:text="@string/payment_creating_qr"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/payment_scan_text" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCountdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/payment_countdown_top"
+                android:gravity="center"
+                android:textColor="@color/payment_note"
+                android:textSize="@dimen/payment_countdown_text"
+                app:lineHeight="@dimen/payment_text_line"
+                tools:text="Hết hạn sau 04:59" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/payment_info_top" />
+
+            <include
+                android:id="@+id/rowCustomer"
+                layout="@layout/item_payment_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/payment_inset" />
+
+            <include
+                android:id="@+id/rowOrderCode"
+                layout="@layout/item_payment_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/payment_inset" />
+
+            <include
+                android:id="@+id/rowAmount"
+                layout="@layout/item_payment_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/payment_inset" />
+
+            <include
+                android:id="@+id/rowStore"
+                layout="@layout/item_payment_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/payment_inset" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/actions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/payment_button_side"
+        android:paddingBottom="@dimen/payment_button_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/payment_cancel_height"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_outline_red_thick"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/payment_cancel"
+            android:textColor="@color/brand_red"
+            android:textSize="@dimen/payment_button_text" />
+
+        <Space
+            android:layout_width="@dimen/payment_button_gap"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnClaim"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/payment_button_height"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_red"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:gravity="center"
+            android:letterSpacing="-0.02"
+            android:maxLines="1"
+            android:text="@string/payment_claim"
+            android:textColor="@color/white"
+            android:textSize="@dimen/payment_button_text"
+            app:autoSizeMaxTextSize="@dimen/payment_button_text"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeTextType="uniform" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/brand_red"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Overlay IV–VII: đè lên màn QR, chặn chạm xuống dưới. Chạm vùng tối đóng overlay đang kiểm tra, vòng + chữ thì không. -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/payment_overlay"
+        android:clickable="true"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:layout_width="@dimen/payment_ring_size"
+            android:layout_height="@dimen/payment_ring_size"
+            android:clickable="true">
+
+            <vn.btmh.ui.activities.paymentdetail.PaymentRingView
+                android:id="@+id/ring"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivOverlayIcon"
+                android:layout_width="@dimen/payment_ring_icon"
+                android:layout_height="@dimen/payment_ring_icon"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvOverlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_marginHorizontal="@dimen/payment_padding_h"
+            android:layout_marginTop="@dimen/payment_overlay_text_top"
+            android:gravity="center"
+            android:textSize="@dimen/payment_overlay_text"
+            tools:text="Thanh toán thành công" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

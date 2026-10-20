@@ -2,10 +2,11 @@ package vn.baotinmanhhai.btmhkiosk.ui.view;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
@@ -14,6 +15,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import vn.baotinmanhhai.btmhkiosk.BuildConfig;
+import vn.baotinmanhhai.btmhkiosk.databinding.SheetVerifyBinding;
 import vn.baotinmanhhai.btmhkiosk.ui.Ui;
 
 /**
@@ -32,6 +34,11 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
 
         /** Xac minh thanh cong: dong lop phu, danh dau don hang da xac minh chinh chu. */
         void onVerified();
+
+        /** Nut home o goc tren-phai: dong lop phu RA HAN man Home, giong het moi man khac co nut home
+         * (OrderConfirmView/PaymentView/CustomerConfirmView) - truoc day bi gan nham vao onCancel() nen bam
+         * vao chi dong lop nay, van dung lai o man ben duoi (Xac nhan don hang) thay vi ve Home that. */
+        void onGoHome();
     }
 
     private static final long TICK_MS = 1800;
@@ -39,7 +46,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
     private final Listener listener;
     private final FrameLayout popupOverlay;
     private final LinearLayout scanColumn;
-    private final FaceScanView face;
+    private vn.btmh.ui.customviews.DashedCircleView dashedCircle;
     private final TextView scanCaption;
     private final TextView scanButton;
     private final View successBadge;
@@ -71,15 +78,17 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         header.addView(back, new LinearLayout.LayoutParams(Ui.px(64), Ui.px(64)));
         TextView title = Ui.text(context, "Xác thực khuôn mặt", 14f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
         header.addView(title, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        // Dung dung 1 kieu icon home voi moi man khac (OrderConfirmView/PaymentView/CustomerConfirmView): icon
+        // vien (HOME_OUTLINE) mau do thuong hieu, KHONG nen dac/khong shadow - truoc day man nay tu ve rieng
+        // kieu icon dac nen tron + shadow, khac han cac man con lai (app that dung chung 1 HeaderFragment nen
+        // icon home GIONG HET nhau o moi man, xem activity_face_auth.xml).
         FrameLayout homeBtn = new FrameLayout(context);
-        homeBtn.setBackground(Ui.oval(Ui.BURGUNDY_PRIMARY));
-        homeBtn.addView(new IconView(context, IconView.HOME, Ui.SURFACE_WHITE).strokeUnits(1.8f),
-                new FrameLayout.LayoutParams(Ui.px(26), Ui.px(26), Gravity.CENTER));
+        homeBtn.addView(new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.0f),
+                new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
         homeBtn.setClickable(true);
-        homeBtn.setOnClickListener(v -> listener.onCancel());
+        homeBtn.setOnClickListener(v -> listener.onGoHome());
         Ui.pressEffect(homeBtn);
-        Ui.softShadow(homeBtn);
-        header.addView(homeBtn, new LinearLayout.LayoutParams(Ui.px(48), Ui.px(48)));
+        header.addView(homeBtn, new LinearLayout.LayoutParams(Ui.px(66), Ui.px(66)));
         column.addView(header, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
@@ -95,36 +104,48 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         scroll.addView(scanColumn, new ScrollView.LayoutParams(
                 ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
 
+        // activity_face_auth.xml that: KHONG co the trang trang boc ngoai - logo_with_text + vong tron net dut +
+        // icon FaceID + huong dan + hang 2 nut, nam truc tiep tren nen gradient trang. Truoc day boc trong 1
+        // "scanCard" trang bo goc + vong tron mau be tu ve (FaceScanView) - khong khop thiet ke that, thay het.
         LinearLayout scanCard = new LinearLayout(context);
         scanCard.setOrientation(LinearLayout.VERTICAL);
         scanCard.setGravity(Gravity.CENTER_HORIZONTAL);
-        scanCard.setBackground(Ui.card(Ui.R_LG));
-        Ui.softShadow(scanCard);
-        scanCard.setPadding(Ui.px(20), Ui.px(28), Ui.px(20), Ui.px(24));
         scanColumn.addView(scanCard, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
+        // activity_face_auth.xml: ivLogo + btnRegister chi hien o luong FLOW_01 (dang nhap tu man cho/bang gia
+        // vang). Man nay la luong "XAC MINH CHINH CHU" truoc DAT MUA (header co nut back + tieu de) nen theo dung
+        // FaceAuthActivity.setupViews() nhanh else: ivLogo GONE, chi con 1 nut "BAT DAU QUET" day du chieu rong.
+
+        // dashedCircleView that: 640dp - qua kho rong so voi man hinh thiet ke 540dp (se tran canh), giam con
+        // 380dp de vua khung ma van la vong tron chu dao, to, noi bat dung tinh than thiet ke.
         FrameLayout faceFrame = new FrameLayout(context);
-        face = new FaceScanView(context);
-        faceFrame.addView(face, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        vn.btmh.ui.customviews.DashedCircleView dashedCircle = new vn.btmh.ui.customviews.DashedCircleView(context);
+        faceFrame.addView(dashedCircle, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        android.widget.ImageView faceIdIcon = new android.widget.ImageView(context);
+        faceIdIcon.setImageResource(vn.baotinmanhhai.btmhkiosk.R.drawable.ic_face_id);
+        faceFrame.addView(faceIdIcon, new FrameLayout.LayoutParams(Ui.px(114), Ui.px(114), Gravity.CENTER));
+        this.dashedCircle = dashedCircle;
         successBadge = buildSuccessBadge(context);
         successBadge.setVisibility(GONE);
         faceFrame.addView(successBadge, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        scanCard.addView(faceFrame, new LinearLayout.LayoutParams(Ui.px(240), Ui.px(240)));
+        LinearLayout.LayoutParams faceFrameLp = new LinearLayout.LayoutParams(Ui.px(380), Ui.px(380));
+        faceFrameLp.topMargin = Ui.px(32);
+        scanCard.addView(faceFrame, faceFrameLp);
 
-        scanCaption = Ui.text(context, "", 10f, Ui.TEXT_BODY_DARK, Ui.W_MEDIUM);
+        scanCaption = Ui.text(context, "", 24f, Color.BLACK, Ui.W_REGULAR);
         scanCaption.setGravity(Gravity.CENTER);
         scanCaption.setLineSpacing(0, 1.2f);
         LinearLayout.LayoutParams capLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        capLp.topMargin = Ui.px(20);
+        capLp.topMargin = Ui.px(32);
         scanCard.addView(scanCaption, capLp);
 
-        scanButton = Ui.primaryButton(context, "BẮT ĐẦU QUÉT", 11f);
+        scanButton = Ui.primaryButton(context, "BẮT ĐẦU QUÉT", 24f);
         scanButton.setOnClickListener(v -> onScanTap());
-        LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(68));
-        btnLp.topMargin = Ui.px(24);
-        scanCard.addView(scanButton, btnLp);
+        LinearLayout.LayoutParams scanLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(72));
+        scanLp.topMargin = Ui.px(42);
+        scanCard.addView(scanButton, scanLp);
 
         // ================= POPUP "XAC MINH CHINH CHU DE TIEP TUC" (che tren cung) =================
         popupOverlay = new FrameLayout(context);
@@ -137,65 +158,41 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         ticker.setDuration(TICK_MS);
         ticker.setRepeatCount(ValueAnimator.INFINITE);
         ticker.setInterpolator(new LinearInterpolator());
-        ticker.addUpdateListener(a -> face.setPhase((float) a.getAnimatedValue()));
+        ticker.addUpdateListener(a -> dashedCircle.setRotationAngle((float) a.getAnimatedValue() * 360f));
 
         applyState();
     }
 
+    /** Bottom sheet "Xac minh chinh chu de tiep tuc" — inflate dung sheet_verify.xml that qua ViewBinding. */
     private void buildPopup(Context context) {
-        LinearLayout card = new LinearLayout(context);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackground(Ui.card(Ui.R_LG));
-        Ui.softShadow(card);
-        card.setPadding(Ui.px(22), Ui.px(20), Ui.px(22), Ui.px(22));
+        SheetVerifyBinding sheet = SheetVerifyBinding.inflate(LayoutInflater.from(context), popupOverlay, false);
+        sheet.btnClose.setOnClickListener(v -> listener.onCancel());
+        sheet.tvBody1.setText(buildBody1());
+        sheet.tvBody3.setText(buildBody3());
+        sheet.btnAccept.setOnClickListener(v -> setState(State.WAITING));
+        popupOverlay.addView(sheet.getRoot(), new FrameLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+    }
 
-        LinearLayout titleRow = new LinearLayout(context);
-        titleRow.setOrientation(LinearLayout.HORIZONTAL);
-        titleRow.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title = Ui.text(context, "Xác minh chính chủ để tiếp tục", 11.5f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        title.setLineSpacing(0, 1.15f);
-        titleRow.addView(title, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        FrameLayout close = new FrameLayout(context);
-        close.addView(new IconView(context, IconView.CLOSE, Ui.TEXT_MUTED_LIGHT).strokeUnits(2f),
-                new FrameLayout.LayoutParams(Ui.px(22), Ui.px(22), Gravity.CENTER));
-        close.setClickable(true);
-        close.setOnClickListener(v -> listener.onCancel());
-        Ui.pressEffect(close);
-        LinearLayout.LayoutParams closeLp = new LinearLayout.LayoutParams(Ui.px(44), Ui.px(44));
-        closeLp.setMarginStart(Ui.px(8));
-        titleRow.addView(close, closeLp);
-        card.addView(titleRow, wrap(16));
+    /** "Theo <b><i><u>quy định Nhà nước</u></i></b>, thông tin thanh toán..." (verify_body_1). */
+    private static CharSequence buildBody1() {
+        String prefix = "Theo ";
+        String bolded = "quy định Nhà nước";
+        String suffix = ", thông tin thanh toán và hóa đơn cần trùng khớp với Căn cước công dân của Quý khách.";
+        android.text.SpannableString sp = new android.text.SpannableString(prefix + bolded + suffix);
+        int s = prefix.length(), e = s + bolded.length();
+        sp.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD_ITALIC), s, e, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sp.setSpan(new android.text.style.UnderlineSpan(), s, e, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return sp;
+    }
 
-        FrameLayout iconFrame = new FrameLayout(context);
-        GradientDrawable dashed = new GradientDrawable();
-        dashed.setShape(GradientDrawable.RECTANGLE);
-        dashed.setColor(Ui.rgb(250, 247, 241));
-        dashed.setCornerRadius(Ui.px(Ui.R_MD));
-        dashed.setStroke(Math.max(2, Ui.px(1.5f)), Ui.rgb(190, 175, 150), Ui.px(7), Ui.px(5));
-        iconFrame.setBackground(dashed);
-        iconFrame.addView(new IconView(context, IconView.CAMERA, Ui.rgb(150, 132, 108)).strokeUnits(1.5f),
-                new FrameLayout.LayoutParams(Ui.px(56), Ui.px(56), Gravity.CENTER));
-        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(140));
-        iconLp.gravity = Gravity.CENTER_HORIZONTAL;
-        iconLp.bottomMargin = Ui.px(18);
-        card.addView(iconFrame, iconLp);
-
-        TextView body = Ui.text(context,
-                "Theo quy định Nhà nước, thông tin thanh toán và hoá đơn cần trùng khớp với Căn cước công dân của Quý khách.\n\n"
-                        + "Để đảm bảo quyền lợi và căn cứ xác minh trả hàng tại cửa hàng, Quý khách vui lòng xác thực gương mặt "
-                        + "và kiểm tra thông tin giao dịch.\n\n"
-                        + "Đồng ý chia sẻ dữ liệu cá nhân theo nghị định 13 về bảo vệ dữ liệu cá nhân.",
-                9.5f, Ui.TEXT_BODY_DARK, Ui.W_REGULAR);
-        body.setLineSpacing(0, 1.3f);
-        card.addView(body, wrap(20));
-
-        TextView agree = Ui.primaryButton(context, "ĐỒNG Ý CHIA SẺ & TIẾP TỤC", 10.5f);
-        agree.setOnClickListener(v -> setState(State.WAITING));
-        card.addView(agree, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(68)));
-
-        popupOverlay.addView(card, new FrameLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        ((FrameLayout.LayoutParams) card.getLayoutParams()).setMargins(Ui.px(20), 0, Ui.px(20), 0);
+    /** "Đồng ý chia sẻ dữ liệu cá nhân theo <u>nghị định 13 về bảo vệ dữ liệu cá nhân</u>" (verify_body_3). */
+    private static CharSequence buildBody3() {
+        String prefix = "Đồng ý chia sẻ dữ liệu cá nhân theo ";
+        String underlined = "nghị định 13 về bảo vệ dữ liệu cá nhân";
+        android.text.SpannableString sp = new android.text.SpannableString(prefix + underlined);
+        sp.setSpan(new android.text.style.UnderlineSpan(), prefix.length(), prefix.length() + underlined.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return sp;
     }
 
     private static View buildSuccessBadge(Context context) {
@@ -236,14 +233,16 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         popupOverlay.setVisibility(state == State.POPUP ? VISIBLE : GONE);
         boolean verifying = state == State.VERIFYING;
         boolean success = state == State.SUCCESS;
-        face.setVerifying(verifying || success);
+        dashedCircle.setSpinningMode(verifying);
+        dashedCircle.setSuccess(success);
         successBadge.setVisibility(success ? VISIBLE : GONE);
-        face.setVisibility(success ? GONE : VISIBLE);
-        if (verifying) face.setPhase(0f);
+        dashedCircle.setVisibility(success ? GONE : VISIBLE);
+        if (verifying) dashedCircle.setRotationAngle(0f);
         switch (state) {
             case WAITING:
-                scanCaption.setText("Vui lòng nhìn thẳng và giữ khuôn mặt vào giữa khung hình");
-                scanCaption.setTextColor(Ui.TEXT_BODY_DARK);
+                // real activity_face_auth.xml: huong dan tinh, khong doi theo trang thai.
+                scanCaption.setText("Vui lòng nhìn thẳng và giữ khuôn mặt vào giữa khung hình hoặc đăng ký tài khoản nếu là khách hàng mới.");
+                scanCaption.setTextColor(Color.BLACK);
                 scanButton.setText("BẮT ĐẦU QUÉT");
                 scanButton.setVisibility(VISIBLE);
                 break;
@@ -293,10 +292,4 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         setPadding(left, top, right, bottom);
     }
 
-    private static LinearLayout.LayoutParams wrap(float bottom) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = Ui.px(bottom);
-        return lp;
-    }
 }

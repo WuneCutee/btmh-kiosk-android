@@ -1,8 +1,16 @@
 package vn.baotinmanhhai.btmhkiosk.ui;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.RadialGradient;
+import android.graphics.Rect;
+import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.TypedValue;
@@ -13,9 +21,12 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * Bo cuc kiosk Windows (WinForms) duoc thiet ke tren form rong 640px (ti le xem truoc 1:2). De giao dien
- * Android giong het o moi do phan giai, MOI kich thuoc duoc ghi bang "px thiet ke" (theo 640px) roi nhan
- * he so scale = chieu rong man hinh / 640. Co chu ghi theo point cua WinForms (1pt = 96/72 px).
+ * He quy chieu kich thuoc: man hinh kiosk-android-gitlab (that) duoc thiet ke tren canvas rong 540dp (xem
+ * values/dimens.xml cua repo that, chu thich "man rong ~540dp, density 320"). MOI kich thuoc duoc ghi bang
+ * gia tri dp that cua repo goc (vd Ui.px(32) cho mot o 32dp that) roi nhan he so scale = chieu rong man hinh
+ * thuc te (px) / 540. Truoc day hang so nay la 640 (tan du thiet ke WinForms cu) khien MOI man hinh da port
+ * theo quy uoc "dp that -> Ui.px()" bi nho hon thuc te ~15.6% (640/540); da sua lai thanh 540 de khop chinh
+ * xac. IdlePlayerView.java tu quan ly scale rieng (scale540, da dung 540 tu truoc) nen khong bi anh huong.
  *
  * Ngoai ra la BO DESIGN TOKEN cua giao dien "Champagne & Ivory Luxury" (che do sang): nen kem, card trang bo goc
  * + bong nhe, do ruou (burgundy) cho nut chinh/tieu de, vang dong cho dai Sidebar, cam dat cho gia tien. Moi view
@@ -26,7 +37,7 @@ public final class Ui {
     private Ui() {
     }
 
-    public static final float DESIGN_WIDTH = 640f;
+    public static final float DESIGN_WIDTH = 540f;
 
     // =====================================================================================
     //  DESIGN TOKENS — CHAMPAGNE LIGHT LUXURY
@@ -49,11 +60,11 @@ public final class Ui {
     public static final int FIELD_GREY = Color.rgb(233, 230, 224);       // #E9E6E0 o chi doc (ngay nhan hang)
     public static final int INK_500 = Color.rgb(80, 79, 79);             // #504F4F (ColorPalette/Ink/500 cua Figma)
 
-    // ---- Xu huong gia (dam hon ban toi de doc duoc tren nen trang) ----
-    public static final int UP_GREEN = Color.rgb(21, 128, 61);
-    public static final int DOWN_RED = Color.rgb(196, 36, 36);
-    public static final int UP_TINT = 0x1A15803D;
-    public static final int DOWN_TINT = 0x1AC42424;
+    // ---- Xu huong gia (dung dung gia tri Figma: home_trend_up/verified_green/payment_green va payment_red/result_warning) ----
+    public static final int UP_GREEN = Color.rgb(52, 199, 89);   // #34C759
+    public static final int DOWN_RED = Color.rgb(255, 56, 60);   // #FF383C
+    public static final int UP_TINT = 0x1A34C759;
+    public static final int DOWN_TINT = 0x1AFF383C;
 
     // ---- Thang bo goc (px thiet ke) ----
     public static final float R_XS = 8, R_SM = 12, R_MD = 16, R_LG = 22, R_XL = 28, R_PILL = 200;
@@ -77,6 +88,7 @@ public final class Ui {
     }
 
     private static float scale = 1f;
+    private static float density = 1f;
 
     public static int rgb(int r, int g, int b) {
         return Color.rgb(r, g, b);
@@ -85,16 +97,22 @@ public final class Ui {
     /** Goi 1 lan khi khoi dong Activity (man hinh khoa doc nen chieu rong khong doi). */
     public static void init(Context context) {
         scale = context.getResources().getDisplayMetrics().widthPixels / DESIGN_WIDTH;
+        density = context.getResources().getDisplayMetrics().density;
     }
 
-    /** px thiet ke (form 640px) -> px that tren man hinh. */
+    /** px thiet ke (canvas 540dp, dung DESIGN_WIDTH) -> px that tren man hinh. */
     public static int px(float designPx) {
         return Math.round(designPx * scale);
     }
 
-    /** Co chu WinForms (point) -> px that tren man hinh. */
+    /**
+     * Co chu: quy uoc cua du an la truyen THANG gia tri sp that cua man hinh goc lam tham so "points"
+     * (vd 16sp that -> textPx(16f)). Phai doi qua density man hinh (KHONG qua `scale` cua Ui.px) de
+     * ra dung sp that, doc lap voi DESIGN_WIDTH — dung "scale" o day se lam chu to/nho sai theo
+     * DESIGN_WIDTH (tung gay loi chu tran/vo khung sau khi DESIGN_WIDTH doi 640->540).
+     */
     public static float textPx(float points) {
-        return points * 96f / 72f * scale;
+        return points * density;
     }
 
     // ---- Chu ----
@@ -141,11 +159,45 @@ public final class Ui {
     // ---- Nen / be mat ----
 
     /** Nen trang mac dinh cua moi man: kem sang, chuyen sac rat nhe theo chieu doc. */
-    public static GradientDrawable pageBackground() {
-        GradientDrawable d = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{PAGE_BG_LIGHT_HI, PAGE_BG_LIGHT});
-        d.setShape(GradientDrawable.RECTANGLE);
-        return d;
+    /**
+     * Nen chuan dung chung cho MOI man hinh (CSS Figma node "BG"): phang #FFFBF4 + 2 quang mo (blur 100px) -
+     * mot vang/cam goc tren-trai (Eclipse, tam ~(192,122) r~215) va mot vang/cam o giua-duoi (Rectangle 29,
+     * tam ~(291,835) r~310). Android View khong co filter blur don gian nen dung RadialGradient de xap xi
+     * hieu ung mo (mau nhat dan deu tu tam ra ngoai, giong ket qua cua blur() tren hinh dac).
+     */
+    public static Drawable pageBackground() {
+        return new Drawable() {
+            private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+            @Override
+            public void draw(Canvas c) {
+                Rect b = getBounds();
+                paint.setShader(null);
+                paint.setColor(0xFFFFFBF4);
+                c.drawRect(b, paint);
+
+                glow(c, px(192), px(122), px(215), 0x66FF9429);
+                glow(c, px(291), px(835), px(310), 0x55FFC117);
+            }
+
+            private void glow(Canvas c, float cx, float cy, float r, int centerColor) {
+                paint.setShader(new RadialGradient(cx, cy, r, centerColor, centerColor & 0x00FFFFFF, Shader.TileMode.CLAMP));
+                c.drawCircle(cx, cy, r, paint);
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.TRANSLUCENT;
+            }
+        };
     }
 
     /** Hinh chu nhat (radius thiet ke 0 = vuong goc) co the co vien. */
@@ -257,8 +309,10 @@ public final class Ui {
     }
 
     /** "44.550.000" (khong don vi) — dung trong bang gia, don vi nam o tieu de cot. */
+    /** BR_001: don vi VND ngan cach bang dau ',' (vd 12,380,000) - giong dung PriceFormat.kt/Formats.kt cua
+     *  app that (Locale.US), KHONG dung vi-VN (ra dau cham, sai BR_001 va lech voi man Don hang/Thanh toan). */
     public static String number(double value) {
-        NumberFormat nf = NumberFormat.getNumberInstance(Locale.forLanguageTag("vi-VN"));
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
         nf.setMaximumFractionDigits(0);
         return nf.format(value);
     }

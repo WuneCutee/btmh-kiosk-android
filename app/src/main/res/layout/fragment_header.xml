@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Header dùng chung — Figma 850:12725 (Đăng ký tài khoản): mũi tên + tiêu đề trái, nút Home tròn phải. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/header_padding_h"
+    android:paddingTop="@dimen/header_padding_top">
+
+    <!-- Icon 24 như Figma, vùng chạm 48: lề âm để icon vẫn thẳng mép trái. -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBack"
+        android:layout_width="@dimen/header_back_touch"
+        android:layout_height="@dimen/header_back_touch"
+        android:layout_marginStart="@dimen/header_back_offset"
+        android:padding="@dimen/header_back_padding"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@id/ivHome"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivHome"
+        app:srcCompat="@drawable/ic_back" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:letterSpacing="-0.02"
+        android:textSize="@dimen/header_title_text"
+        app:layout_constraintBottom_toBottomOf="@id/ivHome"
+        app:layout_constraintEnd_toStartOf="@id/ivHome"
+        app:layout_constraintStart_toEndOf="@id/ivBack"
+        app:layout_constraintTop_toTopOf="@id/ivHome" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivHome"
+        android:layout_width="@dimen/header_home_size"
+        android:layout_height="@dimen/header_home_size"
+        android:padding="@dimen/header_home_padding"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_home" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

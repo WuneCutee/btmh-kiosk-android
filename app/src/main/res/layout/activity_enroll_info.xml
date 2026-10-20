@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/header"
+        android:name="vn.btmh.ui.fragments.header.HeaderFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutProgress"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_active" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_active" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_active" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@id/btnDone"
+        app:layout_constraintTop_toBottomOf="@id/layoutProgress">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_ng_i_nh_n"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_readonly"
+                android:enabled="false"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:paddingHorizontal="24dp"
+                android:textColor="#757981"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_s_c_n_c_c_c_ng_d_n_h_chi_u"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etIdCard"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_readonly"
+                android:enabled="false"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:paddingHorizontal="24dp"
+                android:textColor="#757981"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_ng_y_th_ng_n_m_sinh"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etDob"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_readonly"
+                android:enabled="false"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:paddingHorizontal="24dp"
+                android:textColor="#757981"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_a_ch_th_ng_tr"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_readonly"
+                android:enabled="false"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:paddingHorizontal="24dp"
+                android:textColor="#757981"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPhoneLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_s_i_n_tho_i"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_editable"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:inputType="phone"
+                android:paddingHorizontal="24dp"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_email"
+                android:textColor="#1A1A1A"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/bg_input_editable"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="24dp"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#757981"
+                android:textSize="22sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:gravity="center"
+                android:text="@string/txt_vui_l_ng_ki_m_tra_v_c_p_nh_t_t"
+                android:textColor="#772211"
+                android:textSize="26sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDone"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginBottom="42dp"
+        android:background="@drawable/bg_pill_red"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:text="@string/txt_ho_n_th_nh"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:textAllCaps="false" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

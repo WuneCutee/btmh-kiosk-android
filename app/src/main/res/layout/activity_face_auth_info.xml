@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Xác nhận thông tin khách hàng (S07) — SRS sheet "Xác nhận thông tin KH và thanh toán" mục I, II. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingHorizontal="@dimen/order_padding_h"
+        android:paddingBottom="@dimen/order_content_bottom"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@id/btnDone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_first_top"
+                android:text="@string/confirm_receiver" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvReceiver"
+                style="@style/ConfirmField"
+                tools:text="Nguyễn Văn A" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_label_top"
+                android:text="@string/confirm_id_number" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvIdNumber"
+                style="@style/ConfirmField"
+                tools:text="099999999999" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_label_top"
+                android:text="@string/confirm_dob" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDob"
+                style="@style/ConfirmField"
+                tools:text="09/09/1999" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_label_top"
+                android:text="@string/confirm_address" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvAddress"
+                style="@style/ConfirmField"
+                tools:text="37 Lê Văn Lương, Thanh Xuân, Hà Nội" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPhoneLabel"
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_label_top"
+                android:text="@string/confirm_phone" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPhone"
+                style="@style/ConfirmField"
+                android:background="@drawable/bg_field"
+                android:hint="@string/confirm_phone_hint"
+                android:imeOptions="actionNext"
+                android:importantForAutofill="no"
+                android:inputType="phone"
+                android:maxLength="10"
+                android:textColor="@color/black"
+                android:textColorHint="@color/order_field_text" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPhoneError"
+                style="@style/OrderHint"
+                android:text="@string/confirm_phone_invalid"
+                android:textColor="@color/brand_red"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderFieldLabel"
+                android:layout_marginTop="@dimen/confirm_label_top"
+                android:text="@string/confirm_email" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etEmail"
+                    style="@style/ConfirmField"
+                    android:background="@drawable/bg_field"
+                    android:hint="@string/confirm_email_hint"
+                    android:imeOptions="actionDone"
+                    android:importantForAutofill="no"
+                    android:inputType="textEmailAddress"
+                    android:maxLength="200"
+                    android:paddingEnd="@dimen/order_field_height"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/order_field_text" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnClearEmail"
+                    android:layout_width="@dimen/order_field_height"
+                    android:layout_height="@dimen/order_field_height"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginTop="@dimen/order_field_top"
+                    android:contentDescription="@string/confirm_clear_email"
+                    android:padding="@dimen/order_field_padding_h"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_close" />
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEmailError"
+                style="@style/OrderHint"
+                android:text="@string/confirm_email_invalid"
+                android:textColor="@color/brand_red"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderHint"
+                android:layout_marginTop="@dimen/confirm_note_top"
+                android:gravity="center"
+                android:fontFamily="@font/inter_24pt_italic"
+                android:text="@string/confirm_note"
+                android:textColor="@color/confirm_note"
+                android:textSize="@dimen/confirm_note_text"
+                app:lineHeight="@dimen/confirm_note_line" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnDone"
+        style="@style/OrderButton"
+        android:layout_width="0dp"
+        android:layout_marginHorizontal="@dimen/order_padding_h"
+        android:layout_marginBottom="@dimen/confirm_button_bottom"
+        android:background="@drawable/bg_pill_red"
+        android:text="@string/confirm_done"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/errorView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/confirm_load_error"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/detail_body_text" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnRetry"
+            android:layout_width="@dimen/detail_retry_width"
+            android:layout_height="@dimen/detail_button_height"
+            android:layout_marginTop="@dimen/detail_section_top"
+            android:background="@drawable/bg_pill_red"
+            android:gravity="center"
+            android:text="@string/detail_retry"
+            android:textColor="@color/white"
+            android:textSize="@dimen/detail_button_text" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/brand_red"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

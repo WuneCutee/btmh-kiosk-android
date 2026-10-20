@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet IX — Xác minh chính chủ để tiếp tục. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_sheet_cream"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/sheet_padding_side"
+    android:paddingVertical="@dimen/sheet_padding_vertical">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:gravity="center"
+            android:text="@string/verify_title"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sheet_title_large_text"
+            app:lineHeight="@dimen/sheet_title_large_line" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/dialog_close"
+            android:padding="@dimen/dialog_close_padding"
+            app:srcCompat="@drawable/ic_close" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="@dimen/verify_icon"
+        android:layout_height="@dimen/verify_icon"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/verify_icon_top"
+        android:importantForAccessibility="no"
+        app:srcCompat="@drawable/ic_face_scan" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBody1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/verify_text_top"
+        android:textColor="@color/black"
+        android:textSize="@dimen/verify_text"
+        app:lineHeight="@dimen/verify_line" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sheet_block_gap"
+        android:text="@string/verify_body_2"
+        android:textColor="@color/black"
+        android:textSize="@dimen/verify_text"
+        app:lineHeight="@dimen/verify_line" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBody3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sheet_block_gap"
+        android:textColor="@color/black"
+        android:textSize="@dimen/verify_text"
+        app:lineHeight="@dimen/verify_line" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnAccept"
+        style="@style/OrderButton"
+        android:layout_marginTop="@dimen/sheet_block_gap"
+        android:background="@drawable/bg_pill_red"
+        android:text="@string/verify_accept" />
+</androidx.appcompat.widget.LinearLayoutCompat>

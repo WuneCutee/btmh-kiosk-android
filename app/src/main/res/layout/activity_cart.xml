@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thông tin đơn hàng (S05) — SRS sheet "Thông tin đơn hàng" mockup I (chưa xác minh) và V (đã xác minh). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/order_padding_h"
+        android:paddingTop="@dimen/order_content_top"
+        android:paddingBottom="@dimen/order_button_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/contentColumn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- SRS mục 2: hiện sẵn 2 sản phẩm, từ sản phẩm thứ 3 cuộn trong khung; chiều cao đặt trong CartActivity. -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLines"
+                android:scrollbarSize="@dimen/scrollbar_size"
+                android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+                android:scrollbarTrackVertical="@drawable/scrollbar_track"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fadeScrollbars="false"
+                android:nestedScrollingEnabled="true"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_cart_line" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderSectionTitle"
+                android:text="@string/order_purchase_info" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/order_title_gap"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/OrderRowLabel"
+                    android:text="@string/order_count" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTotalCount"
+                    style="@style/OrderRowValue"
+                    tools:text="5" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/order_row_top"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/OrderRowLabel"
+                    android:text="@string/order_total" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTotalPrice"
+                    style="@style/OrderRowValue"
+                    android:textColor="@color/brand_red"
+                    tools:text="27,500,000 VND" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderSectionTitle"
+                android:layout_marginTop="@dimen/order_section_tight_top"
+                android:text="@string/order_pickup_at_store" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/provinceGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvProvinceLabel"
+                    style="@style/OrderFieldLabel"
+                    android:text="@string/order_province" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fieldProvince"
+                    style="@style/OrderDropdown"
+                    android:hint="@string/order_choose_province"
+                    tools:text="Hà Nội" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStoreLabel"
+                style="@style/OrderFieldLabel"
+                android:text="@string/order_store" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fieldStore"
+                style="@style/OrderDropdown"
+                android:hint="@string/order_choose_store"
+                android:maxLines="2" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/OrderHint"
+                android:fontFamily="@font/inter_24pt_italic"
+                android:text="@string/order_no_delivery_hint" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/order_receive_title_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/OrderSectionTitle"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/order_receive_info" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnEditReceiver"
+                    android:layout_width="@dimen/order_edit_icon"
+                    android:layout_height="@dimen/order_edit_icon"
+                    android:contentDescription="@string/order_edit_receiver"
+                    android:padding="@dimen/order_edit_padding"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_edit"
+                    tools:visibility="visible" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <!-- Mockup V: chỉ hiện khi đã xác minh và xác nhận thông tin. -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/receiverCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/order_title_gap"
+                android:background="@drawable/bg_card_order"
+                android:orientation="vertical"
+                android:padding="@dimen/order_card_padding"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <include
+                    android:id="@+id/rowReceiver"
+                    layout="@layout/item_receiver_row" />
+
+                <include
+                    android:id="@+id/rowIdNumber"
+                    layout="@layout/item_receiver_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/order_card_row_gap" />
+
+                <include
+                    android:id="@+id/rowPhone"
+                    layout="@layout/item_receiver_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/order_card_row_gap" />
+
+                <include
+                    android:id="@+id/rowAddress"
+                    layout="@layout/item_receiver_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/order_card_row_gap" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/order_badge_height"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="@dimen/order_card_row_gap"
+                    android:background="@drawable/bg_badge_verified"
+                    android:fontFamily="@font/inter_24pt_semibold"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/order_badge_padding_h"
+                    android:text="@string/order_verified_badge"
+                    android:textColor="@color/verified_green"
+                    android:textSize="@dimen/order_badge_text" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDateLabel"
+                style="@style/OrderFieldLabel"
+                android:text="@string/order_receive_date" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fieldDate"
+                style="@style/OrderDropdown"
+                android:background="@drawable/bg_field_readonly"
+                android:drawableEnd="@null"
+                android:hint="@string/order_receive_date_placeholder"
+                android:textColor="@color/order_date_text"
+                tools:text="10/08/2026" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPickupHours"
+                style="@style/OrderHint"
+                android:fontFamily="@font/inter_24pt_italic"
+                tools:text="Khung giờ nhận: 09:00 - 20:30" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/order_section_top"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/tradingNotice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/order_button_gap"
+                    android:background="@drawable/bg_detail_notice"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/detail_notice_padding_h"
+                    android:paddingVertical="@dimen/detail_notice_padding_v"
+                    android:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/detail_notice_icon"
+                        android:layout_height="@dimen/detail_notice_icon"
+                        android:layout_marginEnd="@dimen/detail_notice_icon_gap"
+                        android:importantForAccessibility="no"
+                        app:srcCompat="@drawable/ic_notice" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvTradingNotice"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/detail_notice_text" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/btnVerify"
+                    style="@style/OrderButton"
+                    android:background="@drawable/bg_pill_red"
+                    android:text="@string/order_verify" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvVerifyHint"
+                    style="@style/OrderHint"
+                    android:fontFamily="@font/inter_24pt_italic"
+                    android:textColor="@color/brand_red"
+                    android:text="@string/order_verify_hint" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/btnPlaceOrder"
+                    style="@style/OrderButton"
+                    android:layout_marginTop="@dimen/order_button_gap"
+                    android:background="@drawable/bg_pill_red"
+                    android:text="@string/order_place" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/brand_red"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

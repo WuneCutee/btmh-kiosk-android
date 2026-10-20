@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Overlay V — mockup SRS; màu đặt bằng tint. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="84dp"
+    android:height="84dp"
+    android:viewportWidth="84"
+    android:viewportHeight="84">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M42,4A38,38 0,1 0,42 80A38,38 0,1 0,42 4Z"
+        android:strokeWidth="4"
+        android:strokeColor="@color/white" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M26,43l11,11l22,-24"
+        android:strokeWidth="4.5"
+        android:strokeColor="@color/white"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

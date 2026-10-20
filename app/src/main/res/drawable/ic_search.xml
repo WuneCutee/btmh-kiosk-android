@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- icon_ht_search (biến thể ô nhập, "Vector-đậm") — đường vẽ lấy từ file Figma, tô #7C0410. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:translateX="3.82617"
+        android:translateY="4">
+        <path
+            android:fillColor="@color/brand_red_dark"
+            android:fillType="evenOdd"
+            android:pathData="M7.65217,1.3913C4.19439,1.3913,1.3913,4.19439,1.3913,7.65217C1.3913,11.11,4.19439,13.913,7.65217,13.913C11.11,13.913,13.913,11.11,13.913,7.65217C13.913,4.19439,11.11,1.3913,7.65217,1.3913ZM0,7.65217C0,3.42599,3.42599,0 7.65217,0C11.8784,0 15.3043,3.42599,15.3043,7.65217C15.3043,9.42591,14.7009,11.0587,13.688,12.3564L16.1441,14.8124C16.4157,15.0841,16.4157,15.5246,16.1441,15.7962C15.8724,16.0679,15.4319,16.0679,15.1603,15.7962L12.7358,13.3718C11.3841,14.574,9.60344,15.3043,7.65217,15.3043C3.42599,15.3043,0 11.8784,0 7.65217Z" />
+    </group>
+</vector>

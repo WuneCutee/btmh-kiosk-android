@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet III (chọn tỉnh/thành) và IV (chọn cửa hàng). -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/sheet_height"
+    android:background="@drawable/bg_sheet"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/sheet_padding_h"
+    android:paddingTop="@dimen/sheet_padding_top">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/sheet_back"
+            android:padding="@dimen/dialog_close_padding"
+            app:srcCompat="@drawable/ic_arrow_left" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/order_field_top"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/sheet_title_text"
+            tools:text="Tỉnh/Thành Phố" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/dialog_close"
+            android:padding="@dimen/dialog_close_padding"
+            app:srcCompat="@drawable/ic_close" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/sheet_search_height"
+        android:layout_marginTop="@dimen/sheet_search_top"
+        android:background="@drawable/bg_field"
+        android:drawableEnd="@drawable/ic_search"
+        android:imeOptions="actionSearch"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingHorizontal="@dimen/order_field_padding_h"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_hint"
+        android:textSize="@dimen/order_field_text"
+        tools:hint="Nhập tên Tỉnh/Thành Phố…" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sheet_count_top"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/sheet_count_text"
+        tools:text="8 Tỉnh/Thành Phố" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvOptions"
+        android:scrollbarSize="@dimen/scrollbar_size"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/order_field_top"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/sheet_padding_bottom"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_select_option" />
+</androidx.appcompat.widget.LinearLayoutCompat>

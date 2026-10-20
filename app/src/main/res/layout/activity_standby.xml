@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Màn chờ — Figma 2327:13240: ảnh/video phủ toàn màn, hàng đầu và nút mua nằm đè lên.
+    Danh sách rỗng thì ẩn media, còn lại nền bg_standby. Chạm chỗ không có quảng cáo thì về Home (SRS sheet Home, I).
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_standby"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pagerAds"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/standby_ads_description"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/standby_header_height"
+        android:layout_marginTop="@dimen/standby_top_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/standby_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="@dimen/standby_logo_width"
+            android:layout_height="@dimen/standby_logo_height"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/logo" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <!-- Hotline chỉ để xem: không bắt chạm. -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/chipHotline"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/standby_chip_height"
+                android:background="@drawable/bg_standby_chip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/standby_chip_padding_h"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/standby_chip_icon"
+                    android:layout_height="@dimen/standby_chip_icon"
+                    app:srcCompat="@drawable/ic_phone_call"
+                    app:tint="@color/standby_chip_icon" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvHotline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/standby_chip_icon_gap"
+                    android:fontFamily="@font/inter_24pt_semibold"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/standby_chip_text" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/chipLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/standby_chip_height"
+                android:layout_marginTop="@dimen/standby_chip_gap"
+                android:background="@drawable/bg_pill_red"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/standby_chip_padding_h">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/standby_chip_icon"
+                    android:layout_height="@dimen/standby_chip_icon"
+                    app:srcCompat="@drawable/ic_login"
+                    app:tint="@color/standby_login_icon" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/standby_chip_icon_gap"
+                    android:fontFamily="@font/inter_24pt_semibold"
+                    android:text="@string/home_login"
+                    android:textColor="@color/standby_login_text"
+                    android:textSize="@dimen/standby_chip_text" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/standby_dot_bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/btnBuyNow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/btnBuyNow"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/standby_buy_height"
+        android:layout_marginBottom="@dimen/standby_buy_bottom"
+        android:background="@drawable/bg_pill_red"
+        android:clickable="true"
+        android:elevation="@dimen/standby_buy_elevation"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:outlineAmbientShadowColor="@color/brand_red_shadow"
+        android:outlineSpotShadowColor="@color/brand_red_shadow"
+        android:paddingHorizontal="@dimen/standby_buy_padding_h"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/standby_buy_icon"
+            android:layout_height="@dimen/standby_buy_icon"
+            app:srcCompat="@drawable/ic_shopping_bag" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/standby_buy_text_gap"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+            android:text="@string/standby_buy_now"
+            android:textColor="@color/standby_buy_text"
+            android:textSize="@dimen/standby_buy_text" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

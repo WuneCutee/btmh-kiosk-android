@@ -17,7 +17,8 @@ public class IconView extends View {
             PAUSE = 8, CHECK = 9, CART = 10, PLUS = 11, MINUS = 12, ARROW_RIGHT = 13, QR = 14, CHEVRON_DOWN = 15,
             CHEVRON_UP = 16, PIN = 17, CAMERA = 18, PRINTER = 19, ID_CARD = 20, CHART = 21, GEM = 22, PHONE = 23,
             GOLD_BARS = 24, GIFT = 25, PROMOTION = GIFT, STAR = 26, USER = 27, ARROW_LEFT = 28, EDIT = 29, USER_ROUND = 30,
-            HOME = 31, HOME_OUTLINE = 32, LOGIN = 33;
+            HOME = 31, HOME_OUTLINE = 32, LOGIN = 33, CHEVRON_LEFT = 34, FACE_SCAN = 35, TREND_UP = 36, TREND_DOWN = 37,
+            SHOPPING_BAG = 38, KEY = 39, NOTICE = 40;
 
     private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -84,6 +85,50 @@ public class IconView extends View {
                 path.moveTo(6, 15);
                 path.lineTo(12, 9);
                 path.lineTo(18, 15);
+                c.drawPath(path, stroke);
+                break;
+            case CHEVRON_LEFT:
+                // Dau "<" don gian (khong co duong thang nhu ARROW_LEFT) - giong icon_ht_arrow-down-2 xoay 90 do tren Figma.
+                path.moveTo(15, 6);
+                path.lineTo(9, 12);
+                path.lineTo(15, 18);
+                c.drawPath(path, stroke);
+                break;
+            case FACE_SCAN:
+                // Dung ic_face_scan.xml that: 4 goc khung quet + mat don gian (2 mat + mui + mieng cuoi).
+                path.moveTo(3, 8);
+                path.lineTo(3, 5);
+                path.quadTo(3, 3, 5, 3);
+                path.lineTo(8, 3);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(16, 3);
+                path.lineTo(19, 3);
+                path.quadTo(21, 3, 21, 5);
+                path.lineTo(21, 8);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(21, 16);
+                path.lineTo(21, 19);
+                path.quadTo(21, 21, 19, 21);
+                path.lineTo(16, 21);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(8, 21);
+                path.lineTo(5, 21);
+                path.quadTo(3, 21, 3, 19);
+                path.lineTo(3, 16);
+                c.drawPath(path, stroke);
+                path.reset();
+                c.drawLine(9, 9, 9, 10.5f, stroke);
+                c.drawLine(15, 9, 15, 10.5f, stroke);
+                path.moveTo(12, 9);
+                path.lineTo(12, 13);
+                path.lineTo(11, 13);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(9, 16);
+                path.quadTo(12, 17.6f, 15, 16);
                 c.drawPath(path, stroke);
                 break;
             case SEARCH:
@@ -381,6 +426,55 @@ public class IconView extends View {
                 path.lineTo(21, 12);
                 path.lineTo(16.5f, 17);
                 c.drawPath(path, stroke);
+                break;
+            case TREND_UP:
+                // ic_trend_up.xml that (vector 18x18, "^"): toa do nhan 24/18 cho luoi 24x24 chung cua IconView.
+                path.moveTo(5f, 14.625f);
+                path.cubicTo(5f, 14.625f, 10.155f, 9.375f, 12f, 9.375f);
+                path.cubicTo(13.845f, 9.375f, 19f, 14.625f, 19f, 14.625f);
+                c.drawPath(path, stroke);
+                break;
+            case TREND_DOWN:
+                // ic_trend_down.xml that: cung duong TREND_UP xoay 180 do quanh tam (12,12).
+                path.moveTo(19f, 9.375f);
+                path.cubicTo(19f, 9.375f, 13.845f, 14.625f, 12f, 14.625f);
+                path.cubicTo(10.155f, 14.625f, 5f, 9.375f, 5f, 9.375f);
+                c.drawPath(path, stroke);
+                break;
+            case SHOPPING_BAG:
+                // ic_shopping_bag.xml that (vuesax/linear/shopping-bag-02): than tui bo goc + quai hinh vom.
+                rect.set(3.3f, 5.7f, 20.3f, 21.4f);
+                path.addRoundRect(rect, 4f, 4f, Path.Direction.CW);
+                c.drawPath(path, stroke);
+                path.reset();
+                rect.set(7.9f, 1.1f, 15.4f, 8.6f);
+                path.addArc(rect, 180, 180);
+                c.drawPath(path, stroke);
+                break;
+            case KEY:
+                // ic_activation_key.xml that (56x56): vong tron ban khoa (r=6 tam 22,22) + than + 2 rang, quy doi sang 24x24.
+                c.drawCircle(9.43f, 9.43f, 2.57f, stroke);
+                path.moveTo(12f, 12f);
+                path.lineTo(17.14f, 12f);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(15.43f, 12f);
+                path.lineTo(15.43f, 14.14f);
+                c.drawPath(path, stroke);
+                path.reset();
+                path.moveTo(17.14f, 12f);
+                path.lineTo(17.14f, 13.71f);
+                c.drawPath(path, stroke);
+                break;
+            case NOTICE:
+                // ic_notice.xml that: cham tron cam dac (#F07A22) voi dau "!" trang - mau co dinh, khong theo tham so color.
+                fill.setColor(0xFFF07A22);
+                c.drawCircle(12, 12, 10, fill);
+                fill.setColor(0xFFFFFFFF);
+                rect.set(11, 6.5f, 13, 13.5f);
+                c.drawRect(rect, fill);
+                rect.set(11, 15.5f, 13, 17.5f);
+                c.drawRect(rect, fill);
                 break;
             default:
                 break;

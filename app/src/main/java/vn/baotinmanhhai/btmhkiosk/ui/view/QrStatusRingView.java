@@ -37,6 +37,10 @@ public class QrStatusRingView extends View {
         invalidate();
     }
 
+    public State getState() {
+        return state;
+    }
+
     public void setPhase(float phase) {
         this.phase = phase;
         if (state == State.CHECKING) invalidate();

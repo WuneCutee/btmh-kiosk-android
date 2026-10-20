@@ -23,8 +23,8 @@ android {
         debug {
             isMinifyEnabled = false
             // 10.0.2.2 = alias cua Android Emulator tro ve localhost may host (HTTP chi cho phep o ban debug,
-            // xem src/debug/AndroidManifest.xml).
-            buildConfigField("String", "DEFAULT_BASE_URL", "\"http://10.0.2.2:8080\"")
+            // xem src/debug/AndroidManifest.xml). 8091 = Backend/kiosk-api (doc catalog tu admin-portal).
+            buildConfigField("String", "DEFAULT_BASE_URL", "\"http://10.0.2.2:8091\"")
         }
     }
 
@@ -34,7 +34,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = false
+        viewBinding = true
         buildConfig = true
     }
 
@@ -52,6 +52,12 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    // media3 1.11.1 (ban that dung) doi hoi compileSdk 36 - du an nay con AGP 8.5.2/compileSdk 34,
+    // nen ha xuong ban 1.3.1 (van co du thuoc tinh PlayerView dang dung: use_controller/surface_type/
+    // shutter_background_color/resize_mode).
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.4")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

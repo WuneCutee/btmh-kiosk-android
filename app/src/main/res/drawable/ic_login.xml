@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- icon_ht_login — export từ Figma (Buttons/icon_ht_login.svg); màu đổi bằng tint. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12.5,8.33398L11.4226,9.4114C11.0972,9.73683 11.0972,10.2645 11.4226,10.5899L12.5,11.6673M11.6667,10.0007L18.3334,10.0007M5.00002,16.6673C3.15907,16.6673 1.66669,15.1749 1.66669,13.334V6.66732C1.66669,4.82637 3.15907,3.33398 5.00002,3.33398M5.00002,16.6673C6.84097,16.6673 8.33335,15.1749 8.33335,13.334V6.66732C8.33335,4.82637 6.84097,3.33398 5.00002,3.33398M5.00002,16.6673H11.6667C13.5076,16.6673 15,15.1749 15,13.334M5.00002,3.33398H11.6667C13.5076,3.33398 15,4.82637 15,6.66732"
+        android:strokeWidth="1.5"
+        android:strokeColor="@color/white"
+        android:strokeLineCap="round" />
+</vector>

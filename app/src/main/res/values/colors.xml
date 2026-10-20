@@ -1,11 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Màn chờ — Figma 2327:13240 -->
+    <color name="standby_background">#FFFBF3</color>
+    <color name="standby_chip_background">#66FFFFFF</color>
+    <color name="standby_chip_icon">#504F4F</color>
+    <color name="standby_login_icon">#F1F1F1</color>
+    <color name="standby_login_text">#DDDEE0</color>
+    <color name="standby_dot_active">#EAEAEA</color>
+    <color name="standby_dot_inactive">#BFBFBF</color>
+    <color name="standby_buy_text">#FFFBF4</color>
+    <color name="brand_red">#AA1F23</color>
+    <color name="brand_red_shadow">#7B0410</color>
+
+    <!-- Home (bảng giá) — Figma 844:9967 -->
+    <color name="home_title">#7C0410</color>
+    <color name="home_subtitle">#42464E</color>
+    <color name="home_row_stripe">#F8ECDC</color>
+    <color name="home_row_alt">#FFFBF4</color>
+    <color name="home_scroll_thumb">#F4E3CA</color>
+    <color name="home_scroll_track">#EEEEEE</color>
+    <color name="home_trend_up">#34C759</color>
+
+    <!-- Chi tiết sản phẩm -->
+    <color name="text_primary">#1E1E1E</color>
+    <color name="text_secondary">#4F4F4F</color>
+    <color name="text_hint">#8C8C8C</color>
+    <color name="detail_dot_active">#BFBFBF</color>
+    <color name="detail_dot_inactive">#EAEAEA</color>
+    <color name="detail_stepper_disabled">#C5C5C5</color>
+    <color name="detail_sold_out_background">#C5C5C5</color>
+    <color name="detail_sold_out_text">#757981</color>
+    <color name="detail_desc">#42464E</color>
+    <color name="detail_hint">#757981</color>
+    <color name="detail_stepper_bg">#FFFBF4</color>
+    <color name="detail_stepper_border">#F4E3CA</color>
+    <color name="detail_stepper_off">#AEAEB2</color>
+    <color name="detail_value">#1A1A1A</color>
+    <color name="detail_notice_border">#EDE4DF</color>
+    <color name="detail_notice_icon">#F07A22</color>
+
+    <!-- Thông tin đơn hàng -->
+    <color name="field_readonly">#D9D9D9</color>
+    <color name="field_border">#FBECD9</color>
+    <color name="divider">#EDEDED</color>
+    <color name="option_selected">#F0F2F4</color>
+    <color name="verified_green">#34C759</color>
+    <color name="dim_overlay">#80000000</color>
+    <color name="order_disabled">#A6A6A6</color>
+    <color name="order_disabled_text">#EDEDED</color>
+    <color name="order_field_text">#757981</color>
+    <color name="order_label">#535862</color>
+    <color name="order_value">#1A1A1A</color>
+    <color name="order_receiver_label">#666666</color>
+    <color name="order_date_text">#42464E</color>
+    <color name="order_hint">#757981</color>
+    <color name="verified_bg">#EBF5F5</color>
+    <!-- Đỏ bã trầu — icon X giỏ hàng, kính lúp ô tìm (Figma). -->
+    <color name="brand_red_dark">#7C0410</color>
+    <color name="scrollbar_track">#FFFFFF</color>
+    <color name="confirm_readonly">#E6E6E6</color>
+    <color name="confirm_note">#772211</color>
+    <color name="dialog_close_icon">#5B5B5B</color>
+    <color name="scrollbar_thumb">#F4E3CA</color>
+
+    <!-- Thanh toán QR, kết quả giao dịch — Figma "Màn hình QR thanh toán", "Màn hình kết thúc thanh toán" -->
+    <color name="payment_note">#F80000</color>
+    <color name="result_time">#42464E</color>
+    <color name="result_warning">#FF383C</color>
+    <color name="payment_overlay">#CC000000</color>
+    <color name="payment_green">#34C759</color>
+    <color name="payment_red">#FF383C</color>
+    <color name="payment_orange">#FF8D28</color>
+    <color name="qr_logo_border">#008FF0</color>
+    <color name="qr_logo_outline">#333333</color>
+
+    <!-- Toast — Figma "Màn hình xác nhận thông tin KH" (mẫu thành công); kiểu lỗi cùng khung, tông đỏ (chốt 29/09/2026) -->
+    <color name="toast_text">#595959</color>
+    <color name="toast_success_border">#B0DCB5</color>
+    <color name="toast_success_start">#EAF6EB</color>
+    <color name="toast_success_icon">#00810E</color>
+    <color name="toast_error_border">#F2B8B5</color>
+    <color name="toast_error_start">#FDECEC</color>
+    <color name="toast_error_icon">#D92D20</color>
+
+    <!-- Giấy hẹn (ảnh tải về điện thoại) — Figma "Chi tiết đơn hàng"; chip cùng màu webview BIDV/VTC -->
+    <color name="appt_label">#666666</color>
+    <color name="appt_value">#1A1A1A</color>
+    <color name="appt_chip_waiting_text">#3371E8</color>
+    <color name="appt_chip_waiting_bg">#E7EDF8</color>
+    <color name="appt_chip_waiting_border">#B6C7EA</color>
+
+    <!-- Màn Vàng tích luỹ — Figma 970:10373 -->
+    <color name="list_chevron">#BEA686</color>
+    <color name="list_tab_selected_end">#CBBCA9</color>
+    <color name="list_text_dark">#1A1A1A</color>
+    <color name="list_stepper_bg">#FFFBF4</color>
+    <color name="list_stepper_stroke">#F4E3CA</color>
+    <color name="list_stepper_disabled">#C9C9C9</color>
+    <color name="list_badge_bg">#FFFAEB</color>
+    <color name="list_badge_stroke">#CF999F</color>
+    <color name="list_badge_text">#B54708</color>
+    <color name="list_summary_label">#666666</color>
+    <color name="list_next_enabled_text">#FFFBF4</color>
+    <color name="list_next_disabled_bg">#C5C5C5</color>
+    <color name="list_next_disabled_text">#757981</color>
+    <color name="list_scroll_track">#FFFBF4</color>
+    <color name="list_skeleton_block">#F3ECE1</color>
+    <color name="list_skeleton_shine">#FFF9F0</color>
+    <color name="list_banner_placeholder">#FAFAFA</color>
+    <color name="status_icon_bg">#FBEAEA</color>
+
+    <!-- BtmhKioskAndroid rieng (theme cu, giu lai phong khi con noi tham chieu) -->
     <color name="gold">#D4AF37</color>
     <color name="gold_border">#C5A059</color>
     <color name="card_bg">#1E080C</color>
     <color name="page_bg">#100406</color>
     <color name="muted_text">#C8BAA8</color>
     <color name="error_color">#F87171</color>
-    <color name="white">#FFFFFF</color>
     <color name="button_text">#240508</color>
 </resources>

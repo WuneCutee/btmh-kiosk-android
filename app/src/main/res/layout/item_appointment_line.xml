@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thẻ sản phẩm của giấy hẹn (Figma 1334:16052 Card 102): ảnh 60×88 trong vùng 93, khối tên/giá/số lượng canh giữa. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/appt_line_height"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="@dimen/appt_line_image_area"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivImage"
+            android:layout_width="@dimen/appt_line_image_w"
+            android:layout_height="@dimen/appt_line_image_h"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:maxLines="2"
+            android:textColor="@color/appt_value"
+            android:textSize="@dimen/appt_line_name_text"
+            app:lineHeight="@dimen/appt_line_name_line"
+            tools:text="Đồng Xu Kim Gia Bảo Hoa Sen loại 1 chỉ - 24K (999.9)" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/appt_line_content_gap"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:textColor="@color/brand_red"
+            android:textSize="@dimen/appt_line_price_text"
+            app:lineHeight="@dimen/appt_line_price_line"
+            tools:text="17,000,000 VND" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="@dimen/appt_stepper_width"
+            android:layout_height="@dimen/appt_stepper_height"
+            android:layout_marginTop="@dimen/appt_line_content_gap"
+            android:background="@drawable/bg_detail_stepper"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/AppointmentStepper"
+                android:text="@string/detail_minus_sign" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCount"
+                style="@style/AppointmentStepper"
+                android:textColor="@color/black"
+                tools:text="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/AppointmentStepper"
+                android:text="@string/detail_plus_sign" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

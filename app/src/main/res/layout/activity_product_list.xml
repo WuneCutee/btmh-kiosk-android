@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Màn Vàng tích luỹ — Figma "Kiosk" MtCo74v1AkurJAxkKEvqfd, frame 995:11811. -->
+<!-- Gốc nhận focus khi ô tìm kiếm clearFocus(); tắt lớp xám focus mặc định của Android. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:defaultFocusHighlightEnabled="false"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <!-- Figma: khung 102×66 sát mép phải, icon Home 34 nằm giữa (icon lịch sử GD bên trái đang ẩn). HeaderFragment cách mép 32 nên không dùng. -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivHome"
+        android:layout_width="@dimen/list_home_width"
+        android:layout_height="@dimen/list_home_size"
+        android:layout_marginTop="@dimen/list_home_top"
+        android:contentDescription="@string/list_home"
+        android:paddingHorizontal="@dimen/list_home_padding_h"
+        android:paddingVertical="@dimen/list_home_padding"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_home" />
+
+    <!-- Ô tìm kiếm (Figma "search bar"): lọc thẻ của tab đang chọn. Icon bên phải đổi kính lúp ↔ ✕ theo nội dung. -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llSearch"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/list_search_height"
+        android:layout_marginHorizontal="@dimen/list_side"
+        android:layout_marginTop="@dimen/list_gap"
+        android:background="@drawable/bg_list_search"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/list_search_padding_h"
+        android:paddingVertical="@dimen/list_search_padding_v"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivHome">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="@font/plus_jakarta_sans_regular"
+            android:gravity="center_vertical"
+            android:hint="@string/list_search_hint"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLength="250"
+            android:maxLines="1"
+            android:padding="0dp"
+            android:textColor="@color/list_text_dark"
+            android:textColorHint="@color/list_summary_label"
+            android:textSize="@dimen/list_search_text" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivSearchAction"
+            android:layout_width="@dimen/list_search_icon"
+            android:layout_height="@dimen/list_search_icon"
+            android:layout_marginStart="@dimen/list_search_icon_gap"
+            android:contentDescription="@string/list_search"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_list_search" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <!-- Banner II.2.4: GONE khi rỗng thì thanh tab tự cách ô tìm kiếm 10 (ConstraintLayout bỏ lề của view GONE). -->
+    <FrameLayout
+        android:id="@+id/flBanner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/list_side"
+        android:layout_marginTop="@dimen/list_gap"
+        android:background="@drawable/bg_list_banner"
+        app:layout_constraintDimensionRatio="H,476:132"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llSearch">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vpBanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <vn.btmh.common.widgets.ShimmerLayout
+            android:id="@+id/shimmerBanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_list_banner_skeleton" />
+        </vn.btmh.common.widgets.ShimmerLayout>
+
+        <LinearLayout
+            android:id="@+id/llBannerDots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="@dimen/list_banner_dot_bottom"
+            android:orientation="horizontal"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Mũi tên 10×16 nằm ở mép trong của vùng chạm 26 (lấn 16 vào lề) để khách dễ bấm. -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llTabs"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/list_tab_height"
+        android:layout_marginHorizontal="@dimen/list_tabs_start"
+        android:layout_marginTop="@dimen/list_gap"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/flBanner">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivTabPrev"
+            android:layout_width="@dimen/list_chevron_touch_width"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/list_tab_prev"
+            android:paddingStart="@dimen/list_chevron_touch_extra"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_list_chevron_prev" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTabs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/list_tab_gap"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_category_tab" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivTabNext"
+            android:layout_width="@dimen/list_chevron_touch_width"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/list_tab_next"
+            android:paddingEnd="@dimen/list_chevron_touch_extra"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_list_chevron_next" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvProducts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/list_side"
+        android:layout_marginTop="@dimen/list_gap"
+        android:layout_marginBottom="@dimen/list_section_gap"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@id/llBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llTabs"
+        tools:listitem="@layout/item_product_card" />
+
+    <vn.btmh.common.widgets.ShimmerLayout
+        android:id="@+id/shimmerSkeleton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/rvProducts"
+        app:layout_constraintEnd_toEndOf="@id/rvProducts"
+        app:layout_constraintStart_toStartOf="@id/rvProducts"
+        app:layout_constraintTop_toTopOf="@id/rvProducts">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/list_grid_gap_h" />
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/list_grid_gap_h" />
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/list_grid_gap_v"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/list_grid_gap_h" />
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/list_grid_gap_h" />
+
+                <include
+                    layout="@layout/item_product_skeleton"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/list_card_height"
+                    android:layout_weight="1" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </vn.btmh.common.widgets.ShimmerLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fontFamily="@font/inter_24pt_regular"
+        android:gravity="center"
+        android:text="@string/list_empty"
+        android:textColor="@color/list_summary_label"
+        android:textSize="@dimen/list_empty_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvProducts"
+        app:layout_constraintEnd_toEndOf="@id/rvProducts"
+        app:layout_constraintStart_toStartOf="@id/rvProducts"
+        app:layout_constraintTop_toTopOf="@id/rvProducts" />
+
+    <FrameLayout
+        android:id="@+id/flScrollTrack"
+        android:layout_width="@dimen/list_scroll_width"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/list_scroll_gap"
+        android:background="@drawable/bg_list_scroll_track"
+        app:layout_constraintBottom_toBottomOf="@id/rvProducts"
+        app:layout_constraintStart_toEndOf="@id/rvProducts"
+        app:layout_constraintTop_toTopOf="@id/rvProducts">
+
+        <View
+            android:id="@+id/vScrollThumb"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_home_scroll_thumb"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llBottom"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/list_bottom_height"
+        android:layout_marginHorizontal="@dimen/list_side"
+        android:layout_marginBottom="@dimen/list_bottom_margin"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_list_summary"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/list_summary_padding_h"
+            android:paddingVertical="@dimen/list_summary_padding_v">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_summary_line"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/ListSummaryLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="@string/order_count" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCount"
+                        style="@style/ListSummaryValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        tools:text="1" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <Space
+                    android:layout_width="@dimen/list_summary_pair_gap"
+                    android:layout_height="match_parent" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/ListSummaryLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="@string/list_chi" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvChi"
+                        style="@style/ListSummaryValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        tools:text="10" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_summary_line"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/ListSummaryLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/order_total" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTotal"
+                    style="@style/ListSummaryTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    tools:text="150,000,000 VND" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
+            style="@style/ListNextButton"
+            android:layout_width="@dimen/list_next_width"
+            android:layout_height="@dimen/list_next_height"
+            android:layout_marginStart="@dimen/list_next_gap"
+            android:enabled="false"
+            android:text="@string/list_next" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

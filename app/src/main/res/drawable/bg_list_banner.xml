@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Khung banner: bo 20.37 (Figma), nền #FAFAFA của ô placeholder khi ảnh đang tải. Cắt ảnh theo outline này. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/list_banner_placeholder" />
+    <corners android:radius="@dimen/list_banner_radius" />
+</shape>

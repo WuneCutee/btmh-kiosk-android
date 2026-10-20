@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Khung logo giữa QR thanh toán — Figma: viền tối mảnh ngoài, viền xanh, nền trắng. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/qr_logo_outline" />
+        </shape>
+    </item>
+    <item android:inset="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" />
+            <stroke
+                android:width="3dp"
+                android:color="@color/qr_logo_border" />
+        </shape>
+    </item>
+</layer-list>

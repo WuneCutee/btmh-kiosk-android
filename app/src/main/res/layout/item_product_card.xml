@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Thẻ sản phẩm — Figma 970:10373: cao 272, rộng 1/3 lưới (149–151 ở màn thiết kế), khối nội dung 127 căn giữa, đáy 6.
+  Tổng các phần đúng bằng 272, không dư: ở mật độ màn lẻ, làm tròn từng phần sẽ tràn 1–2 px và cắt viền dưới bộ đếm.
+  Vì vậy khối nội dung lấy hết phần còn lại dưới ảnh và ô tên (54 ở màn thiết kế) co giãn; giá và bộ đếm giữ cỡ.
+  Nhãn "Hết hàng" đặt theo mép thẻ: trên 13, phải 11 (tương đương Figma: lệch ra ngoài ô ảnh 7.5).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_card_height"
+    android:background="@drawable/bg_list_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/list_card_padding_h"
+        android:paddingBottom="@dimen/list_card_padding_bottom">
+
+        <vn.btmh.common.widgets.ShimmerLayout
+            android:id="@+id/shimmerImage"
+            android:layout_width="@dimen/list_image_width"
+            android:layout_height="@dimen/list_image_height">
+
+            <View
+                android:id="@+id/vImagePlaceholder"
+                android:layout_width="@dimen/list_skeleton_image_width"
+                android:layout_height="@dimen/list_skeleton_image_height"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_list_skeleton_block" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+        </vn.btmh.common.widgets.ShimmerLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="@dimen/list_content_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingVertical="@dimen/list_content_padding_v">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvName"
+                style="@style/ListCardName"
+                android:layout_width="@dimen/list_name_width"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:text="Đồng Xu Kim Gia Bảo Hoa Sen, loại 1 chỉ - 24K (999.9)" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPrice"
+                style="@style/ListCardPrice"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_price_height"
+                android:layout_marginTop="@dimen/list_content_gap"
+                tools:text="17,000,000 VND" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/llStepper"
+                android:layout_width="@dimen/list_stepper_width"
+                android:layout_height="@dimen/list_stepper_height"
+                android:layout_marginTop="@dimen/list_content_gap"
+                android:background="@drawable/bg_list_stepper"
+                android:clickable="true"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMinus"
+                    style="@style/ListStepperSign"
+                    android:layout_width="@dimen/list_stepper_cell"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/list_decrease"
+                    android:text="-" />
+
+                <!-- Ô số lượng gõ được: rộng bằng ô gốc cộng hai khe hai bên, nên dấu − và + vẫn đúng vị trí Figma. -->
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etCount"
+                    style="@style/ListStepperCount"
+                    android:layout_width="@dimen/list_stepper_count_width"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:contentDescription="@string/order_count"
+                    android:imeOptions="actionDone"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:padding="0dp"
+                    android:selectAllOnFocus="true"
+                    tools:ignore="LabelFor"
+                    tools:text="0" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPlus"
+                    style="@style/ListStepperSign"
+                    android:layout_width="@dimen/list_stepper_cell"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/list_increase"
+                    android:text="+" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSoldOut"
+        style="@style/ListBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/list_badge_height"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="@dimen/list_badge_margin_top"
+        android:layout_marginEnd="@dimen/list_badge_margin_end"
+        android:background="@drawable/bg_list_badge"
+        android:paddingStart="@dimen/list_badge_padding_start"
+        android:paddingEnd="@dimen/list_badge_padding_end"
+        android:text="@string/list_sold_out"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</FrameLayout>

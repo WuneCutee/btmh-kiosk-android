@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Màn kích hoạt (phương án A2, docs/kiosk/phuong-an-man-kich-hoat.html): chìa khoá trên nền tròn hồng nhạt. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+    <path
+        android:fillColor="@color/status_icon_bg"
+        android:pathData="M28,0a28,28 0,1 1,0 56a28,28 0,1 1,0 -56z" />
+    <path
+        android:pathData="M22,22a6,6 0,1 1,0 12a6,6 0,1 1,0 -12z"
+        android:strokeWidth="2.5"
+        android:strokeColor="@color/brand_red" />
+    <path
+        android:pathData="M28,28h12M36,28v5M40,28v4"
+        android:strokeLineCap="round"
+        android:strokeWidth="2.5"
+        android:strokeColor="@color/brand_red" />
+</vector>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dòng nhãn — giá trị của giấy hẹn (Figma 1334:16052 List item: cao 32, padding dọc 4). -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="@dimen/appt_row_padding_v">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabel"
+        style="@style/AppointmentLabel"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        tools:text="Mã đơn hàng" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvValue"
+        style="@style/AppointmentValue"
+        tools:text="202610120" />
+</androidx.appcompat.widget.LinearLayoutCompat>

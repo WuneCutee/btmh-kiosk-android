@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Một dòng bảng giá — Figma 844:9990: cột tên giãn theo bảng (172 ở màn thiết kế), hai cột giá 106 (ô số 88 + mũi tên 18).
+     Dòng co theo nội dung: đệm 6 + max(tên, giá 24) + 6 → tên 1 dòng cao 36, 3 dòng cao 72. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/home_row_padding">
+
+    <!-- Hiện đủ tên (BA). Mỗi dòng chữ cao 20 như Figma: Android không cộng line-height cho dòng cuối,
+         nên đệm trên/dưới nửa phần dư (20 - chiều cao font) cho đủ n x 20 và chữ nằm giữa dòng. -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvName"
+        style="@style/HomeRowName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|start"
+        android:paddingVertical="@dimen/home_name_padding_vertical"
+        android:paddingEnd="@dimen/home_name_padding_end"
+        tools:text="Vàng Son Đất Việt - Đồng Tháp, loại 0.1 chỉ - 24K(999.9)" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="@dimen/home_price_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/home_row_gap"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvBuyPrice"
+            style="@style/HomeRowPrice"
+            android:layout_width="@dimen/home_price_text_width"
+            android:layout_height="@dimen/home_price_text_height"
+            tools:text="14,000,000" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBuyTrend"
+            android:layout_width="@dimen/home_trend_icon"
+            android:layout_height="@dimen/home_trend_icon"
+            android:importantForAccessibility="no"
+            tools:srcCompat="@drawable/ic_trend_up" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="@dimen/home_price_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/home_row_gap"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSellPrice"
+            style="@style/HomeRowPrice"
+            android:layout_width="@dimen/home_price_text_width"
+            android:layout_height="@dimen/home_price_text_height"
+            tools:text="15,000,000" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivSellTrend"
+            android:layout_width="@dimen/home_trend_icon"
+            android:layout_height="@dimen/home_trend_icon"
+            android:importantForAccessibility="no"
+            tools:srcCompat="@drawable/ic_trend_up" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

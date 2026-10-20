@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="376dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="24dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logo_with_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header" />
+
+    <vn.btmh.ui.customviews.DashedCircleView
+        android:id="@+id/dashedCircleView"
+        android:layout_width="640dp"
+        android:layout_height="640dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="112dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivLogo"
+        app:layout_constraintVertical_bias="0.4" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivFaceId"
+        android:layout_width="114dp"
+        android:layout_height="114dp"
+        android:src="@drawable/ic_face_id"
+        app:layout_constraintBottom_toBottomOf="@id/dashedCircleView"
+        app:layout_constraintEnd_toEndOf="@id/dashedCircleView"
+        app:layout_constraintStart_toStartOf="@id/dashedCircleView"
+        app:layout_constraintTop_toTopOf="@id/dashedCircleView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvInstruction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="112dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:text="@string/txt_vui_l_ng_nh_n_th_ng_v_gi_khu_n_1"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dashedCircleView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvExtraMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginBottom="42dp"
+        android:text="@string/txt_c_n_1_l_n_qu_t"
+        android:textColor="#FF3333"
+        android:textSize="24sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvInstruction" />
+
+    <LinearLayout
+        android:id="@+id/btnContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginBottom="42dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRegister"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_outline_red"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:text="@string/txt_ng_k"
+            android:textColor="@color/brand_red"
+            android:textSize="24sp"
+            app:textAllCaps="false" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnScan"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_red"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:text="@string/txt_b_t_u_qu_t"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:textAllCaps="false" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

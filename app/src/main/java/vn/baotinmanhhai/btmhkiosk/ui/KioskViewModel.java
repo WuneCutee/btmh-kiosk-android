@@ -110,6 +110,8 @@ public class KioskViewModel extends AndroidViewModel {
         public String hotline = null;
         public int idleTimeoutSeconds = DEFAULT_IDLE_TIMEOUT_SECONDS;
         public boolean sellingOpen = false;
+        public String openTime = null;  // "HH:mm:ss" tu bootstrap - man Chi tiet hien "Thoi gian mo ban: tu X den Y" khi ngoai gio
+        public String closeTime = null;
 
         public List<AdsManager.PlayableAd> ads = new ArrayList<>();
         public String websiteUrl = null;
@@ -185,6 +187,8 @@ public class KioskViewModel extends AndroidViewModel {
             s.hotline = hotline;
             s.idleTimeoutSeconds = idleTimeoutSeconds;
             s.sellingOpen = sellingOpen;
+            s.openTime = openTime;
+            s.closeTime = closeTime;
             s.ads = ads;
             s.websiteUrl = websiteUrl;
             s.provinces = provinces;
@@ -371,6 +375,43 @@ public class KioskViewModel extends AndroidViewModel {
                     break;
                 }
             }
+        });
+    }
+
+    public interface CartRefreshCallback {
+        void onResult(List<Models.CartItem> freshCart);
+    }
+
+    /**
+     * BUG THAT da tim thay 15/10/2026: OrderConfirmView.proceedToPlaceOrder() truoc day so sanh gia/ton kho
+     * dua thang vao item.product cua CartItem dang co trong state.cart - nhung ProductDto do la snapshot
+     * CHUP TU LUC THEM VAO GIO (addToCart/stepper tren luoi), KHONG tung duoc lam moi lai sau do (gia/ton kho
+     * co the da doi rat nhieu luc khach con dang dien thong tin o man Thong tin don hang). Ket qua: popup "gia
+     * thay doi" / "het ton kho" KHONG BAO GIO kich hoat duoc du server that su da doi, vi so sanh entryPrices
+     * (chup tu chinh object cu nay) voi item.product.price (van la object cu do) luon bang nhau.
+     *
+     * CartViewModel.placeOrder() that goi refreshProducts() (II.2.8 tung dong) truoc khi tu kiem tra - ham nay
+     * lam dung y vay: goi lai API chi tiet tung san pham trong gio NGAY LUC bam "DAT MUA", thay the toan bo
+     * item.product bang ban moi nhat, roi moi tra ve qua callback de OrderConfirmView tu so sanh/kiem tra.
+     */
+    public void refreshCartProductsForCheck(CartRefreshCallback callback) {
+        List<Models.CartItem> snapshot = new ArrayList<>(state.cart);
+        worker.execute(() -> {
+            List<Models.CartItem> fresh = new ArrayList<>();
+            for (Models.CartItem item : snapshot) {
+                Models.ProductDto latest = item.product;
+                if (item.product != null && item.product.id != null) {
+                    try {
+                        Models.ProductDto d = apiService.productDetail(item.product.id);
+                        if (d != null) latest = d;
+                    } catch (Exception e) {
+                        Log.w(TAG, "refreshCartProductsForCheck: khong lam moi duoc " + item.product.id + ": " + e);
+                    }
+                }
+                fresh.add(new Models.CartItem(latest, item.quantity));
+            }
+            updateState(s -> s.cart = fresh);
+            mainHandler.post(() -> callback.onResult(fresh));
         });
     }
 
@@ -889,6 +930,8 @@ public class KioskViewModel extends AndroidViewModel {
 
     private void applyBootstrapToState(UiState s, Models.BootstrapConfigDto b) {
         s.hotline = b.hotline;
+        s.openTime = b.openTime;
+        s.closeTime = b.closeTime;
         if (b.storeName != null) s.storeName = b.storeName;
         if (b.idleTimeoutSeconds > 0) s.idleTimeoutSeconds = b.idleTimeoutSeconds;
         if (b.stalePriceSeconds > 0) stalePriceSeconds = b.stalePriceSeconds;
@@ -1023,6 +1066,7 @@ public class KioskViewModel extends AndroidViewModel {
         }
         selectCategory(exists ? categoryId : "ALL");
         updateState(s -> s.screen = AppScreen.PRODUCTS);
+        refreshOrderLimit(); // xem ghi chu o openProducts() - cung mot lo hong, cung mot cho sua.
     }
 
     /** Tim kiem (II.2.7): App goi khi du 2 ky tu va sau 300ms debounce; ket qua cu bi bo neu khach go tiep. */
@@ -1121,6 +1165,12 @@ public class KioskViewModel extends AndroidViewModel {
         updateState(s -> s.screen = AppScreen.PRODUCTS);
         // II.2.6: danh sach da tai cu hon 5 phut -> goi lai khi mo man (giu danh sach cu tren man cho toi khi co moi).
         if (accessToken != null && System.currentTimeMillis() - productsAtMs > PERIODIC_MS) reloadProductList();
+        // BUG THAT da tim thay 15/10/2026: han muc 10 chi truoc day CHI duoc tai khi mo man Chi tiet
+        // (openProductById -> refreshOrderLimit()) - neu khach vao thang man Danh sach san pham va bam (+)
+        // tren luoi ma CHUA tung mo Chi tiet lan nao, limitQuantity con null -> ProductAdapter.computeMaxQuantity()
+        // roi ve "khong gioi han theo han muc, chi gioi han boi ton kho" -> stepper tren luoi cho cong vuot han
+        // muc that su (vd 20 cai). Goi luon o day de co du lieu han muc tu luc nay.
+        refreshOrderLimit();
     }
 
     /** Tai lai trang dau theo nhom/tu khoa hien tai (khong bat co "dang tai" de danh sach cu khong bi nhay mat). */
@@ -1162,6 +1212,36 @@ public class KioskViewModel extends AndroidViewModel {
                 verifyRevocation();
             } catch (Exception e) {
                 Log.w(TAG, "Mo chi tiet loi: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Lam moi man chi tiet DANG MO (ten/anh/mo ta vua doi tren web admin) ma khong doi man. San pham da bi tat
+     * cho kenh (404/202) -> ve danh sach tab "Tat ca", giong openProductById.
+     */
+    private void refreshOpenDetail(String productId) {
+        worker.execute(() -> {
+            try {
+                Models.ProductDto detail = apiService.productDetail(productId);
+                if (detail == null) return;
+                updateState(s -> {
+                    if (s.screen == AppScreen.DETAIL && s.selectedProduct != null && productId.equals(s.selectedProduct.id)) {
+                        s.selectedProduct = detail;
+                    }
+                });
+            } catch (Models.ApiException e) {
+                if (e.httpStatus == 404 || "202".equals(e.errorCode)) {
+                    selectCategory("ALL");
+                    updateState(s -> {
+                        if (s.screen == AppScreen.DETAIL) {
+                            s.selectedProduct = null;
+                            s.screen = AppScreen.PRODUCTS;
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Lam moi chi tiet loi: " + e.getMessage());
             }
         });
     }
@@ -1254,6 +1334,13 @@ public class KioskViewModel extends AndroidViewModel {
     }
 
     public void openOrderConfirm() {
+        // BUG THAT da tim thay 15/10/2026: "stores=[]/selectedStoreId=null" truoc day nam trong KHOI BAT DONG BO
+        // ben duoi (chay xong sau khi goi 2-3 API: provinces, limit, stores-theo-tinh) - neu khach nhanh tay
+        // bam "Chon cua hang" va chon XONG truoc khi khoi do chay xong, luc no chay xong se GHI DE
+        // selectedStoreId VE NULL, xoa mat lua chon vua roi cua khach (khach thay nhu "khong chon duoc cua
+        // hang nao ca"). Chuyen 2 dong nay len khoi DONG BO (chay truoc ca man hinh kip hien ra) de khach
+        // khong bao gio co co hoi chon truoc khi reset xong - khoi bat dong bo o duoi KHONG duoc dong vao
+        // selectedStoreId nua.
         updateState(s -> {
             if (s.cart.isEmpty()) {
                 s.notice = "Giỏ hàng trống";
@@ -1263,6 +1350,8 @@ public class KioskViewModel extends AndroidViewModel {
             s.screen = AppScreen.ORDER;
             s.orderLoading = true;
             s.orderError = null;
+            s.stores = new ArrayList<>();
+            s.selectedStoreId = null;
         });
         worker.execute(() -> {
             try {
@@ -1287,8 +1376,6 @@ public class KioskViewModel extends AndroidViewModel {
                     s.provinces = provinces;
                     s.selectedProvinceId = provinceId;
                     s.limitQuantity = finalLimit;
-                    s.stores = new ArrayList<>();
-                    s.selectedStoreId = null;
                 });
                 if (provinceId != null) loadStoresSync(provinceId);
                 updateState(s -> s.orderLoading = false);
@@ -1362,13 +1449,19 @@ public class KioskViewModel extends AndroidViewModel {
                 List<Models.SsePriceItemDto> rows = new ArrayList<>(snapshot.items);
                 sortByOrder(rows);
                 // Tap san pham doi (them/tat san pham) so voi bang cu hoac danh sach dang tai -> tai lai danh sach (II.3.1).
+                // Server cung gui snapshot khi ten/anh/mo ta doi (sua tren web admin) - SSE khong mang anh/mo ta nen
+                // danh sach dang hien phai tai lai qua II.2.6 thi moi thay; chi tai khi da co danh sach tren man.
                 boolean setChanged = productSetChanged(s.board, s.products, rows);
+                boolean listShown = !s.products.isEmpty();
                 s.board = rows;
                 s.boardUpdatedAt = latestUpdate(rows);
                 applyItemsToProducts(s, rows);
                 cache.put("board", rows);
                 cache.put("board_at", System.currentTimeMillis());
-                if (setChanged && accessToken != null) reloadProductList();
+                if ((setChanged || listShown) && accessToken != null) reloadProductList();
+                if (s.screen == AppScreen.DETAIL && s.selectedProduct != null && accessToken != null) {
+                    refreshOpenDetail(s.selectedProduct.id);
+                }
             });
         }
 
@@ -1400,12 +1493,15 @@ public class KioskViewModel extends AndroidViewModel {
 
         @Override
         public void onConfigChanged() {
+            // Server ban config-changed ca khi banner/nhom san pham doi (sua tren web admin) -> tai lai ngay,
+            // khong doi chu ky 5 phut.
             worker.execute(() -> {
                 try {
                     loadBootstrapSync();
                 } catch (Exception e) {
                     Log.w(TAG, "Tai lai cau hinh loi: " + e);
                 }
+                if (accessToken != null) refreshBannersAndCategories(true);
             });
         }
 
@@ -1475,7 +1571,11 @@ public class KioskViewModel extends AndroidViewModel {
                     } catch (Models.DeviceRevokedException e) {
                         verifyRevocation();
                     } catch (Exception e) {
+                        // Truoc day chi log, KHONG set s.offline=true: SSE da mat + REST du phong nay cung
+                        // loi (server that su down) ma dai "MAT KET NOI" van khong hien - khach/van hanh
+                        // tuong nham may van on. Dong bo voi handleSessionError/handleLoadError (cung IOException).
                         Log.w(TAG, "Poll gia du phong loi: " + e);
+                        updateState(s -> s.offline = true);
                     } finally {
                         fallbackPolling = false;
                     }

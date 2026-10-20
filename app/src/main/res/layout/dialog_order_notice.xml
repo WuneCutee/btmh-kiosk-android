@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Popup II (xoá sản phẩm), VI (nhập quá số lượng), VII (số lượng > tồn). -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/dialog_width"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:orientation="vertical"
+    android:padding="@dimen/dialog_padding">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:textColor="@color/order_value"
+            android:textSize="@dimen/dialog_title_text"
+            app:lineHeight="@dimen/dialog_title_line"
+            tools:text="Thông báo" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/dialog_close"
+            android:padding="@dimen/dialog_close_padding"
+            app:srcCompat="@drawable/ic_close" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_message_top"
+        android:textColor="@color/detail_desc"
+        android:textSize="@dimen/dialog_message_text"
+        app:lineHeight="@dimen/dialog_message_line"
+        tools:text="Bạn chắc chắn muốn bỏ sản phẩm này khỏi giỏ hàng?" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_button_top"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnSecondary"
+            style="@style/DialogButton"
+            android:layout_marginEnd="@dimen/dialog_button_gap"
+            android:background="@drawable/bg_pill_outline_red_thick"
+            android:textColor="@color/brand_red"
+            app:autoSizeMaxTextSize="@dimen/dialog_button_text"
+            app:autoSizeTextType="uniform"
+            tools:text="HUỶ" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnPrimary"
+            style="@style/DialogButton"
+            android:background="@drawable/bg_pill_red"
+            android:textColor="@color/white"
+            app:autoSizeMaxTextSize="@dimen/dialog_button_text"
+            app:autoSizeTextType="uniform"
+            tools:text="ĐỒNG Ý" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

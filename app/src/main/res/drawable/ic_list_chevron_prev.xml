@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="10dp"
+    android:height="16dp"
+    android:viewportWidth="7.41"
+    android:viewportHeight="12">
+    <group
+        android:pivotX="3.705"
+        android:scaleX="-1">
+        <group
+            android:translateX="-8.59"
+            android:translateY="-6">
+            <path
+                android:fillColor="@color/list_chevron"
+                android:pathData="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+        </group>
+    </group>
+</vector>

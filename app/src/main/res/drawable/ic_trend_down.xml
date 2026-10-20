@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- icon_ht_arrow-right-2 turned over (price down) (exported from Figma "Kiosk (Copy)") -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/home_trend_icon"
+    android:height="@dimen/home_trend_icon"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+    <group android:pivotX="9.0" android:pivotY="9.0" android:rotation="180">
+        <path
+            android:strokeColor="@color/brand_red"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M3.75 10.9688C3.75 10.9688 7.61662 7.03125 9 7.03125C10.3835 7.03125 14.25 10.9687 14.25 10.9687" />
+    </group>
+</vector>

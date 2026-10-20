@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet VIII — Giá sản phẩm thay đổi. Mỗi sản phẩm đổi giá một khối, thêm vào llChanges. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_sheet_cream"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/sheet_padding_side"
+    android:paddingVertical="@dimen/sheet_padding_vertical">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_24pt_semibold"
+            android:text="@string/price_changed_title"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sheet_title_large_text"
+            app:lineHeight="@dimen/sheet_title_large_line" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/dialog_close"
+            android:padding="@dimen/dialog_close_padding"
+            app:srcCompat="@drawable/ic_close" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sheet_block_gap"
+        android:text="@string/price_changed_intro"
+        android:textColor="@color/black"
+        android:textSize="@dimen/price_text"
+        app:lineHeight="@dimen/price_line" />
+
+    <!-- Nhiều sản phẩm đổi giá: chiều cao chặn trong code để nút Đồng ý không bị đẩy khỏi màn. -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollChanges"
+        android:scrollbarSize="@dimen/scrollbar_size"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llChanges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/price_total_top"
+        android:textColor="@color/black"
+        android:textSize="@dimen/price_text"
+        app:lineHeight="@dimen/price_line"
+        tools:text="Tổng giá trị đơn hàng: 17,200,000 VND" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/order_label_top"
+        android:text="@string/price_changed_outro"
+        android:textColor="@color/black"
+        android:textSize="@dimen/price_text"
+        app:lineHeight="@dimen/price_line" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnAgree"
+        style="@style/OrderButton"
+        android:layout_marginTop="@dimen/sheet_block_gap"
+        android:background="@drawable/bg_pill_red"
+        android:text="@string/dialog_agree" />
+</androidx.appcompat.widget.LinearLayoutCompat>

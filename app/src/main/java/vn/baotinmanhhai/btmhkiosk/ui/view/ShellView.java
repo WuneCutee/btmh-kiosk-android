@@ -2,6 +2,7 @@ package vn.baotinmanhhai.btmhkiosk.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
@@ -11,6 +12,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.view.LayoutInflater;
+
+import vn.baotinmanhhai.btmhkiosk.databinding.FragmentHeaderBinding;
 import vn.baotinmanhhai.btmhkiosk.ui.KioskViewModel;
 import vn.baotinmanhhai.btmhkiosk.ui.Ui;
 
@@ -43,51 +47,28 @@ public class ShellView extends FrameLayout {
         void onLoginLogout(boolean currentlyLoggedIn);
     }
 
-    private static final int GLOW_H = 230; // px thiet ke (chua tinh vung an toan phia tren)
-
-    /** Dai champagne o dinh (champagne -> kem) nam duoi rail va thanh dau. */
-    private static class TopGlow extends View {
-        private final Paint paint = new Paint();
-
-        TopGlow(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onDraw(Canvas c) {
-            int h = getHeight();
-            if (h <= 0) return;
-            paint.setShader(new LinearGradient(0, 0, 0, h,
-                    new int[]{Ui.HEADER_CHAMPAGNE, 0xFFE9E0CC, 0x00F5EFE6},
-                    new float[]{0f, 0.55f, 1f}, Shader.TileMode.CLAMP));
-            c.drawRect(0, 0, getWidth(), h, paint);
-        }
-    }
-
     private final LinearLayout canvas;
-    private final FrameLayout homeButton;
+    private final View homeButton;
     private final LinearLayout header;
     private final LinearLayout homeRow;
     private final TextView loginButton;
     private final TextView homeHotline;
-    private final TopGlow glow;
     private final View backButton;
-    private final LinearLayout titleRow;
+    private final View titleRow;
     private final TextView title;
-    private final TextView subtitle;
     private final FrameLayout container;
-    private final FrameLayout cartButton;
-    private final TextView cartBadge;
     private String shownSubtitle;
     private boolean boundLoggedIn;
     private boolean boundHasLoginState;
 
     public ShellView(Context context, Callbacks callbacks) {
         super(context);
-        setBackground(Ui.pageBackground());
-
-        glow = new TopGlow(context);
-        addView(glow, new LayoutParams(LayoutParams.MATCH_PARENT, Ui.px(GLOW_H), Gravity.TOP));
+        // activity_home.xml/activity_product_list.xml... THAT deu dung android:background="@drawable/bg" (anh
+        // PNG that, khong phai gradient tu ve) cho chinh man hinh noi dung. Truoc day ShellView (khung thanh dau +
+        // nut Home) lai tu ve rieng Ui.pageBackground() (RadialGradient uoc luong, vi tri glow khac anh that) -
+        // 2 nen chong len nhau lech vi tri tai ranh gioi header/noi dung, nhin nhu "lech nen" o quanh icon Home.
+        // Dung THANG anh that cho ca ShellView de dam bao lien tuc tuyet doi voi noi dung ben duoi.
+        setBackground(context.getResources().getDrawable(vn.baotinmanhhai.btmhkiosk.R.drawable.bg, context.getTheme()));
 
         // ---- Canvas (khong con Sidebar/rail — theo mockup Figma moi nhat: bo thanh dock trai, chi con nut Home tron o thanh dau) ----
         canvas = new LinearLayout(context);
@@ -102,107 +83,70 @@ public class ShellView extends FrameLayout {
         homeRow.setOrientation(LinearLayout.HORIZONTAL);
         homeRow.setGravity(Gravity.CENTER_VERTICAL);
 
-        FrameLayout emblem = new FrameLayout(context);
-        emblem.setBackground(Ui.rect(Ui.BURGUNDY_PRIMARY, Ui.R_SM, 0, 0));
-        emblem.addView(new LogoView(context, true).tint(Ui.SURFACE_WHITE),
-                new FrameLayout.LayoutParams(Ui.px(30), Ui.px(26), Gravity.CENTER));
-        Ui.softShadow(emblem);
-        homeRow.addView(emblem, new LinearLayout.LayoutParams(Ui.px(48), Ui.px(48)));
+        // activity_home.xml that: ivLogo la anh logo_mark THUONG (scaleType fitCenter), KHONG co khung/nen do
+        // boc quanh - truoc day boc trong 1 "emblem" FrameLayout nen do bo goc day khong co trong thiet ke that.
+        // home_logo_width=82dp / home_logo_height=75dp / home_logo_start=38dp / home_logo_top=3dp.
+        LogoView homeLogo = new LogoView(context, true).tint(Ui.BURGUNDY_PRIMARY);
+        LinearLayout.LayoutParams homeLogoLp = new LinearLayout.LayoutParams(Ui.px(82), Ui.px(75));
+        homeLogoLp.setMarginStart(Ui.px(38));
+        homeLogoLp.topMargin = Ui.px(3);
+        homeRow.addView(homeLogo, homeLogoLp);
 
         homeRow.addView(new View(context), new LinearLayout.LayoutParams(0, 0, 1f));
 
+        // activity_home.xml that: cot phai la llPills rong CO DINH 145dp, THU TU la hotline chip (tren) roi
+        // nut dang nhap (duoi, marginTop=home_pill_gap 8dp) - truoc day bi dao nguoc thu tu va kich thuoc sai.
         LinearLayout greetCol = new LinearLayout(context);
         greetCol.setOrientation(LinearLayout.VERTICAL);
-        greetCol.setGravity(Gravity.END);
-        loginButton = Ui.text(context, "Đăng nhập", 9.5f, Ui.BURGUNDY_PRIMARY, Ui.W_BOLD);
-        loginButton.setGravity(Gravity.CENTER);
-        loginButton.setBackground(Ui.pressable(Ui.rect(Ui.SURFACE_WHITE, Ui.R_PILL, Ui.BURGUNDY_PRIMARY, 1.2f),
-                Ui.rect(Ui.PAGE_BG_LIGHT, Ui.R_PILL, Ui.BURGUNDY_PRIMARY, 1.2f)));
-        loginButton.setPadding(Ui.px(18), 0, Ui.px(18), 0);
-        Ui.pressEffect(loginButton);
-        loginButton.setOnClickListener(v -> callbacks.onLoginLogout(boundLoggedIn));
-        greetCol.addView(loginButton, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, Ui.px(40)));
 
         LinearLayout hotRow = new LinearLayout(context);
         hotRow.setOrientation(LinearLayout.HORIZONTAL);
         hotRow.setGravity(Gravity.CENTER_VERTICAL);
-        hotRow.addView(new IconView(context, IconView.PHONE, Ui.TEXT_MUTED_LIGHT).strokeUnits(2f),
-                new LinearLayout.LayoutParams(Ui.px(16), Ui.px(16)));
-        homeHotline = Ui.text(context, "", Ui.T_SMALL, Ui.TEXT_MUTED_LIGHT, Ui.W_MEDIUM);
+        hotRow.setBackground(Ui.rect(0x66FFFFFF, Ui.R_PILL, 0, 0)); // bg_standby_chip that: standby_chip_background
+        hotRow.setPadding(Ui.px(16), 0, Ui.px(16), 0); // home_pill_padding
+        hotRow.addView(new IconView(context, IconView.PHONE, 0xFF504F4F).strokeUnits(2f), // standby_chip_icon
+                new LinearLayout.LayoutParams(Ui.px(20), Ui.px(20))); // home_pill_icon
+        homeHotline = Ui.text(context, "", 16f, Color.BLACK, Ui.W_MEDIUM); // HomePillText: home_text_body/black
         LinearLayout.LayoutParams hotTextLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        hotTextLp.setMarginStart(Ui.px(5));
+        hotTextLp.setMarginStart(Ui.px(6)); // home_pill_icon_gap
         hotRow.addView(homeHotline, hotTextLp);
-        LinearLayout.LayoutParams hotRowLp = new LinearLayout.LayoutParams(
+        greetCol.addView(hotRow, new LinearLayout.LayoutParams(Ui.px(145), Ui.px(44))); // home_pill_width/height
+
+        LinearLayout loginRow = new LinearLayout(context);
+        loginRow.setOrientation(LinearLayout.HORIZONTAL);
+        loginRow.setGravity(Gravity.CENTER);
+        loginRow.setBackground(Ui.pressable(Ui.rect(Ui.BURGUNDY_PRIMARY, Ui.R_PILL, 0, 0),
+                Ui.rect(Ui.BURGUNDY_DARK, Ui.R_PILL, 0, 0))); // bg_pill_red
+        loginRow.setPadding(Ui.px(16), 0, Ui.px(16), 0); // home_pill_padding
+        loginRow.addView(new IconView(context, IconView.LOGIN, 0xFFF1F1F1).strokeUnits(2f), // standby_login_icon
+                new LinearLayout.LayoutParams(Ui.px(20), Ui.px(20))); // home_pill_icon
+        loginButton = Ui.text(context, "Đăng Nhập", 16f, 0xFFDDDEE0, Ui.W_MEDIUM); // standby_login_text
+        LinearLayout.LayoutParams loginTextLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        hotRowLp.topMargin = Ui.px(6);
-        greetCol.addView(hotRow, hotRowLp);
+        loginTextLp.setMarginStart(Ui.px(6)); // home_pill_icon_gap
+        loginRow.addView(loginButton, loginTextLp);
+        Ui.pressEffect(loginRow);
+        loginRow.setOnClickListener(v -> callbacks.onLoginLogout(boundLoggedIn));
+        LinearLayout.LayoutParams loginLp = new LinearLayout.LayoutParams(Ui.px(145), Ui.px(32)); // home_login_height
+        loginLp.topMargin = Ui.px(8); // home_pill_gap
+        greetCol.addView(loginRow, loginLp);
         homeRow.addView(greetCol, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
         header.addView(homeRow, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        titleRow = new LinearLayout(context);
-        titleRow.setOrientation(LinearLayout.HORIZONTAL);
-        titleRow.setGravity(Gravity.CENTER_VERTICAL);
-        FrameLayout back = new FrameLayout(context);
-        back.addView(new IconView(context, IconView.ARROW_LEFT, Ui.TEXT_TITLE_DARK).strokeUnits(2.2f),
-                new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
-        back.setClickable(true);
-        back.setOnClickListener(v -> callbacks.onBack());
-        Ui.pressEffect(back);
-        backButton = back;
-        titleRow.addView(back, new LinearLayout.LayoutParams(Ui.px(64), Ui.px(64)));
-
-        LinearLayout titleCol = new LinearLayout(context);
-        titleCol.setOrientation(LinearLayout.VERTICAL);
-        title = Ui.text(context, "", 14f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
-        title.setSingleLine(true);
-        titleCol.addView(title, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        subtitle = Ui.text(context, "", Ui.T_SMALL, Ui.TEXT_BODY_DARK, Ui.W_REGULAR);
-        subtitle.setVisibility(GONE);
-        LinearLayout.LayoutParams sLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        sLp.topMargin = Ui.px(4);
-        titleCol.addView(subtitle, sLp);
-        titleRow.addView(titleCol, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        // Ca dong tieu de cung bam duoc de quay lai (cham nhu mui ten) khi khong phai Home
-        titleCol.setOnClickListener(v -> {
-            if (backButton.getVisibility() == VISIBLE) callbacks.onBack();
-        });
-        titleRow.addView(new View(context), new LinearLayout.LayoutParams(0, 0, 1f)); // day icon gio hang ve sat phai
-
-        // Icon gio hang + badge so luong (chi hien o San pham/Chi tiet, xem setScreen()/setCartCount())
-        cartButton = new FrameLayout(context);
-        cartButton.addView(new IconView(context, IconView.CART, Ui.TEXT_TITLE_DARK).strokeUnits(2f),
-                new FrameLayout.LayoutParams(Ui.px(30), Ui.px(30), Gravity.CENTER));
-        cartBadge = Ui.text(context, "", 8f, Ui.SURFACE_WHITE, Ui.W_BOLD);
-        cartBadge.setGravity(Gravity.CENTER);
-        cartBadge.setBackground(Ui.oval(Ui.BURGUNDY_PRIMARY));
-        cartBadge.setVisibility(GONE);
-        FrameLayout.LayoutParams badgeLp = new FrameLayout.LayoutParams(Ui.px(26), Ui.px(26), Gravity.TOP | Gravity.END);
-        cartButton.addView(cartBadge, badgeLp);
-        cartButton.setClickable(true);
-        cartButton.setOnClickListener(v -> callbacks.onViewCart());
-        Ui.pressEffect(cartButton);
-        cartButton.setVisibility(GONE);
-        titleRow.addView(cartButton, new LinearLayout.LayoutParams(Ui.px(64), Ui.px(64)));
-
-        // Nut "Ve trang chu" (thay cho rail da bo) — an o Home vi dang o do roi. Theo CSS Figma moi nhat (man
-        // "Chon vat pham"): KHONG con pill/khoanh nen gi ca, chi icon nha VIEN do noi truc tiep tren nen.
-        homeButton = new FrameLayout(context);
-        homeButton.addView(new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.4f),
-                new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
-        homeButton.setClickable(true);
-        homeButton.setOnClickListener(v -> callbacks.onNavHome());
-        Ui.pressEffect(homeButton);
-        LinearLayout.LayoutParams homeLp = new LinearLayout.LayoutParams(Ui.px(64), Ui.px(64));
-        homeLp.setMarginStart(Ui.px(8));
-        titleRow.addView(homeButton, homeLp);
-
+        // fragment_header.xml that (dung chung moi man khac Home/Order): mui ten quay lai trai, tieu de, nut Home
+        // tron phai. Inflate dung layout that thay vi tu ve bang Ui.px() de khop pixel tuyet doi.
+        FragmentHeaderBinding headerBinding = FragmentHeaderBinding.inflate(LayoutInflater.from(context), header, false);
+        titleRow = headerBinding.getRoot();
+        backButton = headerBinding.ivBack;
+        backButton.setOnClickListener(v -> callbacks.onBack());
+        title = headerBinding.tvTitle;
+        View home = headerBinding.ivHome;
+        home.setOnClickListener(v -> callbacks.onNavHome());
+        homeButton = home;
         header.addView(titleRow, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
@@ -238,13 +182,16 @@ public class ShellView extends FrameLayout {
     /** Dat tieu de + muc dang chon tren rail + mui ten Quay lai theo man hinh. */
     public void setScreen(KioskViewModel.AppScreen screen) {
         boolean isHome = screen == KioskViewModel.AppScreen.HOME;
+        boolean isOrder = screen == KioskViewModel.AppScreen.ORDER;
         homeButton.setVisibility(isHome ? GONE : VISIBLE);
         // Home dung hang rieng (logo vuong + chao/dang nhap), cac man khac dung hang tieu de + mui ten quay lai.
         homeRow.setVisibility(isHome ? VISIBLE : GONE);
-        titleRow.setVisibility(isHome ? GONE : VISIBLE);
+        // Man Xac nhan don hang tu ve header rieng (back/home/tieu de) -> an HET ca khung header dung chung (khong
+        // chi an titleRow) de khong con dai dem rong phia tren no (truoc day con mot soc mong gay "lech hang").
+        header.setVisibility(isOrder ? GONE : VISIBLE);
+        titleRow.setVisibility(isHome || isOrder ? GONE : VISIBLE);
         // Dai champagne chi dung cho Home (theo mockup rieng cua Home) — mockup "Chon vat pham" nen phang #FFFBF4,
         // khong co dai gradient nay, nen an di de dung mau nen.
-        glow.setVisibility(screen == KioskViewModel.AppScreen.PRODUCTS ? GONE : VISIBLE);
         switch (screen) {
             case PRODUCTS:
                 // Theo mockup Figma "Man hinh Vang tich luy": thanh dau CHI con nut Home, khong mui ten/tieu de/gio hang
@@ -252,43 +199,45 @@ public class ShellView extends FrameLayout {
                 setTitle("", false);
                 break;
             case DETAIL:
-                setTitle("Chi tiết sản phẩm", true);
-                break;
-            case ORDER:
-                setTitle("Thông tin đơn hàng", true);
-                titleRow.setPadding(0, Ui.px(16), 0, 0); // Tieu de man xac nhan xuong thap hon mot chut
+                // Tieu de = TEN SAN PHAM (activity_product_detail.xml that dung title dong, khong phai chu tinh
+                // "Chi tiet san pham") - dat tam placeholder, KioskActivity.render() se goi setDetailTitle() ngay
+                // sau do voi ten that.
+                setTitle("", true);
                 break;
             default:
                 break;
         }
-        // Icon gio hang: chi hien o Chi tiet (San pham dung thanh tong hop day man thay the, xem ProductsView).
-        cartButton.setVisibility(screen == KioskViewModel.AppScreen.DETAIL ? VISIBLE : GONE);
     }
 
-    /** Loi chao/Dang nhap + hotline tren thanh dau Home (theo mockup Figma — thay cho nut rieng trong HomeView). */
+    /** Tieu de dong cua man Chi tiet = TEN SAN PHAM (activity_product_detail.xml that). */
+    public void setDetailTitle(String productName) {
+        setTitle(productName != null ? productName : "", true);
+    }
+
+    /**
+     * Loi chao/Dang nhap + hotline tren thanh dau Home. Figma node 1085:11214 ("Bang gia vang" da dang nhap):
+     * nut chi doi thanh "Đăng xuất" don gian (KHONG them "Xin chao, {ten} ·" truoc do) - man nay la thiet ke
+     * chua tung dua vao code that (activity_home.xml goc chi co 1 trang thai "chua login"), nhung theo Figma
+     * chinh xac hon suy doan "Xin chao" truoc day.
+     */
     public void bindHome(String loggedInCustomerName, String hotline) {
         boolean loggedIn = loggedInCustomerName != null;
         if (loggedIn != boundLoggedIn || !boundHasLoginState) {
             boundLoggedIn = loggedIn;
             boundHasLoginState = true;
-            loginButton.setText(loggedIn ? "Xin chào, " + loggedInCustomerName + " · Đăng xuất" : "Đăng nhập");
+            loginButton.setText(loggedIn ? "Đăng xuất" : "Đăng Nhập");
         }
         homeHotline.setText(hotline != null && !hotline.isEmpty() ? hotline : "");
     }
 
-    /** So luong (dong) trong gio hang — hien thi dang cham so tren icon gio hang, an khi gio rong. */
+    /** fragment_header.xml that khong co icon gio hang (vao gio hang qua nut "TIEP TUC" o ProductsView) - no-op,
+     * giu lai chi de KioskActivity.java khong phai sua goi. */
     public void setCartCount(int count) {
-        cartBadge.setVisibility(count > 0 ? VISIBLE : GONE);
-        cartBadge.setText(count > 99 ? "99+" : String.valueOf(count));
     }
 
-    /** Dong phu duoi tieu de (rong/null = an). */
+    /** fragment_header.xml that khong co o phu duoi tieu de - no-op (HomeView.subtitle() da luon tra ve null). */
     public void setSubtitle(String text) {
-        if (java.util.Objects.equals(text, shownSubtitle)) return;
         shownSubtitle = text;
-        boolean has = text != null && !text.isEmpty();
-        subtitle.setText(has ? text : "");
-        subtitle.setVisibility(has ? VISIBLE : GONE);
     }
 
     /**
@@ -298,9 +247,6 @@ public class ShellView extends FrameLayout {
     public void onInsets(int left, int top, int right, int bottom, int barsBottom) {
         header.setPadding(Ui.px(6), top + Ui.px(10), Ui.px(16), Ui.px(4));
         canvas.setPadding(left, 0, right, 0);
-        LayoutParams glp = (LayoutParams) glow.getLayoutParams();
-        glp.height = top + Ui.px(GLOW_H);
-        glow.setLayoutParams(glp);
         for (int i = 0; i < container.getChildCount(); i++) {
             View v = container.getChildAt(i);
             if (v instanceof Ui.InsetAware) ((Ui.InsetAware) v).onInsets(0, 0, 0, bottom);

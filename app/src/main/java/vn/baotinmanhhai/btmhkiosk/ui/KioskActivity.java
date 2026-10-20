@@ -36,12 +36,14 @@ import java.util.List;
 import vn.baotinmanhhai.btmhkiosk.BuildConfig;
 import vn.baotinmanhhai.btmhkiosk.data.Models;
 import vn.baotinmanhhai.btmhkiosk.ui.view.CustomerAuthView;
+import vn.baotinmanhhai.btmhkiosk.ui.view.CustomerConfirmView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.DetailView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.GoodsPickupView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.HomeView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.IdentityVerifyView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.IdlePlayerView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.OrderConfirmView;
+import vn.baotinmanhhai.btmhkiosk.ui.view.OrderPopups;
 import vn.baotinmanhhai.btmhkiosk.ui.view.PaymentView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.ProductsView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.SetupView;
@@ -75,6 +77,10 @@ public class KioskActivity extends AppCompatActivity {
     private CustomerAuthView customerAuth; // man Xac thuc khach hang (UI tinh) — chen giua Chi tiet va Xac nhan don hang
     private PaymentView payment; // man Thanh toan QR + Ket qua giao dich (UI tinh, mo phong) — sau "DAT MUA" o Xac nhan don hang
     private IdentityVerifyView identityVerify; // popup + quet khuon mat "Xac minh chinh chu" (khach DA dang nhap), truoc DAT MUA
+    private CustomerConfirmView customerConfirm; // "Xac nhan thong tin khach hang" (S07) - sua SDT/email truoc khi thanh toan
+    private boolean receiverConfirmed; // da hoan thanh CustomerConfirmView trong phien Xac nhan don hang hien tai chua
+    private String confirmedPhone;
+    private String confirmedEmail;
     private boolean verifyingForOrder; // dang mo customerAuth tu nut "Xac minh chinh chu" (khach CHUA dang nhap) — khac voi dang nhap tu Home
     private int pendingQuantity = 1; // so luong da chon o Chi tiet, giu trong luc dang o man Xac thuc
     private Models.ProductDto pendingProduct; // san pham tuong ung, them vao gio hang sau khi xac thuc xong
@@ -97,7 +103,10 @@ public class KioskActivity extends AppCompatActivity {
         @Override
         public void run() {
             long idleMs = SystemClock.elapsedRealtime() - lastInteraction;
-            if (!idleShowing && currentScreen != null && currentScreen != KioskViewModel.AppScreen.SETUP
+            // Dang o man Thanh toan (cho quet QR / cho ket qua chuyen khoan): khong tu dong ve man cho,
+            // de khach khong bi mat man QR/ket qua giua chung khi dang doi ngan hang xu ly.
+            boolean onPayment = payment != null && payment.getVisibility() == View.VISIBLE;
+            if (!idleShowing && !onPayment && currentScreen != null && currentScreen != KioskViewModel.AppScreen.SETUP
                     && idleMs >= idleTimeoutSeconds * 1000L) {
                 showIdle();
             }
@@ -156,6 +165,37 @@ public class KioskActivity extends AppCompatActivity {
 
             @Override
             public void onIncrement(Models.ProductDto product) {
+                // Truoc day bam (+) luc da dung tran chi im lang khong lam gi (nut da tu khoa o ProductCardView) -
+                // theo yeu cau 15/10/2026, bam tiep luc do phai BAO RO ly do (han muc hay het ton) thay vi im lang.
+                int current = 0;
+                double otherUnits = 0;
+                if (lastState != null) {
+                    for (Models.CartItem it : lastState.cart) {
+                        if (it.product == null) continue;
+                        if (it.product.id.equals(product.id)) current = it.quantity;
+                        else otherUnits += it.lineUnits();
+                    }
+                }
+                Double limitQuantity = lastState != null ? lastState.limitQuantity : null;
+                Integer byLimit = null;
+                if (limitQuantity != null && product.quantity > 0) {
+                    double room = limitQuantity - otherUnits;
+                    byLimit = room <= 0 ? 0 : (int) Math.floor(room / product.quantity + 1e-9);
+                }
+                int byStock = product.remainingQuantity != null ? Math.max(0, product.remainingQuantity) : Integer.MAX_VALUE;
+                int maxQty = Math.max(0, Math.min(byLimit == null ? Integer.MAX_VALUE : byLimit, byStock));
+                if (current >= maxQty) {
+                    if (byLimit != null && current >= byLimit) {
+                        int cappedByLimit = byLimit;
+                        OrderPopups.showPurchaseLimit(KioskActivity.this, limitQuantity, product.name, cappedByLimit,
+                                () -> viewModel.updateCartQuantity(product.id, cappedByLimit), null);
+                    } else {
+                        int cappedByStock = byStock;
+                        OrderPopups.showOutOfStock(KioskActivity.this, product.name, cappedByStock,
+                                () -> viewModel.updateCartQuantity(product.id, cappedByStock), null);
+                    }
+                    return;
+                }
                 viewModel.addToCart(product, 1, false);
             }
 
@@ -192,6 +232,16 @@ public class KioskActivity extends AppCompatActivity {
         });
         order = new OrderConfirmView(this, new OrderConfirmView.Callbacks() {
             @Override
+            public void onBack() {
+                navigateBack();
+            }
+
+            @Override
+            public void onGoHome() {
+                viewModel.goHome();
+            }
+
+            @Override
             public void onSelectProvince(long provinceId) {
                 viewModel.selectProvince(provinceId);
             }
@@ -213,27 +263,26 @@ public class KioskActivity extends AppCompatActivity {
 
             @Override
             public void onPlaceOrder() {
-                String[] sum = order.getPaymentSummary();
-                String hotline = lastState != null ? lastState.hotline : null;
-                payment.bind(sum[0], sum[1], sum[2], sum[3], hotline);
-                show(payment, true);
+                // SRS "Xac nhan thong tin KH" (CartViewModel.placeOrder() that): da xac minh nhung CHUA xac
+                // nhan SDT/email trong phien nay -> mo CustomerConfirmView truoc, chua vao thang Thanh toan.
+                if (!receiverConfirmed) {
+                    openCustomerConfirm();
+                    return;
+                }
+                openPayment();
+            }
+
+            @Override
+            public void onRequestCartRefresh(KioskViewModel.CartRefreshCallback callback) {
+                viewModel.refreshCartProductsForCheck(callback);
             }
 
             @Override
             public void onVerifyIdentity() {
-                // Chua dang nhap -> phai dang ky tai khoan (CCCD/VNeID) truoc; da dang nhap roi -> quet khuon mat
-                // xac minh chinh chu thang (khong can dang ky lai).
-                boolean loggedIn = lastState != null && lastState.loggedInCustomerName != null;
-                if (loggedIn) {
-                    identityVerify.reset();
-                    show(identityVerify, true);
-                } else {
-                    authForLoginOnly = false;
-                    verifyingForOrder = true;
-                    pendingProduct = null;
-                    customerAuth.reset();
-                    show(customerAuth, true);
-                }
+                // Bam "XAC MINH CHINH CHU" luon mo thang popup quet khuon mat, du da dang nhap hay chua
+                // (khong bat dang ky tai khoan truoc nua).
+                identityVerify.reset();
+                show(identityVerify, true);
             }
         });
         identityVerify = new IdentityVerifyView(this, new IdentityVerifyView.Listener() {
@@ -245,9 +294,45 @@ public class KioskActivity extends AppCompatActivity {
             @Override
             public void onVerified() {
                 show(identityVerify, false);
+                // Quet FaceID xong ma chua dang nhap (chua co ten tu lastState): dien thong tin demo de "Thong tin
+                // nhan hang" co du du lieu hien thi, giong nhu luong dang nhap tu Home.
+                boolean loggedIn = lastState != null && lastState.loggedInCustomerName != null;
+                if (!loggedIn) {
+                    order.setCustomerInfo("Nguyễn Văn A (demo)", "099999999999", "0987654321", "Hà Nội");
+                }
                 order.setVerified(true);
             }
+
+            @Override
+            public void onGoHome() {
+                show(identityVerify, false);
+                viewModel.goHome();
+            }
         });
+        customerConfirm = new CustomerConfirmView(this, new CustomerConfirmView.Callbacks() {
+            @Override
+            public void onBack() {
+                show(customerConfirm, false);
+            }
+
+            @Override
+            public void onGoHome() {
+                show(customerConfirm, false);
+                viewModel.goHome();
+            }
+
+            @Override
+            public void onDone(String phone, String email) {
+                receiverConfirmed = true;
+                confirmedPhone = phone;
+                confirmedEmail = email;
+                order.setConfirmedContact(phone);
+                show(customerConfirm, false);
+                openPayment();
+            }
+        });
+        customerConfirm.setVisibility(View.GONE); // mac dinh an - thieu dong nay la nguyen nhan man "Xac nhan thong
+        // tin khach hang" che het toan bo app tu luc khoi dong (nuot moi cham, k the bam nut nao khac).
         payment = new PaymentView(this, new PaymentView.Listener() {
             @Override
             public void onCancel() {
@@ -256,8 +341,16 @@ public class KioskActivity extends AppCompatActivity {
 
             @Override
             public void onFinished() {
+                // SRS VIII.10 (repo that): sau "Tiep tuc trai nghiem" ve lai DANH SACH SAN PHAM (khong phai
+                // Home) - man do tu tai lai gia/ton.
                 show(payment, false);
                 viewModel.clearCart();
+                viewModel.openProducts();
+            }
+
+            @Override
+            public void onGoHome() {
+                show(payment, false);
                 viewModel.goHome();
             }
         });
@@ -389,6 +482,7 @@ public class KioskActivity extends AppCompatActivity {
         root.addView(goodsPickup, full);
         root.addView(customerAuth, full);
         root.addView(identityVerify, full);
+        root.addView(customerConfirm, full);
         root.addView(payment, full);
         root.addView(status, full);
         root.addView(website, full);
@@ -468,6 +562,31 @@ public class KioskActivity extends AppCompatActivity {
      */
     private void closeCustomerAuth() {
         show(customerAuth, false);
+    }
+
+    /** "DAT MUA" nhung chua xac nhan SDT/email trong phien nay (CartViewModel.placeOrder() that): mo S07. */
+    private void openCustomerConfirm() {
+        String dob = "09/09/1999"; // Phase 1: chua co ho so e-KYC that, dien demo giong cac truong con lai
+        customerConfirm.bind(order.getRecipientName(), order.getRecipientId(), dob, order.getRecipientAddress(),
+                confirmedPhone != null ? confirmedPhone : order.getRecipientPhone(), confirmedEmail);
+        show(customerConfirm, true);
+    }
+
+    /**
+     * Mo man Thanh toan QR voi thong tin don hang hien tai. Chan luon tai day neu dang mat ket noi:
+     * man nay chi hien QR chuyen khoan tinh (Phase 1, chua co cong thanh toan that), khach van co the
+     * chuyen khoan thuc su nhung kiosk mat ket noi se KHONG ghi nhan/doi soat duoc don hang do o backend
+     * (gia/ton kho cung co the da doi so voi luc hien gio hang) - rui ro mat tien that cho khach va BTMH.
+     */
+    private void openPayment() {
+        if (lastState != null && lastState.offline) {
+            Toast.makeText(this, "Mất kết nối — chưa thể thanh toán lúc này. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String[] sum = order.getPaymentSummary();
+        String hotline = lastState != null ? lastState.hotline : null;
+        payment.bind(sum[0], sum[1], sum[2], sum[3], hotline);
+        show(payment, true);
     }
 
     /**
@@ -556,12 +675,23 @@ public class KioskActivity extends AppCompatActivity {
             show(setup, state.screen == KioskViewModel.AppScreen.SETUP);
             if (state.screen == KioskViewModel.AppScreen.ORDER && previous != KioskViewModel.AppScreen.ORDER) {
                 order.resetStorePicker(); // vao man Xac nhan don hang moi: dat lai o tim kiem/tinh-thanh dang mo
+                order.captureEntryPrices(state.cart); // "gia luc vao man" - moc so sanh cho bottom sheet VIII luc DAT MUA
+                receiverConfirmed = false; // phai xac nhan lai SDT/email (CustomerConfirmView) moi phien Xac nhan don hang
+                confirmedPhone = null;
+                confirmedEmail = null;
+                if (state.loggedInCustomerName != null) {
+                    // Da dang nhap: coi nhu da xac minh chinh chu luon, hien the thong tin nhan hang, khong can
+                    // bam "XAC MINH CHINH CHU" / quet FaceID nua (Phase 1: chua co ho so that, dien du lieu demo).
+                    order.setCustomerInfo(state.loggedInCustomerName, "099999999999", "0987654321", "Hà Nội");
+                    order.setVerified(true);
+                }
             }
         }
 
         shell.setSubtitle(state.screen == KioskViewModel.AppScreen.HOME ? HomeView.subtitle(state) : null);
         shell.setCartCount(state.cartItemCount());
         shell.bindHome(state.loggedInCustomerName, state.hotline);
+        home.setLoggedIn(state.loggedInCustomerName != null);
         home.bind(state);
         products.bind(state);
         setup.bind(state.isActivating, state.activationError);
@@ -570,7 +700,9 @@ public class KioskActivity extends AppCompatActivity {
                     && previous != KioskViewModel.AppScreen.ORDER) {
                 detail.resetQuantity(); // vao Chi tiet tu danh sach/Home: so luong ve 1
             }
-            detail.bind(state.selectedProduct, state.pricesHidden, state.sellingOpen, state.limitQuantity);
+            detail.bind(state.selectedProduct, state.pricesHidden, state.sellingOpen, state.limitQuantity,
+                    state.openTime, state.closeTime);
+            if (state.screen == KioskViewModel.AppScreen.DETAIL) shell.setDetailTitle(state.selectedProduct.name);
         }
         if (state.screen == KioskViewModel.AppScreen.ORDER) order.bind(state);
 
@@ -642,7 +774,7 @@ public class KioskActivity extends AppCompatActivity {
     /** Chuyen vung an toan (cutout / thanh he thong neu hien / ban phim) cho tung man. */
     private void applyInsets(int l, int t, int r, int b, int barsBottom) {
         shell.onInsets(l, t, r, b, barsBottom); // rail + thanh dau + cac man trong khung (home/products/detail/order)
-        View[] screens = {setup, goodsPickup, customerAuth, identityVerify, payment, status, website, idle};
+        View[] screens = {setup, goodsPickup, customerAuth, identityVerify, customerConfirm, payment, status, website, idle};
         for (View v : screens) {
             if (v instanceof Ui.InsetAware) ((Ui.InsetAware) v).onInsets(l, t, r, b);
             else v.setPadding(l, t, r, b);
@@ -694,6 +826,10 @@ public class KioskActivity extends AppCompatActivity {
     private void showIdle() {
         if (lastState == null) return;
         idleShowing = true;
+        // Popup/sheet (gioi han, het ton, gia thay doi, chon Tinh/Cua hang...) deu la Dialog rieng, KHONG nam
+        // trong cay View cua Activity nen cac show(..., false) ben duoi khong dong duoc - phai tu dong rieng
+        // (yeu cau 15/10/2026: khong de popup treo tren man hinh cho khi khong ai con tuong tac).
+        OrderPopups.dismissActive();
         closeGoodsPickup(); // het thoi gian cho: bo man Tra hang (neu dang mo) truoc khi vao man cho
         closeCustomerAuth(); // ... va man Xac thuc khach hang (neu dang mo)
         show(payment, false); // ... va man Thanh toan (neu dang mo)

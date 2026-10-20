@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Máy bị thu hồi (II.5.1). Không có Figma: phương án B đã duyệt (docs/kiosk/phuong-an-man-thu-hoi.html). -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <!-- Nhấn giữ 5 giây: mở màn kích hoạt cho kỹ thuật (RevokedActivity). -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="@dimen/home_logo_width"
+        android:layout_height="@dimen/home_logo_height"
+        android:layout_marginTop="@dimen/act_logo_top"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/logo_mark" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/home_card_side"
+        android:layout_marginTop="@dimen/act_card_top"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/home_card_radius"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/act_card_padding"
+            android:paddingVertical="@dimen/status_card_padding_v">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/status_icon"
+                android:layout_height="@dimen/status_icon"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_revoked_lock" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/StatusTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/status_title_top"
+                android:text="@string/revoked_title" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/ActivationSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/act_subtitle_top"
+                android:text="@string/revoked_message" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/groupDeviceCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/revoked_code_top"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_24pt_regular"
+                    android:text="@string/revoked_device_code_label"
+                    android:textColor="@color/order_field_text"
+                    android:textSize="@dimen/revoked_code_text" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDeviceCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/revoked_code_gap"
+                    android:fontFamily="@font/inter_24pt_medium"
+                    android:textColor="@color/order_value"
+                    android:textSize="@dimen/revoked_code_text"
+                    tools:text="KSK-0100" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.appcompat.widget.LinearLayoutCompat>

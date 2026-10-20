@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sửa "Thông tin nhận hàng" — export từ Figma (Vector.svg, 18×18). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11.9641,2.73239L13.3658,1.33063C14.14,0.556458 15.3952,0.556458 16.1694,1.33063C16.9435,2.1048 16.9435,3.35998 16.1694,4.13415L14.7676,5.53591M11.9641,2.73239L3.73023,10.9663C2.68493,12.0116 2.16226,12.5342 1.80637,13.1711C1.45047,13.808 1.0924,15.3119 0.75,16.75C2.18809,16.4076 3.69199,16.0495 4.32889,15.6936C4.96579,15.3377 5.48844,14.8151 6.53375,13.7698L14.7676,5.53591M11.9641,2.73239L14.7676,5.53591M7.75,16.75H13.75"
+        android:strokeWidth="1.5"
+        android:strokeColor="@color/brand_red"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

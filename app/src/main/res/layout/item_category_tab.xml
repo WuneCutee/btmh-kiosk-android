@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Một ô tab danh mục — Figma 970:10373: 113×38, bo 8, ô đang chọn nền gradient.
+     Bề rộng và khe phải do CategoryTabAdapter đặt lại lúc gắn dữ liệu: ít tab thì giãn cho kín dải. -->
+<androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ListTab"
+    android:layout_width="@dimen/list_tab_width"
+    android:layout_height="@dimen/list_tab_height"
+    android:layout_marginEnd="@dimen/list_tab_gap"
+    android:background="@drawable/bg_list_tab"
+    android:paddingHorizontal="@dimen/list_tab_padding_h"
+    tools:text="Kim Gia Bảo" />

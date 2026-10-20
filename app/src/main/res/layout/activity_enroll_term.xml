@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/header"
+        android:name="vn.btmh.ui.fragments.header.HeaderFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutStepper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <View
+            android:id="@+id/stepperLine1"
+            android:layout_width="3dp"
+            android:layout_height="0dp"
+            android:background="#000000"
+            app:layout_constraintBottom_toTopOf="@id/step2Circle"
+            app:layout_constraintEnd_toEndOf="@id/step1Circle"
+            app:layout_constraintStart_toStartOf="@id/step1Circle"
+            app:layout_constraintTop_toBottomOf="@id/step1Circle" />
+
+        <View
+            android:id="@+id/stepperLine2"
+            android:layout_width="3dp"
+            android:layout_height="0dp"
+            android:background="#000000"
+            app:layout_constraintBottom_toTopOf="@id/step3Circle"
+            app:layout_constraintEnd_toEndOf="@id/step2Circle"
+            app:layout_constraintStart_toStartOf="@id/step2Circle"
+            app:layout_constraintTop_toBottomOf="@id/step2Circle" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/step1Circle"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_circle_outline_black"
+            android:gravity="center"
+            android:text="@string/txt_1"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/step1Circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/step1Circle"
+            app:layout_constraintTop_toTopOf="@id/step1Circle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/txt_b_c_1"
+                android:textColor="#1A1A1A"
+                android:textSize="20sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:text="@string/txt_x_c_th_c_th_c_n_c_c_vneid"
+                android:textColor="#504F4F"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/step2Circle"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_circle_outline_black"
+            android:gravity="center"
+            android:text="@string/txt_2"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step1Circle" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/step2Circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/step2Circle"
+            app:layout_constraintTop_toTopOf="@id/step2Circle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/txt_b_c_2"
+                android:textColor="#1A1A1A"
+                android:textSize="20sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:text="@string/txt_x_c_th_c_khu_n_m_t"
+                android:textColor="#504F4F"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/step3Circle"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_circle_outline_black"
+            android:gravity="center"
+            android:text="@string/txt_3"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step2Circle" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/step3Circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/step3Circle"
+            app:layout_constraintTop_toTopOf="@id/step3Circle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/txt_b_c_3"
+                android:textColor="#1A1A1A"
+                android:textSize="20sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:text="@string/txt_t_o_t_i_kho_n_v_x_c_nh_n_th_ng"
+                android:textColor="#504F4F"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/cardTerms"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottom"
+        app:layout_constraintTop_toBottomOf="@id/layoutStepper">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/txt_i_u_ki_n_v_i_u_kho_n_mua_v_ng"
+            android:textColor="#000000"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="false"
+            android:scrollbarSize="8dp"
+            android:scrollbarThumbVertical="@drawable/bg_scrollbar">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:lineSpacingExtra="8dp"
+                android:text="@string/txt_lorem_ipsum_dolor_sit_amet_con"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginBottom="42dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="@font/inter_24pt_regular"
+            android:text="@string/txt_b_t_bu_c_s_d_ng_d_ch_v"
+            android:textColor="#FF0000"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/layoutCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <CheckBox
+                android:id="@+id/cbAgree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:button="@drawable/selector_checkbox"
+                android:buttonTint="@null"
+                android:checked="false"
+                android:paddingStart="16dp"
+                android:scaleX="1.2"
+                android:scaleY="1.2"
+                app:buttonTint="@null" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_24pt_regular"
+                android:text="@string/txt_t_i_ng_cho_btmh_thu_th_p_v_x_l"
+                android:textColor="#1A1A1A"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutButtonsState1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDisagree"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_outline_red"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_kh_ng_ng"
+                android:textColor="@color/brand_red"
+                android:textSize="24sp"
+                app:textAllCaps="false" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAgree"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_red"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_ng_v_ti_p_t_c"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:textAllCaps="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutButtonsState2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRegisterCccd"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_red"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_ng_k_b_ng_cccd"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:textAllCaps="false" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRegisterVneid"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_red"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:text="@string/txt_ng_k_b_ng_vneid"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:textAllCaps="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Thin (100) -->
+    <font
+        android:font="@font/inter_24pt_thin"
+        android:fontStyle="normal"
+        android:fontWeight="100"
+        app:font="@font/inter_24pt_thin"
+        app:fontStyle="normal"
+        app:fontWeight="100" />
+    <font
+        android:font="@font/inter_24pt_thinitalic"
+        android:fontStyle="italic"
+        android:fontWeight="100"
+        app:font="@font/inter_24pt_thinitalic"
+        app:fontStyle="italic"
+        app:fontWeight="100" />
+
+    <!-- ExtraLight (200) -->
+    <font
+        android:font="@font/inter_24pt_extralight"
+        android:fontStyle="normal"
+        android:fontWeight="200"
+        app:font="@font/inter_24pt_extralight"
+        app:fontStyle="normal"
+        app:fontWeight="200" />
+    <font
+        android:font="@font/inter_24pt_extralightitalic"
+        android:fontStyle="italic"
+        android:fontWeight="200"
+        app:font="@font/inter_24pt_extralightitalic"
+        app:fontStyle="italic"
+        app:fontWeight="200" />
+
+    <!-- Light (300) -->
+    <font
+        android:font="@font/inter_24pt_light"
+        android:fontStyle="normal"
+        android:fontWeight="300"
+        app:font="@font/inter_24pt_light"
+        app:fontStyle="normal"
+        app:fontWeight="300" />
+    <font
+        android:font="@font/inter_24pt_lightitalic"
+        android:fontStyle="italic"
+        android:fontWeight="300"
+        app:font="@font/inter_24pt_lightitalic"
+        app:fontStyle="italic"
+        app:fontWeight="300" />
+
+    <!-- Regular (400) -->
+    <font
+        android:font="@font/inter_24pt_regular"
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        app:font="@font/inter_24pt_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+    <font
+        android:font="@font/inter_24pt_italic"
+        android:fontStyle="italic"
+        android:fontWeight="400"
+        app:font="@font/inter_24pt_italic"
+        app:fontStyle="italic"
+        app:fontWeight="400" />
+
+    <!-- Medium (500) -->
+    <font
+        android:font="@font/inter_24pt_medium"
+        android:fontStyle="normal"
+        android:fontWeight="500"
+        app:font="@font/inter_24pt_medium"
+        app:fontStyle="normal"
+        app:fontWeight="500" />
+    <font
+        android:font="@font/inter_24pt_mediumitalic"
+        android:fontStyle="italic"
+        android:fontWeight="500"
+        app:font="@font/inter_24pt_mediumitalic"
+        app:fontStyle="italic"
+        app:fontWeight="500" />
+
+    <!-- SemiBold (600) -->
+    <font
+        android:font="@font/inter_24pt_semibold"
+        android:fontStyle="normal"
+        android:fontWeight="600"
+        app:font="@font/inter_24pt_semibold"
+        app:fontStyle="normal"
+        app:fontWeight="600" />
+    <font
+        android:font="@font/inter_24pt_semibolditalic"
+        android:fontStyle="italic"
+        android:fontWeight="600"
+        app:font="@font/inter_24pt_semibolditalic"
+        app:fontStyle="italic"
+        app:fontWeight="600" />
+
+    <!-- Bold (700) -->
+    <font
+        android:font="@font/inter_24pt_bold"
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        app:font="@font/inter_24pt_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" />
+    <font
+        android:font="@font/inter_24pt_bolditalic"
+        android:fontStyle="italic"
+        android:fontWeight="700"
+        app:font="@font/inter_24pt_bolditalic"
+        app:fontStyle="italic"
+        app:fontWeight="700" />
+
+    <!-- ExtraBold (800) -->
+    <font
+        android:font="@font/inter_24pt_extrabold"
+        android:fontStyle="normal"
+        android:fontWeight="800"
+        app:font="@font/inter_24pt_extrabold"
+        app:fontStyle="normal"
+        app:fontWeight="800" />
+    <font
+        android:font="@font/inter_24pt_extrabolditalic"
+        android:fontStyle="italic"
+        android:fontWeight="800"
+        app:font="@font/inter_24pt_extrabolditalic"
+        app:fontStyle="italic"
+        app:fontWeight="800" />
+
+    <!-- Black (900) -->
+    <font
+        android:font="@font/inter_24pt_black"
+        android:fontStyle="normal"
+        android:fontWeight="900"
+        app:font="@font/inter_24pt_black"
+        app:fontStyle="normal"
+        app:fontWeight="900" />
+    <font
+        android:font="@font/inter_24pt_blackitalic"
+        android:fontStyle="italic"
+        android:fontWeight="900"
+        app:font="@font/inter_24pt_blackitalic"
+        app:fontStyle="italic"
+        app:fontWeight="900" />
+
+</font-family>

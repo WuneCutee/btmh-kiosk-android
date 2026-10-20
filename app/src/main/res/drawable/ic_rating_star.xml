@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sao đánh giá (Figma "Union" 40x38) — tô đặc, màu đổi qua tint: #FFCC00 đã chọn, #F2F2F2 chưa chọn. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="38dp"
+    android:viewportWidth="24"
+    android:viewportHeight="22.8">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,0.6L15.27,7.56L22.8,8.48L17.24,13.66L18.67,21.12L12,17.43L5.33,21.12L6.76,13.66L1.2,8.48L8.73,7.56Z" />
+</vector>

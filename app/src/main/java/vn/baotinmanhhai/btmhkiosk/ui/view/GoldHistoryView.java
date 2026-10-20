@@ -1,6 +1,7 @@
 package vn.baotinmanhhai.btmhkiosk.ui.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -110,7 +111,8 @@ public class GoldHistoryView extends LinearLayout {
     }
 
     private static TextView columnTitle(Context context, String text, int gravity) {
-        TextView t = Ui.caps(context, text, 7.5f, Ui.BURGUNDY_PRIMARY, 0.08f);
+        // HomeTableHeader (Figma 844:9967): chu den dam, khong phai do thuong hieu.
+        TextView t = Ui.caps(context, text, 7.5f, Color.BLACK, 0.08f);
         t.setGravity(gravity);
         return t;
     }
@@ -194,7 +196,8 @@ public class GoldHistoryView extends LinearLayout {
 
     private void buildSummary(GoldHistoryClient.History history) {
         summary.removeAllViews();
-        if (history.priceChanges == null) return;
+        // Website tinh tom tat tren gia ban -> san pham chi mua vao luon ra 0 "khong doi" du gia mua co bien dong: an.
+        if (history.priceChanges == null || GoldHistoryClient.buyOnly(history)) return;
         for (GoldHistoryClient.Change c : history.priceChanges) {
             boolean down = "down".equalsIgnoreCase(c.trend);
             boolean up = "up".equalsIgnoreCase(c.trend);
@@ -324,7 +327,9 @@ public class GoldHistoryView extends LinearLayout {
             date.setText(row.date);
             today.setVisibility(newest ? VISIBLE : GONE);
             buy.setText(Ui.number(row.buy));
-            sell.setText(Ui.number(row.sell));
+            boolean hasSell = GoldHistoryClient.hasSellPrice(row.sell);
+            sell.setText(hasSell ? Ui.number(row.sell) : "Không bán");
+            sell.setTextColor(hasSell ? Ui.PRICE_ORANGE : Ui.TEXT_MUTED_LIGHT);
             if (row.delta == null || row.delta == 0) {
                 delta.setText(row.delta == null ? "—" : "Không đổi");
                 delta.setTextColor(Ui.TEXT_MUTED_LIGHT);

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Toast dùng chung — Figma "Màn hình xác nhận thông tin KH"; nền và icon đặt trong KioskToast theo kiểu. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toast"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minWidth="@dimen/toast_min_width"
+    android:minHeight="@dimen/toast_min_height"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/toast_padding_start"
+    android:paddingTop="@dimen/toast_padding_v"
+    android:paddingEnd="@dimen/toast_padding_end"
+    android:paddingBottom="@dimen/toast_padding_v"
+    tools:background="@drawable/bg_toast_success">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="@dimen/toast_icon"
+        android:layout_height="@dimen/toast_icon"
+        android:importantForAccessibility="no"
+        tools:srcCompat="@drawable/ic_toast_success" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/toast_icon_gap"
+        android:maxWidth="@dimen/toast_max_width"
+        android:textColor="@color/toast_text"
+        android:textSize="@dimen/toast_text"
+        tools:text="Tạo Tài Khoản thành công!" />
+</androidx.appcompat.widget.LinearLayoutCompat>

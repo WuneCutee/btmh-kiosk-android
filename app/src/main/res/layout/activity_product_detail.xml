@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chi tiết sản phẩm — SRS sheet "Chi tiết sản phẩm" (Còn hàng / Hết hàng), API Kiosk II.2.8. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/detail_padding_h"
+        android:paddingTop="@dimen/detail_content_top"
+        android:paddingBottom="@dimen/detail_content_bottom"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/actions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/detail_image_height"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/detail_image_radius"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/pagerImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="@dimen/detail_dot_bottom"
+                    android:orientation="horizontal" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Ngoài giờ bán: nhắc khung giờ, nằm trên tên sản phẩm (Figma 2206:13652). -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/tradingNotice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_name_top"
+                android:background="@drawable/bg_detail_notice"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/detail_notice_padding_h"
+                android:paddingVertical="@dimen/detail_notice_padding_v"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/detail_notice_icon"
+                    android:layout_height="@dimen/detail_notice_icon"
+                    android:layout_marginEnd="@dimen/detail_notice_icon_gap"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_notice" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTradingNotice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/detail_notice_text"
+                    tools:text="Thời gian mở bán: từ 08:30 đến 16:00" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_name_top"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:textColor="@color/detail_value"
+                android:textSize="@dimen/detail_name_text"
+                app:lineHeight="@dimen/detail_line_18"
+                tools:text="Đồng xu Kim Gia Bảo Hoa Sen, loại 1 chỉ - 24K (999.9)" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_row_gap"
+                android:text="@string/detail_product_info"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_row_gap"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/detail_price"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+                    android:textColor="@color/brand_red"
+                    android:textSize="@dimen/detail_price_text"
+                    tools:text="14,000,000 VND" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_row_gap"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/detail_code"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/detail_body_text"
+                    tools:text="KGB1010022001" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_row_gap"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/detail_chi"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvChi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/detail_body_text"
+                    tools:text="5" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_row_gap"
+                android:justificationMode="inter_word"
+                android:textColor="@color/detail_desc"
+                android:textSize="@dimen/detail_desc_text"
+                app:lineHeight="@dimen/detail_line_14"
+                tools:text="Đồng Xu Kim Gia Bảo Hoa Sen là vàng miếng dạng đồng xu có định lượng 5 chỉ." />
+
+            <!-- Figma: nhãn + gợi ý hạn mức một cột bên trái, stepper canh trên bên phải. -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_section_top"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+                        android:text="@string/detail_count"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/detail_body_text"
+                        app:lineHeight="@dimen/detail_line_16" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvMaxHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/detail_hint_top"
+                        android:fontFamily="@font/inter_24pt_italic"
+                        android:textColor="@color/detail_hint"
+                        android:textSize="@dimen/detail_hint_text"
+                        app:lineHeight="@dimen/detail_line_12"
+                        tools:text="Khách hàng được mua tối đa 10 sản phẩm/giao dịch" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/stepper"
+                    android:layout_width="@dimen/detail_stepper_width"
+                    android:layout_height="@dimen/detail_stepper_height"
+                    android:layout_gravity="top"
+                    android:background="@drawable/bg_detail_stepper"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btnMinus"
+                        android:layout_width="@dimen/detail_stepper_button"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/detail_decrease"
+                        android:gravity="center"
+                        android:text="@string/detail_minus_sign"
+                        android:textColor="@color/detail_value"
+                        android:textSize="@dimen/detail_stepper_sign_text" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etCount"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:gravity="center"
+                        android:imeOptions="actionDone"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        android:padding="0dp"
+                        android:selectAllOnFocus="true"
+                        android:textColor="@color/detail_value"
+                        android:textSize="@dimen/detail_stepper_count_text"
+                        tools:ignore="LabelFor"
+                        tools:text="1" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btnPlus"
+                        android:layout_width="@dimen/detail_stepper_button"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/detail_increase"
+                        android:gravity="center"
+                        android:text="@string/detail_plus_sign"
+                        android:textColor="@color/detail_value"
+                        android:textSize="@dimen/detail_stepper_sign_text" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/detail_total_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+                    android:text="@string/detail_total"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_24pt_semibold"
+                    android:textColor="@color/brand_red"
+                    android:textSize="@dimen/detail_value_text"
+                    tools:text="14,000,000" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/actions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/detail_padding_h"
+        android:layout_marginBottom="@dimen/detail_button_bottom"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnAddToCart"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/detail_button_height"
+            android:layout_marginEnd="@dimen/detail_button_gap"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_outline_red"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/detail_add_to_cart"
+            android:textColor="@color/brand_red"
+            android:textSize="@dimen/detail_button_text"
+            app:autoSizeMaxTextSize="@dimen/detail_button_text"
+            app:autoSizeTextType="uniform" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnBuyNow"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/detail_button_height"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_red"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/detail_buy_now"
+            android:textColor="@color/white"
+            android:textSize="@dimen/detail_button_text" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnBlocked"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/detail_button_height"
+            android:layout_weight="1"
+            android:background="@drawable/bg_pill_sold_out"
+            android:enabled="false"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/detail_sold_out"
+            android:textColor="@color/detail_sold_out_text"
+            app:autoSizeMaxTextSize="@dimen/detail_button_text"
+            app:autoSizeTextType="uniform"
+            android:textSize="@dimen/detail_button_text"
+            android:visibility="gone" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/errorView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/detail_padding_h"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/detail_load_error"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/detail_body_text"
+                    app:lineHeight="@dimen/detail_line_16" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnRetry"
+            android:layout_width="@dimen/detail_retry_width"
+            android:layout_height="@dimen/detail_button_height"
+            android:layout_marginTop="@dimen/detail_section_top"
+            android:background="@drawable/bg_pill_red"
+            android:fontFamily="@font/inter_24pt_medium"
+            android:letterSpacing="-0.02"
+            android:gravity="center"
+            android:text="@string/detail_retry"
+            android:textColor="@color/white"
+            android:textSize="@dimen/detail_button_text" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/brand_red"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

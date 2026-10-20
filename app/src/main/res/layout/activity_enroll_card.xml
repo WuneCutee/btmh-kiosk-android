@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/header"
+        android:name="vn.btmh.ui.fragments.header.HeaderFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutProgress"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_active" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_inactive" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_inactive" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:text="@string/txt_qu_t_th_c_n_c_c"
+        android:textColor="#000000"
+        android:textSize="32sp"
+        app:layout_constraintTop_toBottomOf="@id/layoutProgress" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/inter_24pt_regular"
+        android:text="@string/txt_a_m_t_tr_c_c_a_th_c_n_c_c_v_o_"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/inter_24pt_regular"
+        android:text="@string/txt_l_u_trong_tr_ng_h_p_x_c_th_c_b"
+        android:textColor="#FF383C"
+        android:textSize="22sp"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+    <LinearLayout
+        android:id="@+id/boxCenter"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="56dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/bg_dashed_green"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvNote">
+
+        <FrameLayout
+            android:layout_width="320dp"
+            android:layout_height="320dp">
+
+            <vn.btmh.ui.customviews.DashedCircleView
+                android:id="@+id/dashedCircleView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivCard"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_card" />
+
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvBoxMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/inter_24pt_regular"
+            android:text="@string/txt_m_t_tr_c_h_ng_l_n"
+            android:textColor="#4CAF50"
+            android:textSize="26sp" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBottomMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/header_padding_h"
+        android:layout_marginTop="84dp"
+        android:fontFamily="@font/inter_24pt_regular"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/txt_kh_ng_t_m_th_y_th_vui_l_ng_a_c"
+        android:textColor="#000000"
+        android:textSize="26sp"
+        app:layout_constraintTop_toBottomOf="@id/boxCenter" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

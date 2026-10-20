@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Man hinh co cutout (lo camera/tai tho): ve noi dung TRAN vao vung cutout thay vi de dai den (letterbox). -->
-    <style name="Theme.BtmhKiosk" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.BtmhKiosk" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/gold</item>
         <item name="colorPrimaryDark">@color/page_bg</item>
         <item name="colorAccent">@color/gold</item>

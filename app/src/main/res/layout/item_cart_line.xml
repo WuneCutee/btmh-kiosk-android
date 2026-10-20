@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dòng giỏ hàng — Figma 2235:13656 (Card 461×144): ảnh 85×125 sát trái vùng 112 (cách chữ 27), khối tên/giá/stepper canh giữa theo chiều dọc. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/order_item_height"
+    android:layout_marginEnd="@dimen/order_item_gap"
+    android:layout_marginBottom="@dimen/order_item_gap"
+    android:background="@drawable/bg_card_white"
+    android:paddingHorizontal="@dimen/order_item_padding_h">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivImage"
+        android:layout_width="@dimen/order_item_image_w"
+        android:layout_height="@dimen/order_item_image_h"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/order_item_image_gap"
+        android:ellipsize="end"
+        android:fontFamily="@font/inter_24pt_medium"
+        android:maxLines="2"
+        android:textColor="@color/order_value"
+        android:textSize="@dimen/order_item_name_text"
+        app:layout_constraintBottom_toTopOf="@id/tvPrice"
+        app:layout_constraintEnd_toStartOf="@id/btnRemove"
+        app:layout_constraintStart_toEndOf="@id/ivImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:lineHeight="@dimen/order_item_name_line"
+        tools:text="Đồng Xu Kim Gia Bảo Hoa Sen loại 1 chỉ - 24K (999.9)" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/btnRemove"
+        android:layout_width="@dimen/order_item_remove"
+        android:layout_height="@dimen/order_item_remove"
+        android:layout_marginTop="@dimen/order_item_remove_top"
+        android:contentDescription="@string/order_remove"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_red" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/order_item_content_gap"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:textColor="@color/brand_red"
+        android:textSize="@dimen/order_item_price_text"
+        app:layout_constraintBottom_toTopOf="@id/stepper"
+        app:layout_constraintEnd_toEndOf="@id/tvName"
+        app:layout_constraintStart_toStartOf="@id/tvName"
+        app:layout_constraintTop_toBottomOf="@id/tvName"
+        app:lineHeight="@dimen/order_item_price_line"
+        tools:text="17,000,000 VND" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/stepper"
+        android:layout_width="@dimen/order_stepper_width"
+        android:layout_height="@dimen/order_stepper_height"
+        android:layout_marginTop="@dimen/order_item_content_gap"
+        android:background="@drawable/bg_detail_stepper"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvName"
+        app:layout_constraintTop_toBottomOf="@id/tvPrice">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnMinus"
+            android:layout_width="@dimen/order_stepper_button"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/detail_decrease"
+            android:gravity="center"
+            android:text="@string/detail_minus_sign"
+            android:textColor="@color/order_value"
+            android:textSize="@dimen/order_stepper_sign_text" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etCount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="4"
+            android:padding="0dp"
+            android:selectAllOnFocus="true"
+            android:textColor="@color/black"
+            android:textSize="@dimen/order_stepper_count_text"
+            tools:ignore="LabelFor"
+            tools:text="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnPlus"
+            android:layout_width="@dimen/order_stepper_button"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/detail_increase"
+            android:gravity="center"
+            android:text="@string/detail_plus_sign"
+            android:textColor="@color/order_value"
+            android:textSize="@dimen/order_stepper_sign_text" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.constraintlayout.widget.ConstraintLayout>

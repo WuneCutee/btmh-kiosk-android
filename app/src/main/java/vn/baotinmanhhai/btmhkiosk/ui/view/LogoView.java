@@ -12,25 +12,22 @@ import android.view.View;
 import vn.baotinmanhhai.btmhkiosk.R;
 
 /**
- * Logo BTMH (vang tren nen trong suot, 350x120) ve bang Canvas: nguyen logo, hoac chi bieu tuong "MH" (cat phan tren) de
- * lam dau an thuong hieu o dai Sidebar. Logo vang nen dat tren nen toi, hoac doi mau bang {@link #tint(int)} (do ruou tren nen champagne).
+ * Logo BTMH (bieu tuong "M-H" do ruou tren nen trong suot) ve bang Canvas, doi mau bang {@link #tint(int)}.
+ *
+ * <p>R.drawable.logo gio la anh that lay tu repo chuan (chi bieu tuong, khong con ghep chung voi chu "BAO TIN
+ * MANH HAI" trong 1 anh rong 350x120 nhu truoc) - nen luon ve TRON anh, khong cat theo Rect EMBLEM cu nua (cat
+ * theo toa do cu se ra 1 goc rong cua anh moi, lam logo bien mat). Tham so emblemOnly giu lai cho tuong thich
+ * chu ky goi ham cac noi dang dung, khong con anh huong ket qua ve.</p>
  */
 public class LogoView extends View {
 
-    /** Vung bieu tuong "MH" trong anh logo 350x120. */
-    private static final Rect EMBLEM = new Rect(126, 0, 224, 80);
-
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final Bitmap bitmap;
-    private final boolean emblemOnly;
     private final RectF dst = new RectF();
 
     public LogoView(Context context, boolean emblemOnly) {
         super(context);
-        this.emblemOnly = emblemOnly;
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inScaled = false; // drawable-nodpi: giu nguyen 350x120
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo, o);
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo);
     }
 
     /** Ve logo dat mot mau (logo goc vang tren trong suot -> loc SRC_IN giu hinh, doi mau, vd do ruou tren nen champagne). */
@@ -43,7 +40,7 @@ public class LogoView extends View {
     @Override
     protected void onDraw(Canvas c) {
         if (bitmap == null) return;
-        Rect src = emblemOnly ? EMBLEM : new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        Rect src = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         float sw = src.width();
         float sh = src.height();
         float w = getWidth() - getPaddingLeft() - getPaddingRight();

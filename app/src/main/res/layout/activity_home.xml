@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home (bảng giá) — Figma "Kiosk" MtCo74v1AkurJAxkKEvqfd, 844:9967 "Home_chưa login". -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <!-- Figma cắt ảnh logo chỉ còn chữ M-H (82x75, cách lề 38): logo_mark là logo.png bỏ viền trong suốt. -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="@dimen/home_logo_width"
+        android:layout_height="@dimen/home_logo_height"
+        android:layout_marginStart="@dimen/home_logo_start"
+        android:layout_marginTop="@dimen/home_logo_top"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/llPills"
+        app:srcCompat="@drawable/logo_mark" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llPills"
+        android:layout_width="@dimen/home_pill_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/home_screen_top"
+        android:layout_marginEnd="@dimen/home_screen_side"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Hotline chỉ để xem: không bắt chạm. -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/home_pill_height"
+            android:background="@drawable/bg_standby_chip"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/home_pill_padding">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/home_pill_icon"
+                android:layout_height="@dimen/home_pill_icon"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_phone_call"
+                app:tint="@color/standby_chip_icon" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvHotline"
+                style="@style/HomePillText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/home_pill_icon_gap"
+                android:paddingHorizontal="@dimen/home_pill_text_padding"
+                tools:text="1800.2209" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/home_login_height"
+            android:layout_marginTop="@dimen/home_pill_gap"
+            android:background="@drawable/bg_pill_red"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/home_pill_padding">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/home_pill_icon"
+                android:layout_height="@dimen/home_pill_icon"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_login"
+                app:tint="@color/standby_login_icon" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/HomePillText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/home_pill_icon_gap"
+                android:paddingHorizontal="@dimen/home_pill_text_padding"
+                android:text="@string/home_login"
+                android:textColor="@color/standby_login_text" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPrices"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/home_card_side"
+        android:layout_marginTop="@dimen/home_section_gap"
+        android:layout_marginBottom="@dimen/home_section_gap"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/home_card_radius"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@id/btnSavingsProducts"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llPills"
+        app:strokeWidth="0dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/home_card_padding_horizontal"
+            android:paddingVertical="@dimen/home_card_padding_vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/HomeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_title_height"
+                android:padding="@dimen/home_title_padding"
+                android:text="@string/price_board_title" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvUpdatedAt"
+                style="@style/HomeSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_text_line_height"
+                android:paddingHorizontal="@dimen/home_title_padding"
+                tools:text="Cập nhật lúc 08/10/2026 10:10:10" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/HomeSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_text_line_height"
+                android:paddingHorizontal="@dimen/home_title_padding"
+                android:text="@string/price_board_unit" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStaleWarning"
+                style="@style/HomeWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/home_warning_gap"
+                android:visibility="gone"
+                tools:text="Giá đang được cập nhật, vui lòng liên hệ hotline 1800.2209"
+                tools:visibility="visible" />
+
+            <!-- Card giãn giữa hai nút trên và nút dưới; ở màn thiết kế 540×960 cao 587 (= 16 + 102 + 16 + bảng 437 + 16).
+                 Bảng: cột trái (tiêu đề + danh sách) | 6 | rãnh cuộn 5 chạy từ tiêu đề cột xuống đáy, như Figma. -->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/home_card_gap"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- Cột tên giãn theo bảng (183 ở màn thiết kế); hai cột giá và đệm phải cố định như dòng dữ liệu. -->
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/home_text_line_height"
+                        android:orientation="horizontal"
+                        android:paddingEnd="@dimen/home_row_padding">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/HomeTableHeader"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="@string/price_board_column_product" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/HomeTableHeader"
+                            android:layout_width="@dimen/home_price_width"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/home_header_gap"
+                            android:text="@string/price_board_column_buy" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/HomeTableHeader"
+                            android:layout_width="@dimen/home_price_width"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/home_header_gap"
+                            android:text="@string/price_board_column_sell" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="@dimen/home_table_header_gap"
+                        android:layout_weight="1">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvPrices"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scrollbars="none"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:listitem="@layout/item_price_row" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvTableMessage"
+                            style="@style/HomeRowText"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            tools:text="Đang tải bảng giá…" />
+                    </FrameLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <FrameLayout
+                    android:id="@+id/flScrollTrack"
+                    android:layout_width="@dimen/home_scrollbar_width"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/home_scrollbar_gap"
+                    android:background="@drawable/bg_home_scroll_track"
+                    android:paddingVertical="@dimen/home_scrollbar_padding">
+
+                    <View
+                        android:id="@+id/vScrollThumb"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:background="@drawable/bg_home_scroll_thumb"
+                        android:visibility="invisible" />
+                </FrameLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSavingsProducts"
+        style="@style/HomeActionButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/home_button_height"
+        android:layout_marginHorizontal="@dimen/home_footer_side"
+        android:layout_marginBottom="@dimen/home_footer_bottom"
+        android:text="@string/home_savings_products"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

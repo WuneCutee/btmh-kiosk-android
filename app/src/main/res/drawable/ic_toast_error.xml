@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:fillColor="@color/toast_error_icon"
+        android:pathData="M10,0A10,10 0,1 0,10 20A10,10 0,1 0,10 0Z" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M10,5.2v5.6"
+        android:strokeWidth="1.9"
+        android:strokeColor="@color/white"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="@color/white"
+        android:pathData="M8.9,14.2a1.1,1.1 0,1 1,2.2 0a1.1,1.1 0,1 1,-2.2 0" />
+</vector>

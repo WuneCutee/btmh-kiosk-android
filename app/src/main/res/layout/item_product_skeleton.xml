@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thẻ khung khi đang tải: cùng cỡ thẻ thật, các khối #F3ECE1 ở chỗ ảnh, 3 dòng tên, giá, bộ đếm. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_card_height"
+    android:background="@drawable/bg_list_card">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/list_card_padding_h">
+
+        <View
+            android:layout_width="@dimen/list_skeleton_image_width"
+            android:layout_height="@dimen/list_skeleton_image_height"
+            android:layout_marginTop="@dimen/list_skeleton_image_top"
+            android:background="@drawable/bg_list_skeleton_block" />
+
+        <View
+            android:layout_width="@dimen/list_name_width"
+            android:layout_height="@dimen/list_skeleton_bar_height"
+            android:layout_marginTop="@dimen/list_skeleton_name_top"
+            android:background="@drawable/bg_list_skeleton_block" />
+
+        <View
+            android:layout_width="@dimen/list_name_width"
+            android:layout_height="@dimen/list_skeleton_bar_height"
+            android:layout_marginTop="@dimen/list_skeleton_bar_gap"
+            android:background="@drawable/bg_list_skeleton_block" />
+
+        <View
+            android:layout_width="@dimen/list_skeleton_bar_short"
+            android:layout_height="@dimen/list_skeleton_bar_height"
+            android:layout_gravity="start"
+            android:layout_marginStart="@dimen/list_skeleton_bar_start"
+            android:layout_marginTop="@dimen/list_skeleton_bar_gap"
+            android:background="@drawable/bg_list_skeleton_block" />
+
+        <View
+            android:layout_width="@dimen/list_skeleton_price_width"
+            android:layout_height="@dimen/list_skeleton_price_height"
+            android:layout_marginTop="@dimen/list_skeleton_price_top"
+            android:background="@drawable/bg_list_skeleton_block" />
+
+        <View
+            android:layout_width="@dimen/list_stepper_width"
+            android:layout_height="@dimen/list_stepper_height"
+            android:layout_marginTop="@dimen/list_skeleton_stepper_top"
+            android:background="@drawable/bg_list_skeleton_pill" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>

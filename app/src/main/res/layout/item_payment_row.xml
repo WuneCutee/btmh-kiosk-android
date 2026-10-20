@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dòng nhãn — giá trị của màn QR thanh toán và Kết quả giao dịch (Figma, mục 6–9). -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/payment_row_gap"
+    android:minHeight="@dimen/payment_row_min_height"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/black"
+        android:textSize="@dimen/payment_row_text"
+        app:lineHeight="@dimen/payment_text_line"
+        tools:text="Khách hàng" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.4"
+        android:fontFamily="@font/inter_24pt_semibold"
+        android:gravity="end"
+        android:textColor="@color/black"
+        android:textSize="@dimen/payment_row_text"
+        app:lineHeight="@dimen/payment_text_line"
+        tools:text="Nguyễn Văn A" />
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,11 +1,6 @@
 package vn.baotinmanhhai.btmhkiosk.ui.view;
 
-import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,15 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import vn.baotinmanhhai.btmhkiosk.data.Models;
-import vn.baotinmanhhai.btmhkiosk.ui.Ui;
 
 /**
- * Luoi san pham co phan trang. 2 cot trong vung noi dung (CANVAS_W = 640 - rail): cardWidth = (CANVAS_W - SPACING) / 2 - SPACING
- * cao = cardWidth * 1.3. Dong cuoi (chiem het chieu ngang): "Dang tai them…" khi con trang,
- * "Ban da xem het danh sach san pham" khi het (II.2.6). Khi danh sach moi hien ra, cac the hien dan le tung
- * cai (stagger) — chi cho vi tri chua tung hien.
+ * Luoi san pham co phan trang (cuon toi gan cuoi tu goi onLoadMore() — khong co dong "het danh sach" rieng,
+ * giong het app chuan: strings.xml that khong co chuoi nay). The san pham gio inflate item_product_card.xml
+ * that qua {@link ProductCardView} thay vi tu ve Canvas.
  */
-public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.Holder> {
 
     public interface OnProductClick {
         void onClick(Models.ProductDto product);
@@ -38,37 +31,18 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public static final int COLUMNS = 3;
-    public static final int SPACING = 14;
-    public static final int CARD_W = (int) ((Ui.CANVAS_W - SPACING) / COLUMNS - SPACING);
-    public static final int CARD_H = (int) (CARD_W * 1.6);
-    public static final int INFO_H = 100;
-    private static final int TYPE_ITEM = 0;
-    private static final int TYPE_FOOTER = 1;
 
     private final List<Models.ProductDto> items = new ArrayList<>();
     private final OnProductClick onClick;
     private final OnStepperChange onStepperChange;
-    private boolean hasMore;
     private boolean pricesHidden;
     private Map<String, Integer> cartQuantities = new HashMap<>();
     private Double limitQuantity; // han muc chung (chi) cho toan gio hang; null = khong gioi han
     private double totalCartUnits; // tong so chi TAT CA san pham dang co trong gio (tru rieng ra khi tinh tung the)
-    /** Vi tri lon nhat da chay hieu ung hien dan (de cuon/tai them khong chay lai). */
-    private int animatedUpTo = -1;
-    private String firstId = null;
 
     public ProductAdapter(OnProductClick onClick, OnStepperChange onStepperChange) {
         this.onClick = onClick;
         this.onStepperChange = onStepperChange;
-    }
-
-    /** Chieu cao the (px thuc). Duoc ProductsView dat theo chieu cao vung hien thi de 2 hang vua khit man hinh. */
-    private int cardHeightPx = -1;
-
-    public void setCardHeightPx(int heightPx) {
-        if (heightPx == cardHeightPx) return;
-        cardHeightPx = heightPx;
-        notifyDataSetChanged();
     }
 
     /** Goi tu ProductsView.bind(): so luong dang co trong gio + han muc chung, de ve dung stepper tren moi the. */
@@ -80,94 +54,30 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void submitList(List<Models.ProductDto> newItems, boolean hasMore, boolean pricesHidden) {
-        String newFirst = newItems != null && !newItems.isEmpty() ? newItems.get(0).id : null;
-        boolean sameList = newFirst != null && newFirst.equals(firstId) && newItems.size() >= items.size();
-        if (!sameList) animatedUpTo = -1; // danh sach khac hoan toan (doi danh muc/tim kiem) -> hien dan lai tu dau
-        firstId = newFirst;
         items.clear();
         if (newItems != null) items.addAll(newItems);
-        this.hasMore = hasMore;
         this.pricesHidden = pricesHidden;
         notifyDataSetChanged();
     }
 
-    public boolean isFooter(int position) {
-        return position == items.size() && hasFooter();
-    }
-
-    private boolean hasFooter() {
-        return !items.isEmpty();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return isFooter(position) ? TYPE_FOOTER : TYPE_ITEM;
-    }
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == TYPE_FOOTER) {
-            LinearLayout box = new LinearLayout(parent.getContext());
-            box.setOrientation(LinearLayout.VERTICAL);
-            box.setGravity(Gravity.CENTER_HORIZONTAL);
-            box.setPadding(0, Ui.px(22), 0, Ui.px(40));
-            box.setLayoutParams(new RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            LinearLayout ornament = new LinearLayout(parent.getContext());
-            ornament.setGravity(Gravity.CENTER_VERTICAL);
-            ornament.addView(line(parent), new LinearLayout.LayoutParams(Ui.px(46), Math.max(1, Ui.px(1))));
-            View diamond = new View(parent.getContext());
-            diamond.setBackground(Ui.rect(Ui.SIDEBAR_GOLD_BOT, 0, 0, 0));
-            diamond.setRotation(45f);
-            LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(Ui.px(8), Ui.px(8));
-            dlp.setMargins(Ui.px(12), 0, Ui.px(12), 0);
-            ornament.addView(diamond, dlp);
-            ornament.addView(line(parent), new LinearLayout.LayoutParams(Ui.px(46), Math.max(1, Ui.px(1))));
-            box.addView(ornament, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            TextView text = Ui.text(parent.getContext(), "", 9f, Ui.TEXT_MUTED_LIGHT, Ui.W_REGULAR);
-            text.setGravity(Gravity.CENTER);
-            text.setLetterSpacing(0.03f);
-            LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            tlp.topMargin = Ui.px(14);
-            box.addView(text, tlp);
-            return new FooterHolder(box, text, ornament);
-        }
-        int cardH = cardHeightPx > 0 ? cardHeightPx : Ui.px(CARD_H);
-        ProductCardView card = new ProductCardView(parent.getContext(), Ui.px(CARD_W), cardH, Ui.px(INFO_H));
-        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(Ui.px(CARD_W), cardH);
-        int margin = Ui.px(SPACING / 2f);
-        lp.setMargins(margin, margin, margin, margin);
-        card.setLayoutParams(lp);
+    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ProductCardView card = new ProductCardView(parent.getContext());
+        card.setLayoutParams(new RecyclerView.LayoutParams(
+                RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
         return new Holder(card);
     }
 
-    private static View line(ViewGroup parent) {
-        View v = new View(parent.getContext());
-        v.setBackgroundColor(Ui.SIDEBAR_GOLD_TOP);
-        return v;
-    }
-
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof FooterHolder) {
-            FooterHolder f = (FooterHolder) holder;
-            f.text.setText(hasMore ? "Đang tải thêm…" : "Bạn đã xem hết danh sách sản phẩm");
-            f.ornament.setVisibility(hasMore ? View.INVISIBLE : View.VISIBLE);
-            return;
-        }
+    public void onBindViewHolder(@NonNull Holder holder, int position) {
         Models.ProductDto product = items.get(position);
-        Holder h = (Holder) holder;
-        h.card.bind(product, pricesHidden);
-        h.card.setOnClickListener(v -> onClick.onClick(product));
+        holder.card.bind(product, pricesHidden);
+        holder.card.setOnClickListener(v -> onClick.onClick(product));
 
         int inCart = cartQuantities.getOrDefault(product.id, 0);
         int maxQty = computeMaxQuantity(product, inCart);
-        h.card.bindQuantity(inCart, maxQty, new ProductCardView.StepperListener() {
+        holder.card.bindQuantity(inCart, maxQty, new ProductCardView.StepperListener() {
             @Override
             public void onIncrement() {
                 onStepperChange.onIncrement(product);
@@ -178,34 +88,11 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 onStepperChange.onDecrement(product);
             }
         });
-
-        // Hien dan le tung the (toi da ~6 the dau/lo, tre 45ms moi the) — nhe cho may yeu.
-        h.card.animate().cancel();
-        if (position > animatedUpTo) {
-            animatedUpTo = position;
-            float rest = h.card.restAlpha();
-            h.card.setAlpha(0f);
-            h.card.setTranslationY(Ui.px(18));
-            h.card.animate().alpha(rest).translationY(0f)
-                    .setStartDelay((position % 6) * 45L).setDuration(300)
-                    .setInterpolator(new DecelerateInterpolator(1.6f)).start();
-        } else {
-            h.card.setTranslationY(0f);
-            h.card.setAlpha(h.card.restAlpha());
-        }
-    }
-
-    @Override
-    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof Holder) {
-            ((Holder) holder).card.animate().cancel();
-            ((Holder) holder).card.setTranslationY(0f);
-        }
     }
 
     @Override
     public int getItemCount() {
-        return items.size() + (hasFooter() ? 1 : 0);
+        return items.size();
     }
 
     /** X = floor((han muc - so chi cac san pham KHAC trong gio) / ban vi), gioi han them boi ton kho (giong OrderConfirmView). */
@@ -223,17 +110,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Holder(ProductCardView card) {
             super(card);
             this.card = card;
-        }
-    }
-
-    static class FooterHolder extends RecyclerView.ViewHolder {
-        final TextView text;
-        final View ornament;
-
-        FooterHolder(View root, TextView text, View ornament) {
-            super(root);
-            this.text = text;
-            this.ornament = ornament;
         }
     }
 }

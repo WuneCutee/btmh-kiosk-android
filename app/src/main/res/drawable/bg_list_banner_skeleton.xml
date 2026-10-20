@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Khối giữ chỗ banner khi II.2.4 chưa trả lần nào: cùng màu khối skeleton của thẻ. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/list_skeleton_block" />
+    <corners android:radius="@dimen/list_banner_radius" />
+</shape>

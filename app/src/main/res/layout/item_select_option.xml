@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/sheet_option_padding_h"
+    android:paddingVertical="@dimen/sheet_option_padding_v">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_24pt_regular"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/sheet_option_text"
+            tools:text="Cơ sở Ngô Quyền" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/sheet_option_sub_text"
+            android:visibility="gone"
+            tools:text="Số 18 Ngô Quyền, Phường Cửa Nam, Hà Nội"
+            tools:visibility="visible" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivCheck"
+        android:layout_width="@dimen/sheet_check"
+        android:layout_height="@dimen/sheet_check"
+        android:importantForAccessibility="no"
+        app:srcCompat="@drawable/ic_check_circle" />
+</androidx.appcompat.widget.LinearLayoutCompat>

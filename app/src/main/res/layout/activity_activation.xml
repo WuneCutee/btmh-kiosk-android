@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kích hoạt máy — API Kiosk II.2.14. Không có Figma: phương án A2 đã duyệt (docs/kiosk/phuong-an-man-kich-hoat.html). -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:fillViewport="true">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/home_logo_width"
+            android:layout_height="@dimen/home_logo_height"
+            android:layout_marginTop="@dimen/act_logo_top"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/logo_mark" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/home_card_side"
+            android:layout_marginTop="@dimen/act_card_top"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/home_card_radius"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/act_card_padding"
+                android:paddingVertical="@dimen/status_card_padding_v">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/status_icon"
+                    android:layout_height="@dimen/status_icon"
+                    android:layout_gravity="center_horizontal"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_activation_key" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/StatusTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/status_title_top"
+                    android:text="@string/act_title" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/ActivationSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_subtitle_top"
+                    android:text="@string/act_subtitle" />
+
+                <!-- Còn mã máy cũ nhưng mất khoá: nhắc liên hệ quản trị viên (II.2.1). -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvReactivate"
+                    style="@style/ActivationMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_message_top"
+                    android:gravity="center"
+                    android:text="@string/act_reactivate"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/ActivationLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_section_top"
+                    android:labelFor="@id/etDeviceCode"
+                    android:text="@string/act_device_code" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etDeviceCode"
+                    style="@style/ActivationField"
+                    android:layout_marginTop="@dimen/act_field_top"
+                    android:hint="@string/act_device_code_hint"
+                    android:imeOptions="actionNext" />
+
+                <!-- Lỗi của ô mã máy; ẩn khi không lỗi. -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDeviceCodeError"
+                    style="@style/ActivationFieldError"
+                    android:visibility="gone"
+                    tools:text="Mã máy không tồn tại. Vui lòng kiểm tra lại." />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/ActivationLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_field_gap"
+                    android:labelFor="@id/etActivationCode"
+                    android:text="@string/act_activation_code" />
+
+                <!-- FrameLayout bao ngoai etActivationCode: KHONG co trong activity_activation.xml that (man that
+                     khong co nut quet QR, chi dung dau doc QR vat ly nhu ban phim) - them loi tat quet bang camera
+                     (ScanOptions/zxing, KioskActivity.onScanQr) cho may/emulator khong co dau doc vat ly, dat lot
+                     trong o nhap nen khong lam vo bo cuc so voi man that. -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_field_top">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etActivationCode"
+                        style="@style/ActivationField"
+                        android:hint="@string/act_activation_code_hint"
+                        android:imeOptions="actionDone"
+                        android:paddingEnd="44dp" />
+
+                    <!-- Icon QR ve bang IconView (code), gan vao day luc runtime - xem SetupView.java. -->
+                    <FrameLayout
+                        android:id="@+id/btnScanQr"
+                        android:layout_width="@dimen/act_field_height"
+                        android:layout_height="@dimen/act_field_height"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+                </FrameLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvActivationCodeError"
+                    style="@style/ActivationFieldError"
+                    android:visibility="gone"
+                    tools:text="Mã kích hoạt không đúng. Kiểm tra lại hoặc xin mã mới." />
+
+                <!-- Lỗi không thuộc ô nào (mạng, lệch giờ, hệ thống bận); lỗi của từng ô hiện ngay dưới ô đó. -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvError"
+                    style="@style/ActivationMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/act_message_top"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    tools:text="Không kết nối được máy chủ. Vui lòng kiểm tra mạng rồi thử lại."
+                    tools:visibility="visible" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnActivate"
+                    style="@style/ListNextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/home_button_height"
+                    android:layout_marginTop="@dimen/act_button_top"
+                    android:enabled="false"
+                    android:text="@string/act_submit"
+                    android:textSize="@dimen/act_button_text"
+                    app:cornerRadius="@dimen/home_button_radius" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Đẩy dòng thông tin máy xuống đáy khi màn còn chỗ; bàn phím hiện thì cả khối cuộn được. -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="@dimen/act_card_top" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDeviceInfo"
+            style="@style/ActivationFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/home_card_side"
+            android:layout_marginBottom="@dimen/act_footer_bottom"
+            tools:text="Phiên bản 1.0.0 · Q-KIOSK 27" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.core.widget.NestedScrollView>

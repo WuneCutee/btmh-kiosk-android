@@ -130,13 +130,36 @@ public class GoldHistoryClient {
         }
     }
 
-    /** Danh sach hien thi: moi nhat truoc, kem chenh lech gia ban so voi ngay lien truoc. */
+    /**
+     * Website tra sell = 1 (khong phai gia that) cho san pham BTMH chi MUA VAO, khong ban ra - vd vang nguyen lieu
+     * NL9999/NL999 (kiem that 16/10/2026). Coi gia ban <= 1 la "khong co gia ban".
+     */
+    public static boolean hasSellPrice(long sell) {
+        return sell > 1;
+    }
+
+    /** San pham khong co gia ban o moi ngay (chi mua vao) - khi do tom tat "Hom nay/30 ngay..." cua website (tinh
+     *  tren gia ban) luon bang 0, khong co y nghia. */
+    public static boolean buyOnly(History h) {
+        if (h == null || h.dataPoints == null || h.dataPoints.isEmpty()) return false;
+        for (Point p : h.dataPoints) {
+            if (hasSellPrice(p.sell)) return false;
+        }
+        return true;
+    }
+
+    /** Danh sach hien thi: moi nhat truoc, kem chenh lech gia ban so voi ngay lien truoc (khong co gia ban thi
+     *  tinh tren gia mua vao). */
     public static List<Row> rows(History h) {
         List<Row> out = new ArrayList<>();
         if (h == null || h.dataPoints == null) return out;
         for (int i = 0; i < h.dataPoints.size(); i++) {
             Point p = h.dataPoints.get(i);
-            Long delta = i == 0 ? null : p.sell - h.dataPoints.get(i - 1).sell;
+            Long delta = null;
+            if (i > 0) {
+                Point prev = h.dataPoints.get(i - 1);
+                delta = hasSellPrice(p.sell) && hasSellPrice(prev.sell) ? p.sell - prev.sell : p.buy - prev.buy;
+            }
             out.add(0, new Row(p.date, p.buy, p.sell, delta));
         }
         return out;

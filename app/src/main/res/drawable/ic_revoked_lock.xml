@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Màn ngừng hoạt động (phương án B, docs/kiosk/phuong-an-man-thu-hoi.html): ổ khoá trên nền tròn hồng nhạt. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+    <path
+        android:fillColor="@color/status_icon_bg"
+        android:pathData="M28,0a28,28 0,1 1,0 56a28,28 0,1 1,0 -56z" />
+    <path
+        android:pathData="M22,26h12a3,3 0,0 1,3 3v8a3,3 0,0 1,-3 3h-12a3,3 0,0 1,-3 -3v-8a3,3 0,0 1,3 -3z"
+        android:strokeWidth="2.5"
+        android:strokeColor="@color/brand_red" />
+    <path
+        android:pathData="M22.5,26v-4a5.5,5.5 0,0 1,11 0v4"
+        android:strokeWidth="2.5"
+        android:strokeColor="@color/brand_red" />
+</vector>

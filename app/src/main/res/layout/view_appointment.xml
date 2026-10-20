@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Giấy hẹn lấy hàng — Figma "Chi tiết đơn hàng" 1334:16052 (khung 375), chip màu như webview. Không hiện trên màn
+     máy: AppointmentRenderer vẽ ra PNG, tải lên MinIO, khách quét QR ở màn Giao dịch thành công để tải về. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/appt_width"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/appt_padding_h"
+    android:paddingTop="@dimen/appt_padding_top"
+    android:paddingBottom="@dimen/appt_padding_bottom">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/AppointmentTitle"
+        android:layout_marginTop="0dp"
+        android:text="@string/appt_order_info" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat style="@style/AppointmentCard">
+
+        <include
+            android:id="@+id/rowOrderCode"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowOrderDate"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowMethod"
+            layout="@layout/item_appointment_row" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/appt_row_padding_v">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/AppointmentLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/appt_status" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/appt_chip_height"
+                android:background="@drawable/bg_appt_chip_waiting"
+                android:fontFamily="@font/inter_24pt_semibold"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/appt_chip_padding_h"
+                android:text="@string/appt_status_waiting"
+                android:textColor="@color/appt_chip_waiting_text"
+                android:textSize="@dimen/appt_chip_text" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/appt_row_padding_v">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/AppointmentLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/appt_barcode" />
+
+            <!-- Rộng = số vạch × 1dp, đặt trong AppointmentRenderer. -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivBarcode"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/appt_barcode_height"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/AppointmentTitle"
+        android:text="@string/appt_receive_info" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat style="@style/AppointmentCard">
+
+        <include
+            android:id="@+id/rowStore"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowAddress"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowReceiver"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowIdNumber"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowPhone"
+            layout="@layout/item_appointment_row" />
+
+        <!-- Ngày nhận hàng: khung giờ nằm dưới nhãn (Figma). -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/appt_row_padding_v">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/AppointmentLabel"
+                    android:text="@string/appt_pickup_date" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPickupHours"
+                    style="@style/AppointmentLabel"
+                    android:layout_marginTop="@dimen/appt_hint_top"
+                    android:textSize="@dimen/appt_hint_text"
+                    app:lineHeight="@dimen/appt_hint_line"
+                    tools:text="Khung giờ nhận : 09:00–20:30" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPickupDate"
+                style="@style/AppointmentValue"
+                tools:text="15/04/2026" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/AppointmentTitle"
+        android:text="@string/appt_product_info" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat style="@style/AppointmentCard">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/lines"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:divider="@drawable/space_appt_line"
+            app:showDividers="middle" />
+
+        <include
+            android:id="@+id/rowCount"
+            layout="@layout/item_appointment_row" />
+
+        <include
+            android:id="@+id/rowTotal"
+            layout="@layout/item_appointment_row" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>
