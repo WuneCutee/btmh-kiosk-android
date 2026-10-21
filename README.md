@@ -173,5 +173,4 @@ cam đất cho giá tiền. Toàn bộ token nằm trong `ui/Ui.java` — view c
 - **Giá mua vào** (`buyPrice`): backend chưa có nguồn dữ liệu (bảng `product_prices` chỉ có giá bán) → luôn "Giá liên hệ".
 - Chưa test trên **máy kiosk Android thật** (Sunmi K2…). Video banner `res/raw/banner.mp4` là 4K H.265 — nếu máy yếu bị
   giật thì chuyển 1080p H.264.
-- Quét QR mới thử được đến bước mở camera trên emulator (camera ảo), chưa quét mã thật.
 - Font: dùng Roboto mặc định (Segoe UI của bản WinForms không có trên Android).
