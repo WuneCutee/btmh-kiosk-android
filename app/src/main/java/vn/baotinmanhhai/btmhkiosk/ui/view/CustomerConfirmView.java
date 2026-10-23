@@ -52,7 +52,7 @@ public class CustomerConfirmView extends LinearLayout implements Ui.InsetAware {
         topBar = new LinearLayout(context);
         topBar.setOrientation(HORIZONTAL);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setPadding(Ui.px(20), Ui.px(32), Ui.px(32), Ui.px(8));
+        topBar.setPadding(Ui.px(20), Ui.px(56), Ui.px(32), Ui.px(8)); // Home: cach tren 56, phai 32 (Figma/fragment_header)
 
         FrameLayout backBtn = new FrameLayout(context);
         backBtn.setClickable(true);
@@ -79,7 +79,7 @@ public class CustomerConfirmView extends LinearLayout implements Ui.InsetAware {
         homeBtn.setOnClickListener(v -> {
             if (callbacks != null) callbacks.onGoHome();
         });
-        IconView homeIcon = new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.0f);
+        android.view.View homeIcon = Ui.homeIcon(context);
         homeBtn.addView(homeIcon, new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
         topBar.addView(homeBtn, new LayoutParams(Ui.px(66), Ui.px(66)));
 
@@ -146,7 +146,7 @@ public class CustomerConfirmView extends LinearLayout implements Ui.InsetAware {
     @Override
     public void onInsets(int l, int t, int r, int b) {
         setPadding(l, 0, r, 0);
-        topBar.setPadding(Ui.px(20), Ui.px(32) + t, Ui.px(32), Ui.px(8));
+        topBar.setPadding(Ui.px(20), Ui.px(56) + t, Ui.px(32), Ui.px(8));
         binding.scroll.setPadding(binding.scroll.getPaddingLeft(), binding.scroll.getPaddingTop(),
                 binding.scroll.getPaddingRight(), binding.scroll.getPaddingBottom() + b);
     }

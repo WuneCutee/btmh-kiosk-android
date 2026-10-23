@@ -48,6 +48,8 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         void onCancel();
         void onFinished();
         void onGoHome();
+        /** Het thoi gian o man ket qua ma khach khong thao tac: ket thuc phien (xoa gio, ve man cho). */
+        void onSessionExpired();
     }
 
     private static final long COUNTDOWN_MS = 5 * 60 * 1000L;
@@ -102,7 +104,7 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         header = new LinearLayout(context);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(Ui.px(20), Ui.px(32), Ui.px(32), Ui.px(8));
+        header.setPadding(Ui.px(20), Ui.px(56), Ui.px(32), Ui.px(8)); // Home: cach tren 56, phai 32 (Figma/fragment_header)
 
         headerBackBtn = new FrameLayout(context);
         headerBackBtn.setClickable(true);
@@ -124,7 +126,7 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         homeBtn.setClickable(true);
         Ui.pressEffect(homeBtn);
         homeBtn.setOnClickListener(v -> listener.onGoHome());
-        IconView homeIcon = new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.0f);
+        android.view.View homeIcon = Ui.homeIcon(context);
         homeBtn.addView(homeIcon, new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
         header.addView(homeBtn, new LinearLayout.LayoutParams(Ui.px(66), Ui.px(66)));
 
@@ -148,7 +150,11 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         for (int i = 0; i < stars.length; i++) {
             final int value = i + 1;
             stars[i].setContentDescription(context.getString(R.string.result_rate_star, value));
-            stars[i].setOnClickListener(v -> setRating(value));
+            // Cham sao -> popup danh gia (Figma), san so sao vua cham; chi to sao tren man khi khach bam GUI.
+            stars[i].setOnClickListener(v -> OrderPopups.showRating(getContext(), value, (submitted, comment) -> {
+                setRating(submitted);
+                KioskToast.success(getContext(), R.string.rating_thanks);
+            }));
             Ui.pressEffect(stars[i]);
         }
         setRating(0);
@@ -389,7 +395,7 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         }
         result.tvHotline.setText(hotline);
         result.hotline.setVisibility(hotline != null && !hotline.isEmpty() ? VISIBLE : GONE);
-        result.tvAutoEnd.setText(context().getString(R.string.result_auto_end, 120));
+        startAutoEndCountdown();
 
         result.rating.setVisibility(success ? VISIBLE : GONE);
         setRating(0);
@@ -437,6 +443,50 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
         return getContext();
     }
 
+    // ==================== TU DONG KET THUC PHIEN O MAN KET QUA ====================
+    // "Phien giao dich se tu dong ket thuc sau N giay neu quy khach khong tiep tuc": dem nguoc THAT (truoc day so
+    // 120 chi la chu tinh, man ket qua khong bao gio tu dong - idleCheck cua KioskActivity bo qua man thanh toan).
+    // Khach cham man hinh = con dang dung -> dem lai tu dau; het gio -> listener.onSessionExpired().
+
+    private static final int AUTO_END_SECONDS = 120;
+    private int autoEndRemaining = AUTO_END_SECONDS;
+    private final Runnable autoEndTick = this::tickAutoEnd;
+
+    private boolean isResultState() {
+        return state == State.RESULT_SUCCESS || state == State.RESULT_UNDETERMINED || state == State.RESULT_FAILED;
+    }
+
+    private void startAutoEndCountdown() {
+        autoEndRemaining = AUTO_END_SECONDS;
+        renderAutoEnd();
+        handler.removeCallbacks(autoEndTick);
+        handler.postDelayed(autoEndTick, 1000);
+    }
+
+    private void tickAutoEnd() {
+        if (!isResultState() || getVisibility() != VISIBLE) return; // roi man ket qua: dung dem
+        autoEndRemaining--;
+        if (autoEndRemaining <= 0) {
+            listener.onSessionExpired();
+            return;
+        }
+        renderAutoEnd();
+        handler.postDelayed(autoEndTick, 1000);
+    }
+
+    private void renderAutoEnd() {
+        result.tvAutoEnd.setText(context().getString(R.string.result_auto_end, autoEndRemaining));
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getActionMasked() == android.view.MotionEvent.ACTION_DOWN && isResultState() && getVisibility() == VISIBLE) {
+            autoEndRemaining = AUTO_END_SECONDS;
+            renderAutoEnd();
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         handler.removeCallbacksAndMessages(null);
@@ -446,6 +496,6 @@ public class PaymentView extends FrameLayout implements Ui.InsetAware {
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
         setPadding(left, 0, right, 0);
-        header.setPadding(Ui.px(20), Ui.px(32) + top, Ui.px(32), Ui.px(8));
+        header.setPadding(Ui.px(20), Ui.px(56) + top, Ui.px(32), Ui.px(8));
     }
 }

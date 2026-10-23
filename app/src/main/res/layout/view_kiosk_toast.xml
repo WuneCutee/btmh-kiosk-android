@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Toast dùng chung — Figma "Màn hình xác nhận thông tin KH"; nền và icon đặt trong KioskToast theo kiểu. -->
+<!-- Thẻ thông báo dùng chung (Figma "Alert"): 343 x ≥72, padding 16, icon 24 cách chữ 8, chữ Inter 16/20 #666666.
+     Nền + icon theo kiểu (thành công / cảnh báo) đặt trong KioskToast. -->
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toast"
-    android:layout_width="wrap_content"
+    android:layout_width="@dimen/toast_min_width"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:minWidth="@dimen/toast_min_width"
     android:minHeight="@dimen/toast_min_height"
     android:orientation="horizontal"
     android:paddingStart="@dimen/toast_padding_start"
@@ -24,11 +25,13 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvMessage"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/toast_icon_gap"
-        android:maxWidth="@dimen/toast_max_width"
+        android:layout_weight="1"
+        android:fontFamily="@font/inter_24pt_regular"
         android:textColor="@color/toast_text"
         android:textSize="@dimen/toast_text"
-        tools:text="Tạo Tài Khoản thành công!" />
+        app:lineHeight="@dimen/toast_text_line"
+        tools:text="Gửi đánh giá thành công" />
 </androidx.appcompat.widget.LinearLayoutCompat>

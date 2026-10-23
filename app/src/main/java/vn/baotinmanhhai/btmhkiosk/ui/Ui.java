@@ -101,6 +101,14 @@ public final class Ui {
     }
 
     /** px thiet ke (canvas 540dp, dung DESIGN_WIDTH) -> px that tren man hinh. */
+    /** Icon Home dung chung MOI header (cung drawable ic_home cua fragment_header) - dat trong khung 34x34. */
+    public static android.view.View homeIcon(Context context) {
+        android.widget.ImageView iv = new android.widget.ImageView(context);
+        iv.setImageResource(vn.baotinmanhhai.btmhkiosk.R.drawable.ic_home);
+        iv.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        return iv;
+    }
+
     public static int px(float designPx) {
         return Math.round(designPx * scale);
     }

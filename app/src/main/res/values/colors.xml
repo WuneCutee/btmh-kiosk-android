@@ -78,9 +78,9 @@
     <color name="qr_logo_outline">#333333</color>
 
     <!-- Toast — Figma "Màn hình xác nhận thông tin KH" (mẫu thành công); kiểu lỗi cùng khung, tông đỏ (chốt 29/09/2026) -->
-    <color name="toast_text">#595959</color>
+    <color name="toast_text">#666666</color>
     <color name="toast_success_border">#B0DCB5</color>
-    <color name="toast_success_start">#EAF6EB</color>
+    <color name="toast_success_start">#E6F4E7</color>
     <color name="toast_success_icon">#00810E</color>
     <color name="toast_error_border">#F2B8B5</color>
     <color name="toast_error_start">#FDECEC</color>

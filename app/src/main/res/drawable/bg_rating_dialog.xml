@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền popup đánh giá (Figma 470x288, bo 16): gradient dọc #FFFFFF → #FAF3E2, phía trên có các quầng
+     mờ (blur 28–46): Ellipse 1 đào #FFBC85 góc trái, Ellipse 2 cam #FF7D45 giữa, Ellipse 5 hồng
+     rgba(173,5,116,.14) bên phải, Ellipse 4 đỏ #FE3F42 nhạt sát mép trên. Mỗi lớp bo 16 để không tràn góc. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/dialog_radius" />
+            <gradient
+                android:angle="270"
+                android:endColor="#FAF3E2"
+                android:startColor="#FFFFFF"
+                android:type="linear" />
+        </shape>
+    </item>
+    <!-- Ellipse 4: đỏ rất nhạt sát mép trên -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/dialog_radius" />
+            <gradient
+                android:angle="270"
+                android:centerColor="#00FE3F42"
+                android:centerY="0.14"
+                android:endColor="#00FE3F42"
+                android:startColor="#29FE3F42"
+                android:type="linear" />
+        </shape>
+    </item>
+    <!-- Ellipse 1: đào, góc trên trái -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/dialog_radius" />
+            <gradient
+                android:centerColor="#4DFFBC85"
+                android:centerX="0.0"
+                android:centerY="0.04"
+                android:endColor="#00FFBC85"
+                android:gradientRadius="200dp"
+                android:startColor="#B3FFBC85"
+                android:type="radial" />
+        </shape>
+    </item>
+    <!-- Ellipse 2: cam, phía trên giữa-trái -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/dialog_radius" />
+            <gradient
+                android:centerColor="#24FF7D45"
+                android:centerX="0.40"
+                android:centerY="0.0"
+                android:endColor="#00FF7D45"
+                android:gradientRadius="150dp"
+                android:startColor="#66FF7D45"
+                android:type="radial" />
+        </shape>
+    </item>
+    <!-- Ellipse 5: hồng rất nhạt, phía trên bên phải -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/dialog_radius" />
+            <gradient
+                android:centerX="0.68"
+                android:centerY="0.0"
+                android:endColor="#00AD0574"
+                android:gradientRadius="150dp"
+                android:startColor="#24AD0574"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>

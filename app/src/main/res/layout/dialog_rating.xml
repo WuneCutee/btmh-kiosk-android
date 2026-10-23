@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Popup đánh giá dịch vụ (Figma "Màn hình kết thúc thanh toán" – popup 470, padding 24, gap 16):
+     tiêu đề + X → 5 sao 40x38 cách 15 (đệm dọc 15) → ô góp ý → nút GỬI rộng hết khung. -->
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/rating_dialog_width"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_rating_dialog"
+    android:orientation="vertical"
+    android:padding="@dimen/dialog_padding">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/plus_jakarta_sans_variable"
+            android:text="@string/rating_title"
+            android:textColor="#1A1A1A"
+            android:textSize="@dimen/dialog_title_text"
+            app:lineHeight="@dimen/dialog_title_line" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/dialog_close"
+            android:layout_height="@dimen/dialog_close"
+            android:contentDescription="@string/dialog_close"
+            app:srcCompat="@drawable/ic_close" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/stars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/rating_title_gap"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/rating_star_pad_v">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/star1"
+            android:layout_width="@dimen/result_star_width"
+            android:layout_height="@dimen/result_star_height"
+            app:srcCompat="@drawable/ic_rating_star" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/star2"
+            android:layout_width="@dimen/result_star_width"
+            android:layout_height="@dimen/result_star_height"
+            android:layout_marginStart="@dimen/rating_star_gap"
+            app:srcCompat="@drawable/ic_rating_star" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/star3"
+            android:layout_width="@dimen/result_star_width"
+            android:layout_height="@dimen/result_star_height"
+            android:layout_marginStart="@dimen/rating_star_gap"
+            app:srcCompat="@drawable/ic_rating_star" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/star4"
+            android:layout_width="@dimen/result_star_width"
+            android:layout_height="@dimen/result_star_height"
+            android:layout_marginStart="@dimen/rating_star_gap"
+            app:srcCompat="@drawable/ic_rating_star" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/star5"
+            android:layout_width="@dimen/result_star_width"
+            android:layout_height="@dimen/result_star_height"
+            android:layout_marginStart="@dimen/rating_star_gap"
+            app:srcCompat="@drawable/ic_rating_star" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <!-- Figma "content row": KHÔNG nền/viền, padding 16, cao 56, chữ nghiêng Plus Jakarta 16 #8E8E93. -->
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/rating_section_gap"
+        android:background="@null"
+        android:fontFamily="@font/plus_jakarta_sans_regular"
+        android:gravity="center_vertical"
+        android:hint="@string/rating_comment_hint"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences"
+        android:maxLength="300"
+        android:maxLines="3"
+        android:minHeight="@dimen/rating_comment_min_height"
+        android:padding="@dimen/rating_comment_padding"
+        android:textColor="#1A1A1A"
+        android:textColorHint="#8E8E93"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:lineHeight="24sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_button_height"
+        android:layout_marginTop="@dimen/rating_section_gap"
+        android:background="@drawable/bg_pill_red"
+        android:fontFamily="@font/cabin_semibold"
+        android:gravity="center"
+        android:text="@string/rating_submit"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dialog_button_text" />
+</androidx.appcompat.widget.LinearLayoutCompat>

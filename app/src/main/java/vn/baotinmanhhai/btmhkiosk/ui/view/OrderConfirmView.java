@@ -79,6 +79,8 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         void onRemoveCartItem(String productId);
         void onPlaceOrder();
         void onVerifyIdentity();
+        /** Icon but canh "Thong tin nhan hang": mo lai man Xac nhan thong tin khach hang de sua SDT/email. */
+        void onEditReceiver();
         /** "DAT MUA": lam moi du lieu song (gia/ton kho) cho tung dong gio hang truoc khi tu kiem tra han
          * muc/gia/ton - xem KioskViewModel.refreshCartProductsForCheck(). */
         void onRequestCartRefresh(KioskViewModel.CartRefreshCallback callback);
@@ -159,7 +161,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         topBar = new LinearLayout(context);
         topBar.setOrientation(HORIZONTAL);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setPadding(Ui.px(20), Ui.px(32), Ui.px(32), Ui.px(8));
+        topBar.setPadding(Ui.px(20), Ui.px(56), Ui.px(32), Ui.px(8)); // Home: cach tren 56, phai 32 (Figma/fragment_header)
 
         FrameLayout backBtn = new FrameLayout(context);
         backBtn.setClickable(true);
@@ -185,7 +187,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         homeBtn.setOnClickListener(v -> {
             if (callbacks != null) callbacks.onGoHome();
         });
-        IconView homeIcon = new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.0f);
+        android.view.View homeIcon = Ui.homeIcon(context);
         homeBtn.addView(homeIcon, new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
         topBar.addView(homeBtn, new LayoutParams(Ui.px(66), Ui.px(66)));
 
@@ -214,26 +216,27 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         binding.fieldProvince.setOnClickListener(v -> openProvinceSheet());
         binding.fieldStore.setOnClickListener(v -> openStoreSheet());
 
-        binding.btnEditReceiver.setVisibility(GONE); // sua thong tin nhan hang: chua lam (giu nguyen gap cu)
+        // Sua thong tin nhan hang: chi hien khi da xac minh (luc do moi co the thong tin) - xem applyVerifiedStyle().
+        binding.btnEditReceiver.setOnClickListener(v -> callbacks.onEditReceiver());
         binding.tradingNotice.setVisibility(GONE);   // chua co nguon du lieu gio mo ban rieng cho man don hang
 
         binding.btnVerify.setOnClickListener(v -> callbacks.onVerifyIdentity());
 
         binding.btnPlaceOrder.setOnClickListener(v -> {
             if (lastState != null && lastState.cart.isEmpty()) {
-                Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
+                KioskToast.error(getContext(), "Giỏ hàng trống");
                 return;
             }
             if (!verified) {
-                Toast.makeText(getContext(), "Vui lòng xác minh chính chủ trước khi đặt mua", Toast.LENGTH_SHORT).show();
+                KioskToast.error(getContext(), "Vui lòng xác minh chính chủ trước khi đặt mua");
                 return;
             }
             if (boundProvinceId == null) {
-                Toast.makeText(getContext(), "Vui lòng chọn Tỉnh/Thành phố", Toast.LENGTH_SHORT).show();
+                KioskToast.error(getContext(), "Vui lòng chọn Tỉnh/Thành phố");
                 return;
             }
             if (boundStoreId == null) {
-                Toast.makeText(getContext(), "Vui lòng chọn cửa hàng nhận hàng", Toast.LENGTH_SHORT).show();
+                KioskToast.error(getContext(), "Vui lòng chọn cửa hàng nhận hàng");
                 return;
             }
             proceedToPlaceOrder();
@@ -677,9 +680,26 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
     @Override
     public void onInsets(int l, int t, int r, int b) {
         setPadding(l, 0, r, 0);
-        topBar.setPadding(Ui.px(20), Ui.px(32) + t, Ui.px(32), Ui.px(8));
+        topBar.setPadding(Ui.px(20), Ui.px(56) + t, Ui.px(32), Ui.px(8));
         binding.scroll.setPadding(binding.scroll.getPaddingLeft(), binding.scroll.getPaddingTop(),
                 binding.scroll.getPaddingRight(), binding.scroll.getPaddingBottom() + b);
+    }
+
+    /** SRS muc 2 / Figma (khung 298): hien toi da 2 san pham; tu san pham thu 3 cuon trong khung, co thanh cuon. */
+    private static final int MAX_VISIBLE_LINES = 2;
+
+    private void limitVisibleLines(int count) {
+        android.content.res.Resources r = getResources();
+        int itemH = r.getDimensionPixelSize(R.dimen.order_item_height);
+        int gap = r.getDimensionPixelSize(R.dimen.order_item_gap); // marginBottom cua moi dong
+        android.view.ViewGroup.LayoutParams lp = binding.rvLines.getLayoutParams();
+        int want = count > MAX_VISIBLE_LINES
+                ? MAX_VISIBLE_LINES * itemH + (MAX_VISIBLE_LINES - 1) * gap  // 2*144 + 10 = 298 (Figma)
+                : android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+        if (lp.height != want) {
+            lp.height = want;
+            binding.rvLines.setLayoutParams(lp);
+        }
     }
 
     public void setVerified(boolean verified) {
@@ -695,6 +715,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
         binding.btnVerify.setVisibility(verified ? GONE : VISIBLE);
         binding.tvVerifyHint.setVisibility(verified ? GONE : VISIBLE);
         binding.receiverCard.setVisibility(verified ? VISIBLE : GONE);
+        binding.btnEditReceiver.setVisibility(verified ? VISIBLE : GONE);
 
         if (canPlaceOrder()) {
             binding.btnPlaceOrder.setBackgroundResource(R.drawable.bg_pill_red);
@@ -752,7 +773,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
 
         binding.progress.setVisibility(s.orderLoading ? VISIBLE : GONE);
         if (s.orderError != null && !s.orderError.isEmpty()) {
-            Toast.makeText(getContext(), s.orderError, Toast.LENGTH_SHORT).show();
+            KioskToast.error(getContext(), s.orderError);
         }
 
         renderItems(s);
@@ -786,6 +807,7 @@ public class OrderConfirmView extends LinearLayout implements Ui.InsetAware {
             totalUnits += it.lineUnits();
         }
         adapter.submit(cart, s.limitQuantity, totalUnits, pricesHidden);
+        limitVisibleLines(cart.size());
 
         binding.tvTotalCount.setText(String.valueOf(totalQty));
         if (pricesHidden) {

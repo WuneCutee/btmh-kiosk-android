@@ -49,7 +49,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
     private vn.btmh.ui.customviews.DashedCircleView dashedCircle;
     private final TextView scanCaption;
     private final TextView scanButton;
-    private final View successBadge;
+    private final View faceIdIcon;
     private final ValueAnimator ticker;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private State state = State.POPUP;
@@ -68,7 +68,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         LinearLayout header = new LinearLayout(context);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(Ui.px(6), Ui.px(16), Ui.px(16), Ui.px(8));
+        header.setPadding(Ui.px(20), Ui.px(56), Ui.px(32), Ui.px(8)); // Home: cach tren 56, phai 32 (Figma/fragment_header)
         FrameLayout back = new FrameLayout(context);
         back.addView(new IconView(context, IconView.ARROW_LEFT, Ui.TEXT_TITLE_DARK).strokeUnits(2.2f),
                 new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
@@ -76,14 +76,17 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         back.setOnClickListener(v -> listener.onCancel());
         Ui.pressEffect(back);
         header.addView(back, new LinearLayout.LayoutParams(Ui.px(64), Ui.px(64)));
-        TextView title = Ui.text(context, "Xác thực khuôn mặt", 14f, Ui.TEXT_TITLE_DARK, Ui.W_BOLD);
+        // Figma: Heading Inter SemiBold 24, letter-spacing -0.02em, den.
+        TextView title = Ui.text(context, "Xác thực khuôn mặt", 24f, Color.BLACK, Ui.W_BOLD);
+        title.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_semibold));
+        title.setLetterSpacing(-0.02f);
         header.addView(title, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         // Dung dung 1 kieu icon home voi moi man khac (OrderConfirmView/PaymentView/CustomerConfirmView): icon
         // vien (HOME_OUTLINE) mau do thuong hieu, KHONG nen dac/khong shadow - truoc day man nay tu ve rieng
         // kieu icon dac nen tron + shadow, khac han cac man con lai (app that dung chung 1 HeaderFragment nen
         // icon home GIONG HET nhau o moi man, xem activity_face_auth.xml).
         FrameLayout homeBtn = new FrameLayout(context);
-        homeBtn.addView(new IconView(context, IconView.HOME_OUTLINE, Ui.BURGUNDY_PRIMARY).strokeUnits(2.0f),
+        homeBtn.addView(Ui.homeIcon(context),
                 new FrameLayout.LayoutParams(Ui.px(34), Ui.px(34), Gravity.CENTER));
         homeBtn.setClickable(true);
         homeBtn.setOnClickListener(v -> listener.onGoHome());
@@ -126,9 +129,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         faceIdIcon.setImageResource(vn.baotinmanhhai.btmhkiosk.R.drawable.ic_face_id);
         faceFrame.addView(faceIdIcon, new FrameLayout.LayoutParams(Ui.px(114), Ui.px(114), Gravity.CENTER));
         this.dashedCircle = dashedCircle;
-        successBadge = buildSuccessBadge(context);
-        successBadge.setVisibility(GONE);
-        faceFrame.addView(successBadge, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        this.faceIdIcon = faceIdIcon;
         LinearLayout.LayoutParams faceFrameLp = new LinearLayout.LayoutParams(Ui.px(380), Ui.px(380));
         faceFrameLp.topMargin = Ui.px(32);
         scanCard.addView(faceFrame, faceFrameLp);
@@ -195,15 +196,6 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         return sp;
     }
 
-    private static View buildSuccessBadge(Context context) {
-        FrameLayout badge = new FrameLayout(context);
-        badge.setBackground(Ui.oval(Ui.withAlpha(Ui.UP_GREEN, 0x22)));
-        TextView check = Ui.text(context, "✓", 32f, Ui.UP_GREEN, Ui.W_BOLD);
-        check.setGravity(Gravity.CENTER);
-        badge.addView(check, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        return badge;
-    }
-
     private void onScanTap() {
         if (state == State.WAITING) {
             setState(State.VERIFYING);
@@ -212,7 +204,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
             }, 1700);
             handler.postDelayed(() -> {
                 if (state == State.SUCCESS) listener.onVerified();
-            }, 2600);
+            }, 3300); // giu man "Nhan dien thanh cong" ~1.6s cho khach kip thay
         } else if (!BuildConfig.DEBUG) {
             // release: chi cho bam lai khi dang cho (chua co camera that de bam "quet lai")
         }
@@ -235,8 +227,10 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
         boolean success = state == State.SUCCESS;
         dashedCircle.setSpinningMode(verifying);
         dashedCircle.setSuccess(success);
-        successBadge.setVisibility(success ? VISIBLE : GONE);
-        dashedCircle.setVisibility(success ? GONE : VISIBLE);
+        // Giong FaceAuthActivity.updateUI(SUCCESS) cua app goc: GIU vong 100 vach (isSuccess=true, progress=100 ->
+        // toan bo vach xanh #4CAF50 + vong tron co dau tich ve o giua), an icon FaceID.
+        dashedCircle.setProgress(success ? 100f : 0f);
+        faceIdIcon.setVisibility(success ? GONE : VISIBLE);
         if (verifying) dashedCircle.setRotationAngle(0f);
         switch (state) {
             case WAITING:
@@ -253,7 +247,7 @@ public class IdentityVerifyView extends FrameLayout implements Ui.InsetAware {
                 break;
             case SUCCESS:
                 scanCaption.setText("Nhận diện thành công");
-                scanCaption.setTextColor(Ui.UP_GREEN);
+                scanCaption.setTextColor(0xFF4CAF50); // app goc: Color.parseColor("#4CAF50")
                 scanButton.setVisibility(GONE);
                 break;
             default:

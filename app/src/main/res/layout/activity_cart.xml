@@ -140,12 +140,18 @@
                     android:layout_weight="1"
                     android:text="@string/order_receive_info" />
 
+                <!-- Figma: net 16x16 sat mep phai hang tieu de (cao 24). Vung cham 30dp, le am bang padding
+                     de net but nam dung mep va khong day hang tieu de cao len. -->
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/btnEditReceiver"
                     android:layout_width="@dimen/order_edit_icon"
                     android:layout_height="@dimen/order_edit_icon"
+                    android:layout_marginEnd="@dimen/order_edit_offset"
+                    android:layout_marginTop="@dimen/order_edit_offset_v"
+                    android:layout_marginBottom="@dimen/order_edit_offset_v"
                     android:contentDescription="@string/order_edit_receiver"
                     android:padding="@dimen/order_edit_padding"
+                    android:scaleType="fitCenter"
                     android:visibility="gone"
                     app:srcCompat="@drawable/ic_edit"
                     tools:visibility="visible" />

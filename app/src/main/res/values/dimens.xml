@@ -166,8 +166,12 @@
     <dimen name="order_card_row_gap">12dp</dimen>
     <dimen name="order_badge_text">12sp</dimen>
     <dimen name="order_badge_padding_h">8dp</dimen>
-    <dimen name="order_edit_icon">32dp</dimen>
+    <!-- Icon sua "Thong tin nhan hang": net 16dp (Figma) = 30 - 2x7 padding; le am de net sat mep phai
+         va hang tieu de giu cao 24dp. -->
+    <dimen name="order_edit_icon">30dp</dimen>
     <dimen name="order_edit_padding">7dp</dimen>
+    <dimen name="order_edit_offset">-7dp</dimen>
+    <dimen name="order_edit_offset_v">-3dp</dimen>
     <dimen name="order_button_height">56dp</dimen>
     <dimen name="order_button_text">20sp</dimen>
     <dimen name="order_button_gap">12dp</dimen>
@@ -202,6 +206,14 @@
     <dimen name="dialog_message_line">22.4sp</dimen>
     <dimen name="dialog_button_gap">10dp</dimen>
     <dimen name="dialog_button_stroke">1.5dp</dimen>
+    <!-- Popup đánh giá dịch vụ (Figma: rộng 470, gap 16, sao cách 15, đệm dọc hàng sao 15, ô góp ý padding 16 / cao 56). -->
+    <dimen name="rating_dialog_width">470dp</dimen>
+    <dimen name="rating_section_gap">16dp</dimen>
+    <dimen name="rating_title_gap">8dp</dimen>
+    <dimen name="rating_star_gap">15dp</dimen>
+    <dimen name="rating_star_pad_v">15dp</dimen>
+    <dimen name="rating_comment_padding">16dp</dimen>
+    <dimen name="rating_comment_min_height">56dp</dimen>
     <dimen name="sheet_padding_side">31dp</dimen>
     <dimen name="sheet_padding_vertical">26dp</dimen>
     <dimen name="sheet_title_large_line">28.8sp</dimen>
@@ -314,19 +326,21 @@
     <dimen name="result_thanks_line">40sp</dimen>
     <dimen name="result_zalo_logo">34dp</dimen>
     <dimen name="result_zalo_logo_text">10sp</dimen>
-    <dimen name="toast_top">35dp</dimen>
-    <dimen name="toast_end">20dp</dimen>
+    <dimen name="toast_top">44dp</dimen>
+    <dimen name="toast_end">29dp</dimen>
     <dimen name="toast_elevation">16dp</dimen>
-    <dimen name="toast_min_width">342dp</dimen>
-    <dimen name="toast_max_width">476dp</dimen>
-    <dimen name="toast_min_height">71dp</dimen>
-    <dimen name="toast_radius">16dp</dimen>
-    <dimen name="toast_padding_start">18dp</dimen>
-    <dimen name="toast_padding_end">20dp</dimen>
-    <dimen name="toast_padding_v">14dp</dimen>
-    <dimen name="toast_icon">20dp</dimen>
-    <dimen name="toast_icon_gap">12dp</dimen>
-    <dimen name="toast_text">15sp</dimen>
+    <dimen name="toast_min_width">343dp</dimen>
+    <dimen name="toast_max_width">343dp</dimen>
+    <dimen name="toast_min_height">72dp</dimen>
+    <dimen name="toast_radius">24dp</dimen>
+    <dimen name="toast_padding_start">16dp</dimen>
+    <dimen name="toast_padding_end">16dp</dimen>
+    <dimen name="toast_padding_v">16dp</dimen>
+    <dimen name="toast_icon">24dp</dimen>
+    <dimen name="toast_icon_gap">8dp</dimen>
+    <dimen name="toast_text">16sp</dimen>
+    <dimen name="toast_text_line">20sp</dimen>
+    <dimen name="toast_gradient_radius">172dp</dimen>
     <!-- Giấy hẹn: Figma "Chi tiết đơn hàng" 1334:16052 (khung 375), vẽ ra ảnh 1125 px -->
     <dimen name="appt_width">375dp</dimen>
     <dimen name="appt_padding_h">16dp</dimen>

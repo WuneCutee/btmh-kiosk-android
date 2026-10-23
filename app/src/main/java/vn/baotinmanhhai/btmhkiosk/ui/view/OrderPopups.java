@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import vn.baotinmanhhai.btmhkiosk.R;
 import vn.baotinmanhhai.btmhkiosk.databinding.DialogOrderNoticeBinding;
+import vn.baotinmanhhai.btmhkiosk.databinding.DialogRatingBinding;
 
 /**
  * Ban rut gon cua OrderDialogs.notice()/purchaseLimitMessage()/outOfStockMessage() cua app chuan, dung chung
@@ -147,6 +148,61 @@ public final class OrderPopups {
             if (onConfirm != null) onConfirm.run();
         });
         showKiosk(dialog);
+    }
+
+    /** Gui danh gia: so sao (1-5) va gop y (co the rong). */
+    public interface RatingListener {
+        void onSubmit(int stars, String comment);
+    }
+
+    private static final int STAR_ON = 0xFFFFCC00;
+    private static final int STAR_OFF = 0xFFF2F2F2;
+
+    /**
+     * Popup danh gia dich vu (Figma "Man hinh ket thuc thanh toan"): mo khi khach cham sao o man ket qua giao
+     * dich, san so sao vua cham; khach doi duoc so sao, nhap gop y roi bam GUI. X / bam ra ngoai: dong, khong gui.
+     */
+    public static void showRating(Context context, int initialStars, RatingListener listener) {
+        DialogRatingBinding db = DialogRatingBinding.inflate(LayoutInflater.from(context));
+        Dialog dialog = new Dialog(context, R.style.OrderDialog);
+        dialog.setContentView(db.getRoot());
+        // Figma HEADER/T18-Semibold (Plus Jakarta Sans 600): font variable - thuoc tinh XML khong an, dat bang code.
+        db.tvTitle.setFontVariationSettings("'wght' 600");
+        // Khong tu bat ban phim khi mo popup: chi mo khi khach cham vao o gop y.
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                    | android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        }
+
+        android.widget.ImageView[] stars = {db.star1, db.star2, db.star3, db.star4, db.star5};
+        int[] rating = {Math.max(1, Math.min(5, initialStars))};
+        Runnable paint = () -> {
+            for (int i = 0; i < stars.length; i++) {
+                stars[i].setImageTintList(android.content.res.ColorStateList.valueOf(i < rating[0] ? STAR_ON : STAR_OFF));
+            }
+        };
+        for (int i = 0; i < stars.length; i++) {
+            final int value = i + 1;
+            stars[i].setContentDescription(context.getString(R.string.result_rate_star, value));
+            stars[i].setOnClickListener(v -> {
+                rating[0] = value;
+                paint.run();
+            });
+        }
+        paint.run();
+
+        db.btnClose.setOnClickListener(v -> dialog.dismiss());
+        db.btnSubmit.setOnClickListener(v -> {
+            String comment = db.etComment.getText() == null ? "" : db.etComment.getText().toString().trim();
+            dialog.dismiss();
+            if (listener != null) listener.onSubmit(rating[0], comment);
+        });
+        showKiosk(dialog);
+        // Theme dialog tu ep cua so hep (~308dp) -> tieu de xuong dong, nut GUI bi cat: dat dung 470dp theo Figma.
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(context.getResources().getDimensionPixelSize(R.dimen.rating_dialog_width),
+                    android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     /** showKiosk() that: man kiosk an thanh he thong, dialog co Window RIENG nen phai tu an lai. */

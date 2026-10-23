@@ -176,7 +176,10 @@ public class ShellView extends FrameLayout {
         title.setText(text);
         backButton.setVisibility(withBack ? VISIBLE : GONE);
         // Home khong co mui ten: tieu de thut vao de thang hang voi cac man khac
-        titleRow.setPadding(withBack ? 0 : Ui.px(8), 0, 0, 0);
+        // Giu padding 56/32 cua fragment_header (truoc day ghi de ve 0 -> nut Home lech so voi cac man khac).
+        int padH = getResources().getDimensionPixelSize(vn.baotinmanhhai.btmhkiosk.R.dimen.header_padding_h);
+        int padTop = getResources().getDimensionPixelSize(vn.baotinmanhhai.btmhkiosk.R.dimen.header_padding_top);
+        titleRow.setPadding(padH + (withBack ? 0 : Ui.px(8)), padTop, padH, 0);
     }
 
     /** Dat tieu de + muc dang chon tren rail + mui ten Quay lai theo man hinh. */
@@ -245,7 +248,10 @@ public class ShellView extends FrameLayout {
      * vung duoi (thanh dieu huong / ban phim: {@code bottom}). {@code barsBottom} khong dung nua (khong con rail).
      */
     public void onInsets(int left, int top, int right, int bottom, int barsBottom) {
-        header.setPadding(Ui.px(6), top + Ui.px(10), Ui.px(16), Ui.px(4));
+        // Nut Home phai CUNG vi tri o moi man (Figma: khung 66, cach tren 56, cach phai 32 - dung fragment_header):
+        // khung header KHONG them padding, le cu (6/10/16) chi ap cho homeRow cua man Home.
+        header.setPadding(0, top, 0, Ui.px(4));
+        homeRow.setPadding(Ui.px(6), Ui.px(10), Ui.px(16), 0);
         canvas.setPadding(left, 0, right, 0);
         for (int i = 0; i < container.getChildCount(); i++) {
             View v = container.getChildAt(i);

@@ -51,13 +51,12 @@ public class ImagePagerView extends FrameLayout {
 
         dots = new LinearLayout(context);
         dots.setOrientation(LinearLayout.HORIZONTAL);
-        dots.setGravity(Gravity.CENTER);
-        dots.setBackground(Ui.rect(Ui.withAlpha(Ui.SURFACE_WHITE, 0xE0), Ui.R_PILL, Ui.BORDER_LIGHT, 1));
-        dots.setPadding(Ui.px(14), Ui.px(9), Ui.px(14), Ui.px(9));
+        // Figma "Silder": KHONG khung nen, cham tron 18x18 cach nhau 8; dat giua anh theo chieu ngang, sat day anh.
+        dots.setGravity(Gravity.CENTER_VERTICAL);
         dots.setVisibility(GONE);
         LayoutParams dotsLp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-        dotsLp.bottomMargin = Ui.px(14);
+        dotsLp.bottomMargin = Ui.px(17);
         addView(dots, dotsLp);
 
         recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -88,25 +87,23 @@ public class ImagePagerView extends FrameLayout {
         if (urls.size() > 1) {
             for (int i = 0; i < urls.size(); i++) {
                 View dot = new View(getContext());
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Ui.px(9), Ui.px(9));
-                lp.setMargins(Ui.px(4), 0, Ui.px(4), 0);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Ui.px(DOT), Ui.px(DOT));
+                if (i > 0) lp.setMarginStart(Ui.px(DOT_GAP));
                 dots.addView(dot, lp);
             }
             highlight(0);
         }
     }
 
+    private static final int DOT = 18, DOT_GAP = 8;
+    private static final int DOT_ACTIVE = 0xFFBFBFBF;   // Figma Ellipse 1 (anh dang xem)
+    private static final int DOT_INACTIVE = 0xFFEAEAEA; // Figma Ellipse 2
+
     private void highlight(int position) {
         for (int i = 0; i < dots.getChildCount(); i++) {
             boolean active = i == position;
             View dot = dots.getChildAt(i);
-            dot.setBackground(Ui.rect(active ? Ui.BURGUNDY_PRIMARY : Ui.BORDER_LIGHT, Ui.R_PILL, 0, 0));
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) dot.getLayoutParams();
-            int w = active ? Ui.px(24) : Ui.px(9);
-            if (lp.width != w) {
-                lp.width = w;
-                dot.setLayoutParams(lp);
-            }
+            dot.setBackground(Ui.oval(active ? DOT_ACTIVE : DOT_INACTIVE));
         }
     }
 

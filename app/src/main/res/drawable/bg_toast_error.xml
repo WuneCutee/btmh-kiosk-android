@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Thẻ thông báo (Figma "Alert"): radial-gradient(100% at 0% 0%, màu nhạt 0% → trắng 50%), viền 1, bo 24. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
-        android:angle="0"
-        android:centerColor="@color/white"
+        android:centerX="0"
+        android:centerY="0"
         android:endColor="@color/white"
-        android:startColor="@color/toast_error_start" />
+        android:gradientRadius="@dimen/toast_gradient_radius"
+        android:startColor="@color/toast_error_start"
+        android:type="radial" />
     <stroke
         android:width="1dp"
         android:color="@color/toast_error_border" />

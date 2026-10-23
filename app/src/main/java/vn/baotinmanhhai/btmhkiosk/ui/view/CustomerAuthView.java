@@ -1042,7 +1042,7 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
         setPadding(left, 0, right, 0);
-        header.setPadding(Ui.px(6), top + Ui.px(10), Ui.px(16), Ui.px(4));
+        header.setPadding(0, top, 0, Ui.px(4)); // fragment_header tu lo 56/32 -> nut Home cung vi tri moi man
         content.setPadding(Ui.px(16), Ui.px(8), Ui.px(16), Ui.px(24) + bottom);
         termsRoot.setPadding(Ui.px(16), Ui.px(8), Ui.px(16), Ui.px(24) + bottom);
     }
@@ -1223,7 +1223,7 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
             }
             if (firstEmpty != null) {
                 firstEmpty.requestFocus();
-                android.widget.Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin", android.widget.Toast.LENGTH_SHORT).show();
+                KioskToast.error(context, "Vui lòng nhập đầy đủ thông tin");
                 return;
             }
             proceed();

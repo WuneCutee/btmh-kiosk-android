@@ -36,6 +36,7 @@ import java.util.List;
 import vn.baotinmanhhai.btmhkiosk.BuildConfig;
 import vn.baotinmanhhai.btmhkiosk.data.Models;
 import vn.baotinmanhhai.btmhkiosk.ui.view.CustomerAuthView;
+import vn.baotinmanhhai.btmhkiosk.ui.view.KioskToast;
 import vn.baotinmanhhai.btmhkiosk.ui.view.CustomerConfirmView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.DetailView;
 import vn.baotinmanhhai.btmhkiosk.ui.view.GoodsPickupView;
@@ -81,6 +82,7 @@ public class KioskActivity extends AppCompatActivity {
     private boolean receiverConfirmed; // da hoan thanh CustomerConfirmView trong phien Xac nhan don hang hien tai chua
     private String confirmedPhone;
     private String confirmedEmail;
+    private boolean confirmReturnsToOrder; // CustomerConfirmView mo sau khi quet FaceID / tu icon sua: HOAN THANH ve don hang, khong sang thanh toan
     private boolean verifyingForOrder; // dang mo customerAuth tu nut "Xac minh chinh chu" (khach CHUA dang nhap) — khac voi dang nhap tu Home
     private int pendingQuantity = 1; // so luong da chon o Chi tiet, giu trong luc dang o man Xac thuc
     private Models.ProductDto pendingProduct; // san pham tuong ung, them vao gio hang sau khi xac thuc xong
@@ -278,6 +280,12 @@ public class KioskActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onEditReceiver() {
+                confirmReturnsToOrder = true; // HOAN THANH o man xac nhan -> quay ve don hang, khong sang thanh toan
+                openCustomerConfirm();
+            }
+
+            @Override
             public void onVerifyIdentity() {
                 // Bam "XAC MINH CHINH CHU" luon mo thang popup quet khuon mat, du da dang nhap hay chua
                 // (khong bat dang ky tai khoan truoc nua).
@@ -301,6 +309,9 @@ public class KioskActivity extends AppCompatActivity {
                     order.setCustomerInfo("Nguyễn Văn A (demo)", "099999999999", "0987654321", "Hà Nội");
                 }
                 order.setVerified(true);
+                // Quet xong -> hien man "Xac nhan thong tin khach hang" truoc; HOAN THANH moi ve "Thong tin don hang".
+                confirmReturnsToOrder = true;
+                openCustomerConfirm();
             }
 
             @Override
@@ -312,11 +323,13 @@ public class KioskActivity extends AppCompatActivity {
         customerConfirm = new CustomerConfirmView(this, new CustomerConfirmView.Callbacks() {
             @Override
             public void onBack() {
+                confirmReturnsToOrder = false;
                 show(customerConfirm, false);
             }
 
             @Override
             public void onGoHome() {
+                confirmReturnsToOrder = false;
                 show(customerConfirm, false);
                 viewModel.goHome();
             }
@@ -328,6 +341,10 @@ public class KioskActivity extends AppCompatActivity {
                 confirmedEmail = email;
                 order.setConfirmedContact(phone);
                 show(customerConfirm, false);
+                if (confirmReturnsToOrder) {
+                    confirmReturnsToOrder = false; // chi sua thong tin: o lai man don hang de khach bam DAT MUA
+                    return;
+                }
                 openPayment();
             }
         });
@@ -352,6 +369,15 @@ public class KioskActivity extends AppCompatActivity {
             public void onGoHome() {
                 show(payment, false);
                 viewModel.goHome();
+            }
+
+            @Override
+            public void onSessionExpired() {
+                // Het 120s o man Ket qua giao dich: ket thuc phien - xoa gio, dong man thanh toan, ve man cho quang cao.
+                show(payment, false);
+                viewModel.clearCart();
+                viewModel.goHome();
+                showIdle();
             }
         });
         setup = new SetupView(this, new SetupView.Callbacks() {
@@ -451,7 +477,7 @@ public class KioskActivity extends AppCompatActivity {
 
             @Override
             public void onNavComingSoon(int nav) {
-                Toast.makeText(KioskActivity.this, "Sắp ra mắt", Toast.LENGTH_SHORT).show();
+                KioskToast.error(KioskActivity.this, "Tính năng sắp ra mắt");
             }
 
             @Override
@@ -580,7 +606,7 @@ public class KioskActivity extends AppCompatActivity {
      */
     private void openPayment() {
         if (lastState != null && lastState.offline) {
-            Toast.makeText(this, "Mất kết nối — chưa thể thanh toán lúc này. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show();
+            KioskToast.error(this, "Mất kết nối — chưa thể thanh toán lúc này. Vui lòng thử lại sau.");
             return;
         }
         String[] sum = order.getPaymentSummary();
@@ -676,6 +702,7 @@ public class KioskActivity extends AppCompatActivity {
             if (state.screen == KioskViewModel.AppScreen.ORDER && previous != KioskViewModel.AppScreen.ORDER) {
                 order.resetStorePicker(); // vao man Xac nhan don hang moi: dat lai o tim kiem/tinh-thanh dang mo
                 order.captureEntryPrices(state.cart); // "gia luc vao man" - moc so sanh cho bottom sheet VIII luc DAT MUA
+                confirmReturnsToOrder = false;
                 receiverConfirmed = false; // phai xac nhan lai SDT/email (CustomerConfirmView) moi phien Xac nhan don hang
                 confirmedPhone = null;
                 confirmedEmail = null;
@@ -725,7 +752,9 @@ public class KioskActivity extends AppCompatActivity {
 
         // Thong bao ky thuat ngan (canh bao lech gio khi kich hoat, SSE bi thay the...) — hien 1 lan.
         if (state.notice != null) {
-            Toast.makeText(this, state.notice, Toast.LENGTH_LONG).show();
+            // "... thanh cong" -> the xanh; con lai (loi ky thuat, gio hang trong...) -> the canh bao.
+            if (state.notice.contains("thành công")) KioskToast.success(this, state.notice);
+            else KioskToast.error(this, state.notice);
             viewModel.clearNotice();
         }
 
@@ -801,9 +830,9 @@ public class KioskActivity extends AppCompatActivity {
                     String url = input.getText().toString().trim();
                     if (url.startsWith("https://") || url.startsWith("http://")) {
                         viewModel.setBaseUrl(url);
-                        Toast.makeText(this, "Đã lưu: " + url, Toast.LENGTH_SHORT).show();
+                        KioskToast.success(this, "Đã lưu: " + url);
                     } else {
-                        Toast.makeText(this, "Địa chỉ phải bắt đầu bằng https://", Toast.LENGTH_LONG).show();
+                        KioskToast.error(this, "Địa chỉ phải bắt đầu bằng https://");
                     }
                 })
                 .show();
