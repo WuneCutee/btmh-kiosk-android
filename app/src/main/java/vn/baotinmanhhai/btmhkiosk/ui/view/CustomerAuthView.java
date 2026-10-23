@@ -52,12 +52,17 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
     private enum CardSubState { INTRO, SCANNING, SUCCESS, ERROR }
 
     /** Noi dung "Dieu kien va dieu khoan mua vang" (theo mockup Figma "Man hinh dieu khoan va chinh sach"). */
-    private static final String TERMS_TEXT = "TRÂN TRỌNG CẢM ƠN QUÝ KHÁCH HÀNG ĐÃ TIN TƯỞNG VÀ LỰA CHỌN MUA SẢN PHẨM "
-            + "VÀNG BẠC CỦA CÔNG TY CỔ PHẦN VÀNG BẠC ĐÁ QUÝ BẢO TÍN MẠNH HẢI (sau đây gọi tắt là \"BTMH\"). "
-            + "Quý khách hàng xác nhận đã đọc, hiểu rõ và đồng ý với các điều khoản bán hàng, chính sách bảo mật và "
-            + "quy trình xác thực thông tin cá nhân (quét khuôn mặt và Căn cước công dân/VNeID) để tiếp tục giao dịch "
-            + "tại BTMH Kiosk.\n\nĐiều 1. Định nghĩa\nTrừ khi ngữ cảnh quy định khác, các từ ngữ dưới đây được hiểu "
-            + "theo đúng quy định tại bản điều khoản và điều kiện mua hàng.";
+    // Noi dung khung dieu khoan theo Figma (tieu de + doan mo dau + Dieu 1), chu Inter Bold 16.
+    private static final String TERMS_TEXT = "ĐIỀU KIỆN VÀ ĐIỀU KHOẢN MUA VÀNG\n\n"
+            + "TRÊN HỆ THỐNG BÁN HÀNG CỦA BẢO TÍN MẠNH HẢI\n"
+            + "Trân trọng cảm ơn Quý khách hàng đã tin tưởng và lựa chọn mua sản phẩm bạc của Công ty Cổ phần Vàng "
+            + "Bạc Đá Quý Bảo Tín Mạnh Hải (Sau đây gọi tắt là “BTMH”), Quý khách hàng xác nhận rằng Quý khách hàng "
+            + "đã đọc, hiểu chính sách bán hàng, hỗ trợ khách hàng, chấp nhận và đồng ý với các điều kiện giao dịch "
+            + "chung do BTMH ban hành. Bằng việc xác nhận tham gia giao dịch với BTMH, Quý khách hàng đồng ý/chấp "
+            + "thuận tất cả các quy định tại bản điều khoản và điều kiện này. Cụ thể như sau:\n\n"
+            + "Điều 1. Định nghĩa\n"
+            + "Trừ khi có quy định rõ ràng khác ngoài quy định này, khi được sử dụng trong văn bản này, các từ dưới "
+            + "đây được hiểu và diễn giải như sau:";
 
     /**
      * Noi dung popup "Thong bao" khi xac thuc that bai — dung dung tu Message List (sheet "Message List" trong Kiosk.xlsx),
@@ -241,89 +246,111 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
         // nen nut CCCD/VNeID chi thay duoc khi cuon het xuong, nhin nhu "bi cat" o day man hinh - sua lai dung
         // kien truc that: termsRoot la 1 nhanh RIENG cung cap do voi `scroll`, tu ban than no co the phan (card
         // dan + panel nut ghim day) nen nut LUON hien du khong cuon trang ngoai, khop dung hanh vi app goc.
+        // Figma "Man hinh Huong dan dang ky tai khoan": noi dung bat dau y=132 (header ket thuc 122 -> +10), le 32,
+        // cac khoi cach nhau 24; 2 nut ghim day (cach day 20, cach nhau 10, cao 56).
         termsRoot = new LinearLayout(context);
         termsRoot.setOrientation(LinearLayout.VERTICAL);
-        termsRoot.setPadding(Ui.px(10), Ui.px(8), Ui.px(10), Ui.px(24));
+        termsRoot.setPadding(Ui.px(32), Ui.px(10), Ui.px(32), Ui.px(20));
         termsRoot.setVisibility(GONE);
         column.addView(termsRoot, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
 
         termsVerticalStepper = buildVerticalStepper(context);
-        LinearLayout.LayoutParams stepperLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        termsRoot.addView(termsVerticalStepper, stepperLp);
+        termsRoot.addView(termsVerticalStepper, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        // activity_enroll_term.xml + EnrollTermActivity.kt THAT: nut "Dang ky" tren man quet luon mo thang vao
-        // UIState.REGISTER (FLOW_01) - KHONG co buoc trung gian "KHONG DONG Y / DONG Y VA TIEP TUC" (layoutButtonsState1
-        // CHI hien o UIState.TERM_ONLY, luong khac khong lien quan nut nay). REGISTER hien NGAY: stepper + the vien
-        // (radius16dp, stroke2dp, mau #5B5B5B, NEN TRONG SUOT - set thang trong code Kotlin, khong phai card trang)
-        // + checkbox + 2 nut CCCD/VNeID, khong co buoc bam "Dong y" nao ca.
+        // Khung dieu khoan (Figma 476 x 426): vien 1px #5B5B5B bo 12, padding 10; chu Inter Bold 16 / dong 22;
+        // thanh cuon 5 (ranh #EEEEEE, con chay #F4E3CA) cach chu 8. Chiem phan con lai giua stepper va day.
         termsCard = new LinearLayout(context);
         termsCard.setOrientation(LinearLayout.VERTICAL);
-        termsCard.setBackground(Ui.rect(0x00000000, 16f, 0xFF5B5B5B, 2f));
-        termsCard.setPadding(Ui.px(14), Ui.px(16), Ui.px(14), Ui.px(16));
+        termsCard.setBackground(Ui.rect(0x00000000, 12f, 0xFF5B5B5B, 1f));
+        termsCard.setPadding(Ui.px(10), Ui.px(10), Ui.px(10), Ui.px(10));
         LinearLayout.LayoutParams termsCardLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
-        termsCardLp.topMargin = Ui.px(32);
-        termsCardLp.bottomMargin = Ui.px(24);
+        termsCardLp.topMargin = Ui.px(24);
         termsRoot.addView(termsCard, termsCardLp);
-        termsCard.addView(Ui.text(context, "ĐIỀU KIỆN VÀ ĐIỀU KHOẢN MUA VÀNG", 22f, 0xFF000000, Ui.W_BOLD), wrap(16));
-        TextView termsBody = Ui.text(context, TERMS_TEXT, 20f, 0xFF000000, Ui.W_REGULAR);
-        termsBody.setLineSpacing(Ui.px(8), 1f);
+        TextView termsBody = new TextView(context);
+        termsBody.setText(TERMS_TEXT);
+        termsBody.setTextColor(0xFF000000);
+        termsBody.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(16f));
+        termsBody.setTypeface(font(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_bold));
+        androidx.core.widget.TextViewCompat.setLineHeight(termsBody, Ui.px(22));
+        termsBody.setPadding(0, 0, Ui.px(13), 0); // 8 khoang cach + 5 thanh cuon
         termsBodyScroll = new ScrollView(context);
         termsBodyScroll.setOverScrollMode(OVER_SCROLL_NEVER);
         termsBodyScroll.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        termsBodyScroll.setClipToPadding(false);
+        termsBodyScroll.setVerticalScrollBarEnabled(true);
+        termsBodyScroll.setScrollbarFadingEnabled(false);
+        termsBodyScroll.setScrollBarSize(Ui.px(5));
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            termsBodyScroll.setVerticalScrollbarTrackDrawable(Ui.rect(0xFFEEEEEE, 12f, 0, 0));
+            termsBodyScroll.setVerticalScrollbarThumbDrawable(Ui.rect(0xFFF4E3CA, 12f, 0, 0));
+        }
         termsBodyScroll.addView(termsBody, new ScrollView.LayoutParams(
                 ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
         termsCard.addView(termsBodyScroll, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
 
-        // layoutBottom that: tvNote + layoutCheckbox + layoutButtonsState2 — LUON wrap_content, ghim duoi cung.
         LinearLayout termsBottom = new LinearLayout(context);
         termsBottom.setOrientation(LinearLayout.VERTICAL);
-        termsRoot.addView(termsBottom, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams termsBottomLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        termsBottomLp.topMargin = Ui.px(24);
+        termsRoot.addView(termsBottom, termsBottomLp);
 
-        // tvNote that: 20sp inter_24pt_regular do #FF0000, KHONG in nghieng (XML khong co thuoc tinh italic).
-        TextView requiredNote = Ui.text(context, "(*) Bắt buộc để sử dụng dịch vụ", 20f, 0xFFFF0000, Ui.W_REGULAR);
-        termsBottom.addView(requiredNote, wrap(24));
+        // "(*) Bat buoc..." Figma: Inter nghieng 16 / dong 22, #FF0000.
+        TextView requiredNote = new TextView(context);
+        requiredNote.setText("(*) Bắt buộc để sử dụng dịch vụ");
+        requiredNote.setTextColor(0xFFFF0000);
+        requiredNote.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(16f));
+        requiredNote.setTypeface(font(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_italic));
+        requiredNote.setIncludeFontPadding(false);
+        requiredNote.setGravity(Gravity.CENTER_VERTICAL);
+        termsBottom.addView(requiredNote, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, Ui.px(22)));
+
+        // Checkbox Figma: o 24 (do #AA1F23 khi tick) + cach 8 + nhan Inter 14 / dong 20 #1A1A1A, canh tren.
         LinearLayout consentRowTerms = new LinearLayout(context);
         consentRowTerms.setOrientation(LinearLayout.HORIZONTAL);
-        consentRowTerms.setGravity(Gravity.CENTER_VERTICAL);
-        // layoutCheckbox that: VISIBLE ngay (UIState.REGISTER set VISIBLE tu dau, khong can bam gi de hien).
+        consentRowTerms.setGravity(Gravity.TOP);
         android.widget.CheckBox termsConsent = new android.widget.CheckBox(context);
-        termsConsent.setChecked(false); // cbAgree that: mac dinh CHUA tick
+        termsConsent.setChecked(false);
+        termsConsent.setButtonDrawable(null);
+        termsConsent.setBackgroundResource(vn.baotinmanhhai.btmhkiosk.R.drawable.selector_checkbox);
         termsConsent.setPadding(0, 0, 0, 0);
-        termsConsent.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFFAA1F23));
-        consentRowTerms.addView(termsConsent, new LinearLayout.LayoutParams(Ui.px(32), Ui.px(32)));
-        TextView consentTextTerms = Ui.text(context,
-                "Tôi đồng ý cho BTMH thu thập và xử lý dữ liệu định danh theo chính sách bảo mật (PDPA).",
-                20f, 0xFF1A1A1A, Ui.W_REGULAR);
-        consentTextTerms.setLineSpacing(0, 1.2f);
+        termsConsent.setMinWidth(0);
+        termsConsent.setMinHeight(0);
+        consentRowTerms.addView(termsConsent, new LinearLayout.LayoutParams(Ui.px(24), Ui.px(24)));
+        TextView consentTextTerms = new TextView(context);
+        consentTextTerms.setText("Tôi đồng ý cho BTMH thu thập và xử lý dữ liệu định danh theo chính sách bảo mật (PDPA).");
+        consentTextTerms.setTextColor(0xFF1A1A1A);
+        consentTextTerms.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(14f));
+        consentTextTerms.setTypeface(font(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_regular));
+        androidx.core.widget.TextViewCompat.setLineHeight(consentTextTerms, Ui.px(20));
+        consentTextTerms.setOnClickListener(v -> termsConsent.toggle());
         LinearLayout.LayoutParams consentTextTermsLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        consentTextTermsLp.setMarginStart(Ui.px(16));
+        consentTextTermsLp.setMarginStart(Ui.px(8));
         consentRowTerms.addView(consentTextTerms, consentTextTermsLp);
-        termsBottom.addView(consentRowTerms, wrap(24));
+        LinearLayout.LayoutParams termsConsentRowLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        termsConsentRowLp.topMargin = Ui.px(6);
+        termsBottom.addView(consentRowTerms, termsConsentRowLp);
 
-        // layoutButtonsState2 that: "DANG KY BANG CCCD" / "DANG KY BANG VNEID", 72dp cao, XML 24sp semibold.
-        // Ui.primaryButton() dung W_BOLD + letterSpacing rong hon font Inter Semibold that nen 24sp bi tran xuong
-        // 2 dong trong pill nua-be-rong - giam xuong 16f de dam bao 1 dong, day la thoa hiep duy nhat con lai.
+        // 2 nut Figma: cao 56, cach nhau 10, Inter Medium 20 viet hoa, letter-spacing -0.02, chu trang.
         LinearLayout termsButtons = new LinearLayout(context);
         termsButtons.setOrientation(LinearLayout.HORIZONTAL);
-        TextView registerCccd = Ui.primaryButton(context, "ĐĂNG KÝ BẰNG CCCD", 16f);
-        // Da chon CCCD/VNeID ngay o day roi - KHONG can hoi lai lan nua o man Huong dan (SU DUNG VNEID/CCCD) nua,
-        // bo qua thang State.HINT, vao thang man quet dung phuong thuc da chon.
+        TextView registerCccd = registerButton(context, "ĐĂNG KÝ BẰNG CCCD");
         registerCccd.setOnClickListener(v -> { cardMethod = "CCCD"; setState(State.CARD_SCAN); });
-        TextView registerVneid = Ui.primaryButton(context, "ĐĂNG KÝ BẰNG VNEID", 16f);
+        TextView registerVneid = registerButton(context, "ĐĂNG KÝ BẰNG VNEID");
         registerVneid.setOnClickListener(v -> { cardMethod = "VNEID"; setState(State.CARD_SCAN); });
-        LinearLayout.LayoutParams tb1 = new LinearLayout.LayoutParams(0, Ui.px(72), 1f);
-        tb1.rightMargin = Ui.px(8);
-        LinearLayout.LayoutParams tb2 = new LinearLayout.LayoutParams(0, Ui.px(72), 1f);
-        tb2.leftMargin = Ui.px(8);
+        LinearLayout.LayoutParams tb1 = new LinearLayout.LayoutParams(0, Ui.px(56), 1f);
+        LinearLayout.LayoutParams tb2 = new LinearLayout.LayoutParams(0, Ui.px(56), 1f);
+        tb2.setMarginStart(Ui.px(10));
         termsButtons.addView(registerCccd, tb1);
         termsButtons.addView(registerVneid, tb2);
-        termsBottom.addView(termsButtons, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams termsButtonsLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        termsButtonsLp.topMargin = Ui.px(18);
+        termsRoot.addView(termsButtons, termsButtonsLp);
 
         // ---- Card "Huong dan" (chon phuong thuc xac thuc: VNeID hoac CCCD) ----
         hintCard = card(context);
@@ -1044,7 +1071,7 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
         setPadding(left, 0, right, 0);
         header.setPadding(0, top, 0, Ui.px(4)); // fragment_header tu lo 56/32 -> nut Home cung vi tri moi man
         content.setPadding(Ui.px(16), Ui.px(8), Ui.px(16), Ui.px(24) + bottom);
-        termsRoot.setPadding(Ui.px(16), Ui.px(8), Ui.px(16), Ui.px(24) + bottom);
+        termsRoot.setPadding(Ui.px(32), Ui.px(10), Ui.px(32), Ui.px(20) + bottom); // Figma: le 32, nut cach day 20
     }
 
     // ==================== DUNG UI ====================
@@ -1364,65 +1391,91 @@ public class CustomerAuthView extends FrameLayout implements Ui.InsetAware {
      * lieu THAT tu activity_enroll_term.xml (layoutStepper) — KHONG boc the trang/bong do (XML khong co background
      * cho ConstraintLayout nay, nam THANG tren nen gradient trang nhu tvNote/checkbox ben duoi).
      */
+    /**
+     * 3 buoc (Figma 540 x 192, le 32): cot trai rong 67 - vong tron 48 vien den 2px, so Roboto Medium 16;
+     * duong noi 2 x 28 (chong -2 moi dau). Cot chu cach 29: "Buoc N:" Roboto Medium 16 #1A1A1A + mo ta Inter 14
+     * #504F4F, moi cum can giua theo vong tron cua no. Ca 3 vong cung mau den (Figma khong to do buoc dang lam).
+     */
     private static LinearLayout buildVerticalStepper(Context context) {
         LinearLayout card = new LinearLayout(context);
         card.setOrientation(LinearLayout.VERTICAL);
-
-        // step1/2/3Circle that: 64dp, bg_circle_outline_black (vien 2px den khi khong active; o day dung mau do
-        // ruou cho buoc active - XML khong phan biet active/inactive vi JS/Kotlin khong doi mau theo buoc thuc te,
-        // nhung giu phan biet nay cho de hieu luong 3 buoc). So 24sp bold, "Buoc N:" 20sp (sans-serif) #1A1A1A,
-        // mo ta 18sp (inter_24pt_regular) #504F4F. Duong noi 3dp rong, cach nhau 32dp (step2Circle marginTop that).
-        // Thu nho so voi so that (64dp/32dp) theo yeu cau nguoi dung ("3 cai buoc kia nho lai 1 iu") - canvas
-        // 540dp cua ban clone nay nho hon nhieu man kiosk that (sw720dp+) nen vong tron 64dp trong ty le hoi to.
         String[] titles = {"Xác thực thẻ Căn cước/VNeID", "Xác thực khuôn mặt", "Tạo tài khoản và xác nhận thông tin"};
-        int railW = 52;
-        int gap = 26;
+        android.graphics.Typeface roboto = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL);
+        android.graphics.Typeface inter = font(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_regular);
+        int circle = 48, line = 28, overlap = 2, railW = 67;
         for (int i = 0; i < titles.length; i++) {
+            boolean last = i == titles.length - 1;
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
-            boolean active = i == 0;
-            boolean last = i == titles.length - 1;
 
-            // "Ray" ben trai: FrameLayout rong dung bang duong kinh vong tron, vong tron + duong noi deu CAN GIUA
-            // trong do -> luon thang hang voi nhau du card co padding bao nhieu (khong con phai tinh margin tay).
             FrameLayout rail = new FrameLayout(context);
-            TextView circle = Ui.text(context, String.valueOf(i + 1), 20f,
-                    active ? Ui.BURGUNDY_PRIMARY : 0xFF000000, Ui.W_BOLD);
-            circle.setGravity(Gravity.CENTER);
-            circle.setBackground(Ui.rect(0x00000000, 100f, active ? Ui.BURGUNDY_PRIMARY : 0xFF000000, 2f));
-            rail.addView(circle, new FrameLayout.LayoutParams(Ui.px(railW), Ui.px(railW), Gravity.TOP | Gravity.CENTER_HORIZONTAL));
+            TextView num = new TextView(context);
+            num.setText(String.valueOf(i + 1));
+            num.setTextColor(0xFF000000);
+            num.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(16f));
+            num.setTypeface(roboto);
+            num.setGravity(Gravity.CENTER);
+            num.setIncludeFontPadding(false);
+            num.setBackground(Ui.rect(0x00000000, 100f, 0xFF000000, 2f));
+            rail.addView(num, new FrameLayout.LayoutParams(Ui.px(circle), Ui.px(circle), Gravity.TOP | Gravity.CENTER_HORIZONTAL));
             if (!last) {
-                View line = new View(context);
-                line.setBackgroundColor(0xFF000000);
-                FrameLayout.LayoutParams lineLp = new FrameLayout.LayoutParams(
-                        Math.max(1, Ui.px(3)), Ui.px(gap), Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-                lineLp.topMargin = Ui.px(railW);
-                rail.addView(line, lineLp);
+                View ln = new View(context);
+                ln.setBackgroundColor(0xFF000000);
+                FrameLayout.LayoutParams lnLp = new FrameLayout.LayoutParams(Ui.px(2), Ui.px(line),
+                        Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+                lnLp.topMargin = Ui.px(circle - overlap);
+                rail.addView(ln, lnLp);
             }
-            row.addView(rail, new LinearLayout.LayoutParams(Ui.px(railW), LinearLayout.LayoutParams.WRAP_CONTENT));
+            int rowH = last ? circle : circle + line - 2 * overlap;
+            row.addView(rail, new LinearLayout.LayoutParams(Ui.px(railW), Ui.px(rowH)));
 
             LinearLayout col = new LinearLayout(context);
             col.setOrientation(LinearLayout.VERTICAL);
             col.setGravity(Gravity.CENTER_VERTICAL);
-            col.addView(Ui.text(context, "Bước " + (i + 1) + ":", 17f, 0xFF1A1A1A, Ui.W_MEDIUM),
-                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            TextView t = Ui.text(context, titles[i], 15f, 0xFF504F4F, Ui.W_REGULAR);
-            LinearLayout.LayoutParams tLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            tLp.topMargin = Ui.px(2);
-            col.addView(t, tLp);
-            LinearLayout.LayoutParams colLp = new LinearLayout.LayoutParams(
-                    0, Ui.px(railW), 1f);
-            colLp.setMarginStart(Ui.px(20));
+            TextView label = new TextView(context);
+            label.setText("Bước " + (i + 1) + ":");
+            label.setTextColor(0xFF1A1A1A);
+            label.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(16f));
+            label.setTypeface(roboto);
+            label.setIncludeFontPadding(false);
+            col.addView(label, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            TextView desc = new TextView(context);
+            desc.setText(titles[i]);
+            desc.setTextColor(0xFF504F4F);
+            desc.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(14f));
+            desc.setTypeface(inter);
+            desc.setIncludeFontPadding(false);
+            LinearLayout.LayoutParams dLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            dLp.topMargin = Ui.px(6);
+            col.addView(desc, dLp);
+            LinearLayout.LayoutParams colLp = new LinearLayout.LayoutParams(0, Ui.px(circle), 1f);
+            colLp.setMarginStart(Ui.px(29));
             row.addView(col, colLp);
-
-            // Rail cua tung row da TU CAO du (railW + gap, vi duong noi nam trong CHINH rail nay) nen KHONG can
-            // them topMargin giua cac row - rail da "dai" het khoang cach toi vong tron tiep theo.
-            LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            card.addView(row, rowLp);
+            card.addView(row, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
         return card;
+    }
+
+    private static android.graphics.Typeface font(Context context, int res) {
+        android.graphics.Typeface tf = androidx.core.content.res.ResourcesCompat.getFont(context, res);
+        return tf != null ? tf : android.graphics.Typeface.DEFAULT;
+    }
+
+    /** Nut Figma "Buttons/Button": nen #AA1F23 pill, Inter Medium 20 viet hoa, letter-spacing -0.02, chu trang. */
+    private static TextView registerButton(Context context, String label) {
+        TextView b = new TextView(context);
+        b.setText(label);
+        b.setAllCaps(true);
+        b.setTextColor(0xFFFFFFFF);
+        b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, Ui.textPx(20f));
+        b.setTypeface(font(context, vn.baotinmanhhai.btmhkiosk.R.font.inter_24pt_medium));
+        b.setLetterSpacing(-0.02f);
+        b.setGravity(Gravity.CENTER);
+        b.setSingleLine(true);
+        b.setBackground(Ui.rect(0xFFAA1F23, 999f, 0, 0));
+        b.setPadding(Ui.px(8), 0, Ui.px(8), 0);
+        Ui.pressEffect(b);
+        return b;
     }
 
     /** Thanh 3 buoc: Xac thuc khach hang (dang o day) -> Xac nhan nhan hang -> Thanh toan. */

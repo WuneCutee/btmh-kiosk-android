@@ -143,11 +143,20 @@ public class CustomerConfirmView extends LinearLayout implements Ui.InsetAware {
         return s == null || s.trim().isEmpty() ? "—" : s;
     }
 
+    /** Padding day GOC cua vung cuon (tu XML), chup 1 lan. Truoc day onInsets cong don getPaddingBottom() + b
+     *  moi lan goi -> moi lan mo man khoang trong cuoi phinh them, cuon duoc qua sau den mat het noi dung. */
+    private int scrollBasePadBottom = -1;
+
+    private int scrollBaseBottom() {
+        if (scrollBasePadBottom < 0) scrollBasePadBottom = binding.scroll.getPaddingBottom();
+        return scrollBasePadBottom;
+    }
+
     @Override
     public void onInsets(int l, int t, int r, int b) {
         setPadding(l, 0, r, 0);
         topBar.setPadding(Ui.px(20), Ui.px(56) + t, Ui.px(32), Ui.px(8));
         binding.scroll.setPadding(binding.scroll.getPaddingLeft(), binding.scroll.getPaddingTop(),
-                binding.scroll.getPaddingRight(), binding.scroll.getPaddingBottom() + b);
+                binding.scroll.getPaddingRight(), scrollBaseBottom() + b);
     }
 }

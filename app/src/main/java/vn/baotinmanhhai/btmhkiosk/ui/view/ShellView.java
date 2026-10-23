@@ -251,7 +251,7 @@ public class ShellView extends FrameLayout {
         // Nut Home phai CUNG vi tri o moi man (Figma: khung 66, cach tren 56, cach phai 32 - dung fragment_header):
         // khung header KHONG them padding, le cu (6/10/16) chi ap cho homeRow cua man Home.
         header.setPadding(0, top, 0, Ui.px(4));
-        homeRow.setPadding(Ui.px(6), Ui.px(10), Ui.px(16), 0);
+        homeRow.setPadding(Ui.px(6), Ui.px(60), Ui.px(16), 0); // Figma Home: hang logo bat dau o y=63 (logo marginTop 3)
         canvas.setPadding(left, 0, right, 0);
         for (int i = 0; i < container.getChildCount(); i++) {
             View v = container.getChildAt(i);

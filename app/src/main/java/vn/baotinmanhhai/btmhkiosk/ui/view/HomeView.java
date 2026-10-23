@@ -80,7 +80,20 @@ public class HomeView extends FrameLayout implements Ui.InsetAware {
         // primaryButton: 2 nut do ruou dac giong het nhau xep chong len nhau (truoc day) nhin nhu bi lap/loi bo
         // cuc. "San pham tich luy" (nut that trong activity_home.xml) giu nguyen la nut chinh (dac), "San pham
         // trang suc" (nut them rieng cho trang thai da dang nhap, khong co trong XML goc) la nut phu (vien).
-        btnJewelry = Ui.outlineButton(context, "Sản phẩm trang sức", 20f);
+        // Figma "Home_chua login": 2 nut CUNG KIEU (nen do #AA1F23, cao 56, cach 16) - tren "San pham tich luy",
+        // duoi "San pham trang suc". Nut tren dung lai dung style cua nut XML btnSavingsProducts.
+        btnJewelry = new androidx.appcompat.widget.AppCompatTextView(context);
+        android.widget.TextView xmlBtn = binding.btnSavingsProducts;
+        btnJewelry.setBackground(xmlBtn.getBackground().getConstantState().newDrawable().mutate());
+        btnJewelry.setTextColor(xmlBtn.getTextColors());
+        btnJewelry.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, xmlBtn.getTextSize());
+        btnJewelry.setTypeface(xmlBtn.getTypeface());
+        btnJewelry.setLetterSpacing(xmlBtn.getLetterSpacing());
+        btnJewelry.setGravity(android.view.Gravity.CENTER);
+        btnJewelry.setAllCaps(false);
+        btnJewelry.setText("Sản phẩm tích luỹ");
+        btnJewelry.setOnClickListener(v -> callbacks.onOpenProducts());
+        xmlBtn.setText("Sản phẩm trang sức");
         btnJewelry.setId(View.generateViewId());
         btnJewelry.setVisibility(GONE);
         // home_button_height that = 56dp (truoc day nham 100dp lam nut cao bat thuong).
@@ -101,17 +114,18 @@ public class HomeView extends FrameLayout implements Ui.InsetAware {
     }
 
     /**
-     * Figma 1085:11214: them nut "San pham trang suc" + dong "Nhan de xem san pham" khi DA dang nhap (an khi
-     * chua dang nhap, khop dung activity_home.xml that chi co 1 nut "San pham tich luy").
+     * Nut "San pham trang suc" + dong "Nhan de xem san pham" (Figma 1085:11214) hien o CA HAI trang thai
+     * (da/chua dang nhap) - yeu cau 23/10/2026; truoc day chi hien khi da dang nhap.
      */
     public void setLoggedIn(boolean loggedIn) {
-        hintText.setVisibility(loggedIn ? VISIBLE : GONE);
-        btnJewelry.setVisibility(loggedIn ? VISIBLE : GONE);
+        // Bo cuc giong nhau du dang nhap hay chua; Figma khong co dong "Nhan de xem san pham".
+        hintText.setVisibility(GONE);
+        btnJewelry.setVisibility(VISIBLE);
         androidx.constraintlayout.widget.ConstraintLayout root =
                 (androidx.constraintlayout.widget.ConstraintLayout) binding.getRoot();
         androidx.constraintlayout.widget.ConstraintSet cs = new androidx.constraintlayout.widget.ConstraintSet();
         cs.clone(root);
-        int anchor = loggedIn ? hintText.getId() : binding.btnSavingsProducts.getId();
+        int anchor = btnJewelry.getId();
         cs.connect(R.id.cardPrices, androidx.constraintlayout.widget.ConstraintSet.BOTTOM, anchor, androidx.constraintlayout.widget.ConstraintSet.TOP);
         cs.applyTo(root);
     }
@@ -130,7 +144,7 @@ public class HomeView extends FrameLayout implements Ui.InsetAware {
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.btnSavingsProducts.getLayoutParams();
         if (lp instanceof androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
             ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) lp).bottomMargin =
-                    Ui.px(122) + b; // home_footer_bottom (dimens that) + inset he thong
+                    Ui.px(33) + b; // Figma Home_chua login: cum nut ket thuc o y=927 -> cach day 33 (+ inset)
             binding.btnSavingsProducts.setLayoutParams(lp);
         }
     }
